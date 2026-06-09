@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "../lib/cn"
-import type { ShaderDevSelectOption } from "../_types"
+import type { ShaderDevSelectOption } from "../types"
 
 export interface ControlSelectProps {
   label: string

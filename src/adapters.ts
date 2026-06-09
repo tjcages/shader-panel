@@ -1,4 +1,4 @@
-import type { ShaderDevFieldDef } from "./_types"
+import type { ShaderDevFieldDef } from "./types"
 
 /** Parse `#rgb` / `#rrggbb` to a normalized `[r, g, b]` tuple in `[0, 1]`. */
 export function hexToRgb01(hex: string): [number, number, number] {

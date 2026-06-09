@@ -1,7 +1,7 @@
 "use client"
 
-import { useCallback, useEffect, useSyncExternalStore } from "react"
-import { ShaderDevPanel } from "./_shader-dev-panel"
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react"
+import { ShaderDevPanel } from "./panel"
 import {
   getActiveShaderDev,
   getActiveShaderDevId,
@@ -9,18 +9,18 @@ import {
   getShaderDevRevision,
   setActiveShaderDev,
   subscribeShaderDevRegistration,
-} from "./_shader-dev-store"
-import { installShaderDevKeyboard } from "./_shader-dev-keyboard"
-import { useInjectShaderDevStyles } from "./_use-inject-styles"
+} from "../store"
+import { installShaderDevKeyboard } from "../hooks/keyboard"
+import { useInjectShaderDevStyles } from "../hooks/use-inject-styles"
 import {
   readShaderDevOpenFlag,
   SHADER_DEV_TOGGLE_EVENT,
   writeShaderDevOpenFlag,
-} from "./_use-shader-dev-shortcut"
+} from "../hooks/use-shortcut"
 import {
   useShaderDevTheme,
   type ShaderDevTheme,
-} from "./_use-shader-dev-theme"
+} from "../hooks/use-theme"
 
 function subscribeOpen(listener: () => void): () => void {
   const onToggle = () => listener()
@@ -31,6 +31,11 @@ function subscribeOpen(listener: () => void): () => void {
 function getOpenSnapshot(): boolean {
   return readShaderDevOpenFlag()
 }
+
+// Only one root renders the panel — whether mounted explicitly via
+// <ShaderDevRoot/> or auto-injected by useShaderDev. The first to claim wins;
+// extras render null so you never get two panels.
+let primaryClaimed = false
 
 /**
  * Mounts once in the app layout. Owns the keyboard shortcut + renders whichever
@@ -48,6 +53,17 @@ export function ShaderDevRoot({
   /** Initial theme when no user override + no `html.dark` are set. Falls back to OS preference if omitted. */
   defaultTheme?: ShaderDevTheme
 } = {}) {
+  // Claim the single "primary" slot. Non-primary instances render nothing.
+  const [isPrimary, setIsPrimary] = useState(false)
+  useEffect(() => {
+    if (primaryClaimed) return
+    primaryClaimed = true
+    setIsPrimary(true)
+    return () => {
+      primaryClaimed = false
+    }
+  }, [])
+
   useInjectShaderDevStyles()
   const theme = useShaderDevTheme(defaultTheme)
   const open = useSyncExternalStore(subscribeOpen, getOpenSnapshot, () => false)
@@ -69,6 +85,8 @@ export function ShaderDevRoot({
     writeShaderDevOpenFlag(next)
     window.dispatchEvent(new CustomEvent(SHADER_DEV_TOGGLE_EVENT))
   }, [])
+
+  if (!isPrimary) return null
 
   if (!registration) {
     return open ? (

@@ -8,25 +8,27 @@ import {
   useRef,
   useState,
 } from "react"
-import { ControlColorInput } from "./ui/control-color-input"
-import { ControlQuickActions } from "./ui/control-quick-actions"
-import { ControlSection } from "./ui/control-section"
-import { ControlSelect } from "./ui/control-select"
-import { ControlSlider } from "./ui/control-slider"
-import { ControlToggle } from "./ui/control-toggle"
-import { ControlVec2 } from "./ui/control-vec2"
+import { ControlColorInput } from "../controls/color-input"
+import { ControlQuickActions } from "../controls/quick-actions"
+import { ControlSection } from "../controls/section"
+import { ControlSelect } from "../controls/select"
+import { ControlSlider } from "../controls/slider"
+import { ControlToggle } from "../controls/toggle"
+import { ControlVec2 } from "../controls/vec2"
 import {
   DEFAULT_SHADER_DEV_PROMPTS,
   type ShaderDevPrompt,
-} from "./_default-prompts"
-import { ShaderDevFloatingPanel } from "./_floating-panel"
+} from "../prompts"
+import { ShaderDevFloatingPanel } from "./floating-panel"
 import {
   clearPersistedShaderDevValues,
+  hasPersistedShaderDevValues,
+  loadPersistedShaderDevValues,
   persistShaderDevValues,
-} from "./_persist"
-import type { ShaderDevTheme } from "./_use-shader-dev-theme"
-import type { ShaderDevFieldDef } from "./_types"
-import { isShaderDevSection } from "./_types"
+} from "../persist"
+import type { ShaderDevTheme } from "../hooks/use-theme"
+import type { ShaderDevFieldDef } from "../types"
+import { isShaderDevSection } from "../types"
 
 export type ShaderDevWriteResult = { ok: boolean; message: string }
 
@@ -94,9 +96,29 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
   const defaultsJson = useMemo(() => JSON.stringify(defaults), [defaults])
   const isModified = valuesJson !== defaultsJson
 
+  const persistKey = persist && id ? id : null
+
+  // Auto-hydrate from localStorage on first mount for this id — push saved
+  // values back through onChange. This makes persistence "just work" without
+  // the consumer wiring `loadPersistedShaderDevValues` into its useState
+  // initializer (that path still works and avoids the one-frame flash).
+  const liveRef = useRef({ onChange, defaults, valuesJson })
+  liveRef.current = { onChange, defaults, valuesJson }
+  const hydratedIdRef = useRef<string | null>(null)
+  useEffect(() => {
+    if (!persistKey) return
+    if (hydratedIdRef.current === persistKey) return
+    hydratedIdRef.current = persistKey
+    if (!hasPersistedShaderDevValues(persistKey)) return
+    const live = liveRef.current
+    const saved = loadPersistedShaderDevValues(persistKey, live.defaults)
+    if (JSON.stringify(saved) !== live.valuesJson) {
+      live.onChange(saved as T)
+    }
+  }, [persistKey])
+
   // Write to localStorage whenever values change (debounce-free — these are
   // tiny blobs and the user is hand-tweaking).
-  const persistKey = persist && id ? id : null
   const skipNextPersistRef = useRef(true)
   useEffect(() => {
     if (!persistKey) return
@@ -305,8 +327,7 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
 
         {shortcutHint ? (
           <div className="sd-shortcut-hint">
-            <kbd>⌘⇧`</kbd> (recommended) · <kbd>⌘⌥D</kbd> · <kbd>⌘⇧D</kbd> if
-            your browser does not reserve it
+            <kbd>⌘⌥D</kbd> to toggle · <kbd>⌘⇧`</kbd> / <kbd>⌘⇧D</kbd> also work
           </div>
         ) : null}
 

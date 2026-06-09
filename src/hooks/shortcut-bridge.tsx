@@ -4,7 +4,7 @@ import { useCallback } from "react"
 import {
   dispatchShaderDevToggle,
   useShaderDevShortcut,
-} from "./_use-shader-dev-shortcut"
+} from "./use-shortcut"
 
 /**
  * Mount once in the site layout (dev only). Registers the keyboard shortcut even

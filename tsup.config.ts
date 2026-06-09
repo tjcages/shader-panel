@@ -4,7 +4,7 @@ const shared: Options = {
   format: ["esm"],
   sourcemap: true,
   target: "es2022",
-  external: ["react", "react-dom", "react/jsx-runtime"],
+  external: ["react", "react-dom", "react-dom/client", "react/jsx-runtime"],
   splitting: false,
   treeshake: true,
 }
@@ -14,7 +14,7 @@ export default defineConfig([
   // `development` condition. Emits the shared .d.ts.
   {
     ...shared,
-    entry: ["index.ts"],
+    entry: ["src/index.ts"],
     dts: true,
     clean: true,
   },
@@ -23,7 +23,7 @@ export default defineConfig([
   // condition, so the stub's shape doesn't need to be re-emitted.
   {
     ...shared,
-    entry: { "index.prod": "index.prod.ts" },
+    entry: { "index.prod": "src/index.prod.ts" },
     dts: false,
     clean: false,
   },

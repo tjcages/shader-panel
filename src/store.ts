@@ -1,5 +1,5 @@
-import type { ShaderDevPrompt } from "./_default-prompts"
-import type { ShaderDevFieldDef, ShaderDevWriteResult } from "./_types"
+import type { ShaderDevPrompt } from "./prompts"
+import type { ShaderDevFieldDef, ShaderDevWriteResult } from "./types"
 
 export type ShaderDevValues = Record<string, unknown>
 

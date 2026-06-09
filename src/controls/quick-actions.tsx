@@ -2,8 +2,8 @@
 
 import { useCallback, useMemo, useState } from "react"
 import { cn } from "../lib/cn"
-import { fillShaderDevPrompt, type ShaderDevPrompt } from "../_default-prompts"
-import { ControlSection } from "./control-section"
+import { fillShaderDevPrompt, type ShaderDevPrompt } from "../prompts"
+import { ControlSection } from "./section"
 
 export interface ControlQuickActionsProps {
   title?: string

@@ -4,22 +4,22 @@ export {
   hexToRgb01,
   type CreateR3FAdapterOptions,
   type CreateWebGLAdapterOptions,
-} from "./_adapters"
+} from "./adapters"
 export {
   DEFAULT_SHADER_DEV_PROMPTS,
   fillShaderDevPrompt,
   type ShaderDevPrompt,
-} from "./_default-prompts"
+} from "./prompts"
 export {
   clearPersistedShaderDevValues,
   hasPersistedShaderDevValues,
   loadPersistedShaderDevValues,
   persistShaderDevValues,
-} from "./_persist"
-export { ShaderDevFloatingPanel } from "./_floating-panel"
-export { ShaderDevPanel } from "./_shader-dev-panel"
-export { ShaderDevRoot } from "./_shader-dev-root"
-export { patchShaderConfigDefaults } from "./_patch-config-file"
+} from "./persist"
+export { ShaderDevFloatingPanel } from "./panel/floating-panel"
+export { ShaderDevPanel } from "./panel/panel"
+export { ShaderDevRoot } from "./panel/root"
+export { patchShaderConfigDefaults } from "./patch-config"
 
 export type {
   ShaderDevColorField,
@@ -31,8 +31,8 @@ export type {
   ShaderDevToggleField,
   ShaderDevVec2Field,
   ShaderDevWriteResult,
-} from "./_types"
-export { isShaderDevSection } from "./_types"
+} from "./types"
+export { isShaderDevSection } from "./types"
 
 export {
   getActiveShaderDev,
@@ -46,7 +46,12 @@ export {
   unregisterShaderDev,
   type ShaderDevRegistration,
   type ShaderDevValues,
-} from "./_shader-dev-store"
+} from "./store"
+
+export {
+  useShaderDev,
+  type UseShaderDevOptions,
+} from "./hooks/use-shader-dev"
 
 export {
   dispatchShaderDevToggle,
@@ -54,41 +59,41 @@ export {
   SHADER_DEV_TOGGLE_EVENT,
   useShaderDevShortcut,
   writeShaderDevOpenFlag,
-} from "./_use-shader-dev-shortcut"
+} from "./hooks/use-shortcut"
 
 export {
   handleShaderDevShortcutKeydown,
   installShaderDevKeyboard,
   matchShaderDevShortcut,
-} from "./_shader-dev-keyboard"
+} from "./hooks/keyboard"
 
 /** @deprecated Use layout inline script + ShaderDevRoot */
-export { ShaderDevShortcutBridge } from "./_shortcut-bridge"
+export { ShaderDevShortcutBridge } from "./hooks/shortcut-bridge"
 
 export {
   ShaderDevThemeProvider,
   useShaderDevTheme,
   useShaderDevThemeContext,
   type ShaderDevTheme,
-} from "./_use-shader-dev-theme"
+} from "./hooks/use-theme"
 
 /**
  * Raw stylesheet + id, exported so consumers with custom SSR setups can inject
  * the styles themselves. The components inject these automatically on mount —
  * you only need this when you want to control the timing.
  */
-export { SHADER_DEV_CSS, SHADER_DEV_STYLE_ID } from "./_styles"
+export { SHADER_DEV_CSS, SHADER_DEV_STYLE_ID } from "./styles"
 
-export { ControlSlider, type ControlSliderProps } from "./ui/control-slider"
-export { ControlSection, type ControlSectionProps } from "./ui/control-section"
+export { ControlSlider, type ControlSliderProps } from "./controls/slider"
+export { ControlSection, type ControlSectionProps } from "./controls/section"
 export {
   ControlColorInput,
   type ControlColorInputProps,
-} from "./ui/control-color-input"
-export { ControlToggle, type ControlToggleProps } from "./ui/control-toggle"
-export { ControlSelect, type ControlSelectProps } from "./ui/control-select"
-export { ControlVec2, type ControlVec2Props } from "./ui/control-vec2"
+} from "./controls/color-input"
+export { ControlToggle, type ControlToggleProps } from "./controls/toggle"
+export { ControlSelect, type ControlSelectProps } from "./controls/select"
+export { ControlVec2, type ControlVec2Props } from "./controls/vec2"
 export {
   ControlQuickActions,
   type ControlQuickActionsProps,
-} from "./ui/control-quick-actions"
+} from "./controls/quick-actions"

@@ -39,8 +39,8 @@ function isKeyD(e: KeyboardEvent): boolean {
 
 /**
  * Toggle shader dev UI.
- * - ⌘⇧D / Ctrl+Shift+D (Chrome on Mac reserves this for "Bookmark all tabs" — may not fire)
- * - ⌘⌥D / Ctrl+Alt+D fallback when the primary chord is captured by the browser
+ * - ⌘⌥D / Ctrl+Alt+D (primary)
+ * - ⌘⇧D / Ctrl+Shift+D (Chrome on Mac may steal this for "Bookmark all tabs")
  */
 export function useShaderDevShortcut(onToggle: () => void, enabled = true) {
   useEffect(() => {

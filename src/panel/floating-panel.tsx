@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react"
 import { createPortal } from "react-dom"
-import { cn } from "./lib/cn"
-import { useInjectShaderDevStyles } from "./_use-inject-styles"
+import { cn } from "../lib/cn"
+import { useInjectShaderDevStyles } from "../hooks/use-inject-styles"
 import {
   ShaderDevThemeProvider,
   useShaderDevTheme,
   type ShaderDevTheme,
-} from "./_use-shader-dev-theme"
+} from "../hooks/use-theme"
 
 export function ShaderDevFloatingPanel({
   side,

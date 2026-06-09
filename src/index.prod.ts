@@ -21,8 +21,8 @@ export {
   hexToRgb01,
   type CreateR3FAdapterOptions,
   type CreateWebGLAdapterOptions,
-} from "./_adapters"
-export { patchShaderConfigDefaults } from "./_patch-config-file"
+} from "./adapters"
+export { patchShaderConfigDefaults } from "./patch-config"
 
 // Re-export types (zero runtime cost — type-only imports are erased).
 export type {
@@ -35,15 +35,15 @@ export type {
   ShaderDevToggleField,
   ShaderDevVec2Field,
   ShaderDevWriteResult,
-} from "./_types"
+} from "./types"
 // Tiny utility — kept as a real impl since it has no UI deps.
-export { isShaderDevSection } from "./_types"
-export type { ShaderDevPrompt } from "./_default-prompts"
+export { isShaderDevSection } from "./types"
+export type { ShaderDevPrompt } from "./prompts"
 export type {
   ShaderDevRegistration,
   ShaderDevValues,
-} from "./_shader-dev-store"
-export type { ShaderDevTheme } from "./_use-shader-dev-theme"
+} from "./store"
+export type { ShaderDevTheme } from "./hooks/use-theme"
 
 // --- No-op runtime ----------------------------------------------------------
 
@@ -118,7 +118,7 @@ export function matchShaderDevShortcut(): boolean {
 }
 
 // Theme — minimal context, just enough to typecheck.
-import { createContext, useContext } from "react"
+import { createContext, useContext, useState } from "react"
 const ThemeContext = createContext<"dark" | "light">("dark")
 export const ShaderDevThemeProvider = ThemeContext.Provider
 export function useShaderDevTheme(): "dark" | "light" {
@@ -126,6 +126,15 @@ export function useShaderDevTheme(): "dark" | "light" {
 }
 export function useShaderDevThemeContext(): "dark" | "light" {
   return useContext(ThemeContext)
+}
+
+// useShaderDev — in prod, just local state seeded with the defaults. No panel,
+// no registry, no overlay. The shader runs with its default config.
+export type { UseShaderDevOptions } from "./hooks/use-shader-dev"
+export function useShaderDev<T>(options: {
+  defaults: T
+}): [T, (next: T) => void] {
+  return useState(() => ({ ...(options.defaults as object) }) as T)
 }
 
 // UI components — all return null in prod.

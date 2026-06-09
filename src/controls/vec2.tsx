@@ -2,7 +2,7 @@
 
 import { useCallback } from "react"
 import { cn } from "../lib/cn"
-import { ControlSlider } from "./control-slider"
+import { ControlSlider } from "./slider"
 
 export interface ControlVec2Props {
   label: string

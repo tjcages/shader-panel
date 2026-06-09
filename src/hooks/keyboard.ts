@@ -1,7 +1,7 @@
 import {
   dispatchShaderDevToggle,
   SHADER_DEV_TOGGLE_EVENT,
-} from "./_use-shader-dev-shortcut"
+} from "./use-shortcut"
 
 export { SHADER_DEV_TOGGLE_EVENT }
 
@@ -24,16 +24,12 @@ export function matchShaderDevShortcut(e: KeyboardEvent): boolean {
   const mod = e.metaKey || e.ctrlKey
   if (!mod) return false
 
-  // Same chord as PerformanceMonitor (⌘⇧D / Ctrl+Shift+D)
-  if (
-    e.shiftKey &&
-    !e.altKey &&
-    (e.key === "d" || e.key === "D" || e.code === "KeyD")
-  ) {
+  // Primary: ⌘⌥D / Ctrl+Alt+D
+  if (!e.shiftKey && e.altKey && e.code === "KeyD") {
     return true
   }
 
-  // Reliable fallback: ⌘⇧` — browsers rarely reserve this
+  // Fallback: ⌘⇧` — browsers rarely reserve this
   if (
     e.shiftKey &&
     !e.altKey &&
@@ -42,8 +38,12 @@ export function matchShaderDevShortcut(e: KeyboardEvent): boolean {
     return true
   }
 
-  // ⌘⌥D / Ctrl+Alt+D
-  if (!e.shiftKey && e.altKey && e.code === "KeyD") {
+  // Fallback: ⌘⇧D / Ctrl+Shift+D (Chrome on Mac may steal this for "Bookmark all tabs")
+  if (
+    e.shiftKey &&
+    !e.altKey &&
+    (e.key === "d" || e.key === "D" || e.code === "KeyD")
+  ) {
     return true
   }
 

@@ -15,5 +15,5 @@
     "resolveJsonModule": true,
     "verbatimModuleSyntax": false
   },
-  "include": ["*.ts", "*.tsx", "ui/*.tsx", "lib/*.ts", "tsup.config.ts"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "tsup.config.ts"]
 }

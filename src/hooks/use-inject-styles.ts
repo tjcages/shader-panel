@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
-import { SHADER_DEV_CSS, SHADER_DEV_STYLE_ID } from "./_styles"
+import { SHADER_DEV_CSS, SHADER_DEV_STYLE_ID } from "../styles"
 
 let injected = false
 

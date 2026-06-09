@@ -1,342 +1,188 @@
 # @tjcages/shader-dev
 
-Drop-in dev panel for tweaking shader uniforms live.
+A floating panel for tweaking shader uniforms live — sliders, color pickers, copy/paste JSON. Works with any **WebGL**, **Three.js**, or **React Three Fiber** shader.
 
-- **Zero CSS framework** — ships its own scoped stylesheet (CSS variables; override anything).
-- **Zero animation library** — pure CSS transitions, no `motion` / `framer-motion` peer dep.
-- **One-line mount** + per-shader `registerShaderDev({ ... })` on hydrate.
-- **Works with any shader** — raw WebGL, [`@paper-design/shaders`](https://github.com/paper-design/shaders), React Three Fiber, custom WebGL2, etc. The panel doesn't care what's behind your `onChange`.
-- **TypeScript-first** — field schema is generic over your config type, so labels and keys stay in sync.
+No CSS framework, no animation library, two peer deps (`react`, `react-dom`), and it compiles out of production builds (~5 KB no-op). Toggle with <kbd>⌘⌥D</kbd>.
 
-Toggle the panel with **⌘⇧`** (recommended — browsers rarely steal it), or **⌘⌥D** / **⌘⇧D** as fallbacks.
-
----
-
-## Install
+<!-- TODO: hero screenshot of the panel open over a shader -->
 
 ```sh
-pnpm add @tjcages/shader-dev
-# or
 npm install @tjcages/shader-dev
 ```
 
-Peer deps: `react >=18`, `react-dom >=18`. That's it.
+## Set it up in seconds
 
-## Two-step setup
+Open your shader file in Cursor / Claude Code and paste **[the setup prompt »](https://github.com/tjcages/shader-panel/blob/main/SETUP_PROMPT.md)**. It detects the renderer, finds your tweakable uniforms, builds the panel, and wires up the hook — nothing to configure.
 
-### 1. Mount the root once
+## Or wire it by hand
 
-```tsx
-// app/layout.tsx, or wherever your top-level UI lives
-import { ShaderDevRoot } from "@tjcages/shader-dev"
-
-export default function Layout({ children }) {
-  return (
-    <>
-      {children}
-      <ShaderDevRoot />
-    </>
-  )
-}
-```
-
-Astro? Use a hydrated React island:
-
-```astro
----
-import { ShaderDevRoot } from "@tjcages/shader-dev"
----
-<ShaderDevRoot client:load />
-```
-
-### 2. Register on the shader component
+One hook. It owns the state, registers the shader, and injects the panel — no `<ShaderDevRoot/>`, no extra files.
 
 ```tsx
-import { useEffect, useState } from "react"
-import { registerShaderDev } from "@tjcages/shader-dev"
-import type { ShaderDevFieldDef } from "@tjcages/shader-dev"
+import { useShaderDev, type ShaderDevFieldDef } from "@tjcages/shader-dev"
 
-type MyConfig = { speed: number; bgColor: string }
+type Config = { speed: number; bgColor: string }
+const DEFAULTS: Config = { speed: 1, bgColor: "#ff5e1f" }
 
-const DEFAULTS: MyConfig = { speed: 1.0, bgColor: "#ff5e1f" }
-
-const FIELDS: ShaderDevFieldDef<MyConfig>[] = [
+const FIELDS: ShaderDevFieldDef<Config>[] = [
   { type: "section", title: "Animation" },
   { type: "slider", key: "speed", label: "Speed", min: 0, max: 2, step: 0.01 },
-  { type: "section", title: "Color" },
   { type: "color", key: "bgColor", label: "Background" },
 ]
 
 export function MyShader() {
-  const [config, setConfig] = useState<MyConfig>(DEFAULTS)
+  const [config] = useShaderDev({
+    id: "my-shader",
+    title: "My shader",
+    defaults: DEFAULTS,
+    fields: FIELDS,
+  })
 
-  // registerShaderDev returns its unregister fn — use it as the effect cleanup.
-  useEffect(() => {
-    return registerShaderDev({
-      id: "my-shader",
-      title: "My shader",
-      values: config,
-      defaults: DEFAULTS,
-      fields: FIELDS,
-      onChange: setConfig,
-    })
-  }, [config])
-
-  // ...render your shader, feed it `config`
+  // feed `config` to your shader — Three.js uniforms, mount.setUniforms(...), a useFrame ref
 }
 ```
 
-That's the full contract. Whatever you do inside `onChange` — set Three.js uniforms, call `mount.setUniforms(...)`, update a `useFrame`-bound ref — is up to you.
+`config` updates as you drag. That's it. (Prefer to mount the panel yourself? See [Manual mount](#manual-mount).)
 
-**Multi-shader pages.** When two or more components call `registerShaderDev` at the same time, a small switcher appears next to the title so you can flip between them. Each registration is keyed by `id` — re-registering with the same id just replaces the entry.
+## Field types
 
-**Per-section reset.** Hover any section header and a `↻` icon appears — clicking resets just that section's fields to their defaults. The bottom-of-panel "Reset to defaults" still resets everything.
-
-**Edits persist across reloads.** The panel writes every change to `localStorage["shader-dev:<id>"]`. To hydrate on mount, use the helper as your `useState` initializer:
-
-```tsx
-import { loadPersistedShaderDevValues, registerShaderDev } from "@tjcages/shader-dev"
-
-const [config, setConfig] = useState(() =>
-  loadPersistedShaderDevValues("my-shader", DEFAULTS),
-)
+```ts
+type ShaderDevFieldDef<T> =
+  | { type: "section"; title: string }
+  | { type: "slider"; key; label; min; max; step }
+  | { type: "color";  key; label }                       // "#rrggbb"
+  | { type: "toggle"; key; label }                       // boolean
+  | { type: "select"; key; label; options: {value; label}[] }
+  | { type: "vec2";   key; label; min; max; step }       // [x, y]
 ```
 
-A small "● Edits saved locally" indicator surfaces at the bottom of the panel whenever current values differ from defaults. "Reset to defaults" wipes the storage entry too. Opt out by passing `persist: false` to `registerShaderDev`.
+Fields are grouped by `section` headers (collapsible). Anything before the first section lands under "Parameters".
 
-**Paste JSON.** Bottom-of-panel "Paste JSON" reveals a textarea — paste a config blob (e.g. one your collaborator copied via "Copy JSON") and hit Apply. Unknown keys are dropped; known keys merge into the current config.
+## What you get for free
 
-## Production builds (zero panel weight)
+- **Multi-shader switcher** — use the hook in several components and a dropdown appears to flip between them.
+- **Saves to localStorage** — edits survive reload automatically. "Reset to defaults" clears them; opt out with `persist: false`.
+- **Copy / Paste JSON** — share a look with a teammate; paste merges known keys.
+- **Per-section reset** — hover a section header for a `↻` that resets just that group.
+- **AI prompts** — a row of copy-paste prompts (improve quality, optimize GPU, find bugs, reduce shimmer, …) written as expert briefs. Click to copy, paste into Cursor / Claude. Customize with `prompts: [...]` or hide with `prompts: []`.
 
-When bundlers build with `NODE_ENV=production` (Astro `astro build`, Next `next build`, Vite `vite build`, etc.), `@tjcages/shader-dev` resolves to a tiny stub via package.json `exports` conditions:
+## Adapters — skip the uniform boilerplate
 
-| | Dev | Prod |
-| --- | --- | --- |
-| Bundle | ~63 KB | ~5.6 KB |
-| `ShaderDevRoot` | full panel | `() => null` |
-| `registerShaderDev` | real registry | no-op |
-| `loadPersistedShaderDevValues` | reads localStorage | returns defaults |
-| `createWebGLAdapter` / `createR3FAdapter` / `hexToRgb01` | full | **full** (still needed at runtime) |
+Generate the `config → uniforms` mapping from your field schema instead of writing it by hand.
 
-The shader runtime keeps working — only the dev UI is gone. To force the full panel even in production (e.g. for a staging build), import from the `/dev` subpath:
+**WebGL / [`@paper-design/shaders`](https://github.com/paper-design/shaders):**
+
+```tsx
+import { createWebGLAdapter } from "@tjcages/shader-dev"
+
+const toUniforms = createWebGLAdapter<Config>({ fields: FIELDS })
+useEffect(() => mount.setUniforms(toUniforms(config)), [config])
+```
+
+**React Three Fiber** (mutates `.value` slots in place — no recompile):
+
+```tsx
+import { createR3FAdapter } from "@tjcages/shader-dev"
+
+const apply = useMemo(() => createR3FAdapter<Config>({ uniforms, fields: FIELDS }), [uniforms])
+useEffect(() => apply(config), [config, apply])
+```
+
+Colors auto-convert (hex → vec3 / `THREE.Color`), vec2s become `[x,y]` / `Vector2`. Uniform names default to `u_<key>`; override with `mapping: { bgColor: "u_bg" }`.
+
+## Production builds
+
+Bundlers building with `NODE_ENV=production` automatically resolve a tiny no-op stub via package `exports` conditions — the panel UI drops out (`ShaderDevRoot` → `null`, `registerShaderDev` → no-op), but the adapters and helpers you use at runtime stay intact. ~63 KB dev → ~5 KB prod.
+
+Need the panel in a production build (e.g. staging)? Import from the `/dev` subpath:
 
 ```ts
 import { ShaderDevRoot } from "@tjcages/shader-dev/dev"
 ```
 
-## AI prompts rail
-
-A "Quick actions" row at the top of every panel surfaces copy-pasteable AI prompts. These aren't one-liners — each is a senior-graphics-engineer brief (~2k chars) with a concrete checklist, specific techniques, and code patterns, so the receiving model has real guidance instead of vibes:
-
-- **Improve visual quality** — color-space correctness, tone mapping (Reinhard/ACES), TPDF dithering, derivative-based edge AA, portable hashes, FBM/domain-warp, smootherstep easing
-- **Optimize GPU performance** — classify the bottleneck first, then cut ALU / transcendentals, warp-divergent branches, `mediump` precision wins, dependent texture reads, and tiler/mobile pitfalls
-- **Reduce shimmer / temporal aliasing** — prefilter high-frequency detail with `fwidth`, fade sub-Nyquist octaves, mip/anisotropy, specular roughness clamping (analytic before temporal)
-- **Find runtime bugs & leaks** — GL disposal chains, context-loss handling, R3F uniform/`useFrame`/`setState` hot-path traps, and GLSL NaN/Inf + `mediump` overflow hazards
-- **Expose missing parameters** — detect every uniform, exclude runtime-driven ones, infer field type + min/max/step, group into sections, keep config/DEFAULTS in sync
-- **Switch to shader-dev adapters** — replace a hand-rolled `configToShaderUniforms` with `createWebGLAdapter` / `createR3FAdapter`
-
-Click a row → preview the full prompt. Click the copy icon → it's on the clipboard, ready to paste into Claude / Cursor / Codex.
-
-Customize per shader:
-
-```ts
-registerShaderDev({
-  // ...
-  prompts: [
-    { id: "diff-from-figma", title: "Match the Figma frame", prompt: "..." },
-    // Pass `[]` to hide the rail entirely.
-  ],
-})
-```
-
-Defaults are exported as `DEFAULT_SHADER_DEV_PROMPTS` — spread them into your own array to extend rather than replace.
-
 ---
 
-## The single AI prompt
+<details id="manual-mount">
+<summary><strong>Manual mount (without the hook)</strong></summary>
 
-Copy and paste this into Claude / Cursor / your editor of choice to wire up an existing shader in one shot. It auto-detects the shader type and generates the three artifacts plus the registration hook.
+<br>
 
-> **Wire `<PATH_TO_SHADER_FILE>` into `@tjcages/shader-dev`.**
->
-> 1. **Detect the shader type:**
->    - `ShaderMount` / `useShaderMount` from `@paper-design/shaders` → **paper-design**
->    - `Canvas` / `useFrame` / `useThree` from `@react-three/fiber` (or material `onBeforeCompile`) → **R3F**
->    - Raw `gl.useProgram` / `gl.uniform*` / fragment string passed to `WebGL2RenderingContext` → **raw WebGL**
->    - Anything else → **custom** (just call the user's existing uniform-set function inside `onChange`)
->
-> 2. **Extract every tweakable parameter and pick the right field type:**
->    - Read the fragment / vertex source: every `uniform float`, `uniform vec2`, `uniform vec3` (color or otherwise), `uniform int`, `uniform bool` is a candidate.
->    - Read the JS side for the literal value currently passed for each uniform — use that as the default.
->    - Skip uniforms that are time, mouse, resolution, or otherwise driven by the runtime (`u_time`, `u_resolution`, `u_mouse`, etc.).
->    - **Field type picking:**
->      - Scalar `float` / `int` → `slider`
->      - `vec3` with a color-y name (`u_bg`, `u_*Color`, `u_tint`) → `color`
->      - `vec2` (direction, anchor, offset) → `vec2`
->      - `bool` → `toggle`
->      - `int` used as a mode/enum (`u_blendMode`, `u_quality`) → `select` with literal options
->    - For sliders / vec2: infer a reasonable `min` / `max` / `step` from the current value's magnitude (a value of `0.5` → `min: 0, max: 1, step: 0.01`; a value of `45` → `min: 0, max: 90, step: 1`). If the GLSL has a comment like `// range: 0..10`, honor it.
->    - Group related uniforms under `{ type: "section", title: "..." }` headers (Animation, Color, Geometry, Mouse, etc.) inferred from name prefixes (`bolt*` → "Lightning bolts", `bloom*` → "Bloom", etc.).
->
-> 3. **Generate three files alongside the shader component:**
->    - `<name>-shader-config.ts` — exports `<NAME>_SHADER_DEFAULTS` (plain object) and the `<Name>ShaderConfig` type. Wrap `DEFAULTS` in `// @shader-config-start` / `// @shader-config-end` marker comments so `patchShaderConfigDefaults` can rewrite it from the dev panel.
->    - `<name>-shader-fields.ts` — exports `<NAME>_SHADER_DEV_FIELDS: ShaderDevFieldDef<<Name>ShaderConfig>[]` with one entry per tweakable uniform, grouped into sections.
->    - For **paper-design / raw WebGL**, prefer `createWebGLAdapter({ fields: FIELDS })` over a hand-rolled `configToShaderUniforms`. Only fall back to a hand-rolled function if uniform names don't follow the `u_${key}` convention and per-key overrides aren't enough.
->    - For **R3F**, prefer `createR3FAdapter({ uniforms, fields: FIELDS })` over hand-mutating each slot.
->
-> 4. **Modify the shader component file:**
->    - Add `import { registerShaderDev } from "@tjcages/shader-dev"`.
->    - Replace any hardcoded config with `useState<<Name>ShaderConfig>(() => ({ ...<NAME>_SHADER_DEFAULTS }))`.
->    - Add the registration effect — return the result of `registerShaderDev` as the cleanup:
->      ```tsx
->      useEffect(() => {
->        return registerShaderDev({
->          id: "<name>",
->          title: "<Pretty name> shader",
->          values: config,
->          defaults: <NAME>_SHADER_DEFAULTS,
->          fields: <NAME>_SHADER_DEV_FIELDS,
->          onChange: setConfig,
->        })
->      }, [config])
->      ```
->    - Wire `config` to the shader runtime in a separate `useEffect([config])`:
->      - **paper-design / raw WebGL:** `mount.setUniforms(toUniforms(config))` where `toUniforms = createWebGLAdapter({ fields: FIELDS })`.
->      - **R3F:** `apply(config)` where `apply = useMemo(() => createR3FAdapter({ uniforms, fields: FIELDS }), [uniforms])`. Don't re-create the uniforms object per render.
->
-> 5. **Do not** add Tailwind classes, motion imports, or extra dependencies. Do not change visual styling. Do not generate React 18-only or React 19-only syntax — match whatever the host project uses.
->
-> Report what shader type you detected, which uniforms you found, and which (if any) you skipped as runtime-driven.
-
-This prompt is deterministic enough that the same file produces the same three artifacts across runs. The result drops in cleanly behind a single `⌘⇧\`` toggle.
-
----
-
-## Field schema
-
-```ts
-type ShaderDevFieldDef<T> =
-  | { type: "section"; title: string }
-  | { type: "slider"; key: keyof T; label: string; min: number; max: number; step: number }
-  | { type: "color";  key: keyof T; label: string }                                          // value: "#rrggbb"
-  | { type: "toggle"; key: keyof T; label: string }                                          // value: boolean
-  | { type: "select"; key: keyof T; label: string; options: ReadonlyArray<{ value: string | number; label: string }> }
-  | { type: "vec2";   key: keyof T; label: string; min: number; max: number; step: number; xLabel?: string; yLabel?: string } // value: [number, number]
-```
-
-`section` headers group fields visually and collapse independently. Fields without a preceding `section` end up under "Parameters". Color values are hex strings (`#RRGGBB`). Vec2 values are stored as `[x, y]` tuples and rendered as two coupled sliders.
-
-## Adapters: skip the uniforms boilerplate
-
-Hand-rolling a `configToShaderUniforms(config)` function for every shader gets old. The adapters generate one from your field schema:
+Prefer to own the wiring? Pass `autoMount: false` to the hook (or skip it entirely with `registerShaderDev`) and render the panel root yourself — once, anywhere (it portals to `<body>`):
 
 ```tsx
-import { createWebGLAdapter } from "@tjcages/shader-dev"
+import { ShaderDevRoot, registerShaderDev } from "@tjcages/shader-dev"
 
-const toUniforms = createWebGLAdapter<MyConfig>({
-  fields: FIELDS,
-  // optional — keys default to `u_${key}`
-  mapping: { bgColor: "u_bg", speed: "u_t" },
-})
+// once, e.g. in your layout
+<ShaderDevRoot />
 
-useEffect(() => {
-  mount.setUniforms(toUniforms(config))
-}, [config])
+// in the shader component
+useEffect(() => registerShaderDev({
+  id: "my-shader", title: "My shader",
+  values: config, defaults: DEFAULTS, fields: FIELDS, onChange: setConfig,
+}), [config])
 ```
 
-For React Three Fiber, mutate uniform `.value` slots in place so the GPU sees changes without a recompile:
+`registerShaderDev` returns an unregister fn if you want it as the effect cleanup.
 
-```tsx
-import { createR3FAdapter } from "@tjcages/shader-dev"
+</details>
 
-const apply = useMemo(
-  () => createR3FAdapter<MyConfig>({ uniforms, fields: FIELDS }),
-  [uniforms],
-)
+<details>
+<summary><strong>Theming</strong></summary>
 
-useEffect(() => apply(config), [config, apply])
-```
+<br>
 
-The R3F adapter calls `.set(hex)` on color slots and `.set(x, y)` on vec2 slots — works automatically with `THREE.Color` and `THREE.Vector2`. For other field types it assigns `.value` directly.
-
-## Theming
-
-The panel ships with light + dark variants that auto-switch based on `html.dark` and OS preference. Override any color globally with CSS variables on the scoped root:
+Light + dark auto-switch based on `html.dark` and OS preference. Override any color with CSS variables on the scoped root:
 
 ```css
 [data-shader-dev] {
   --sd-bg: rgba(20, 20, 20, 0.92);
   --sd-text: #f5f5f5;
-  --sd-surface: rgba(255, 255, 255, 0.06);
   --sd-handle: #00ff95;
-  /* see _styles.ts for the full list — 20+ tunables */
+  /* ~20 tunables — see src/styles.ts */
 }
 ```
 
-Force a theme per mount:
+Force a theme per mount: `<ShaderDevRoot defaultTheme="light" />`.
 
-```tsx
-<ShaderDevRoot defaultTheme="light" />
-```
+</details>
 
-## Optional: write back to source
+<details>
+<summary><strong>Write edits back to your source file</strong></summary>
 
-If you have a dev-only endpoint that can patch your config file, pass `onWriteConfig`:
+<br>
 
-```tsx
-import { patchShaderConfigDefaults } from "@tjcages/shader-dev"
-
-// On the server:
-const next = patchShaderConfigDefaults(
-  source,
-  "MY_SHADER_DEFAULTS",
-  JSON.stringify(values, null, 2),
-)
-```
-
-Mark the defaults block in your config file with the recognized markers:
+Wrap your defaults in marker comments:
 
 ```ts
 // @shader-config-start
-export const MY_SHADER_DEFAULTS = {
-  speed: 1.0,
-  // ...
-} as const
+export const MY_SHADER_DEFAULTS = { speed: 1.0 } as const
 // @shader-config-end
 ```
 
-Then point `registerShaderDev` at it:
+Pass `onWriteConfig` to `registerShaderDev`, and on your dev server use `patchShaderConfigDefaults(source, "MY_SHADER_DEFAULTS", json)` to rewrite the block. A "Write config file" button appears in the panel.
 
-```ts
-registerShaderDev({
-  // ...
-  onWriteConfig: async (values) => {
-    const res = await fetch("/api/dev/write-config", {
-      method: "POST",
-      body: JSON.stringify(values),
-    })
-    return res.json()
-  },
-  writeLabel: "Write to my-shader-config.ts",
-})
-```
+</details>
 
-## API reference
+<details>
+<summary><strong>API reference</strong></summary>
+
+<br>
 
 | Export | Purpose |
 | --- | --- |
-| `ShaderDevRoot` | Mount once in the layout. Owns the keyboard shortcut + renders the active shader's panel. |
-| `registerShaderDev({ id, title, values, defaults, fields, onChange, onWriteConfig? })` | Returns an unregister fn — use it as your `useEffect` cleanup. Re-registering with the same `id` replaces the entry. |
-| `unregisterShaderDev(id)` | Remove a registration explicitly. Rarely needed — prefer the return value of `registerShaderDev`. |
-| `setActiveShaderDev(id)` / `getActiveShaderDev()` / `getShaderDevRegistrations()` | Multi-shader registry API — read or switch which shader the panel shows. |
-| `createWebGLAdapter({ fields, mapping?, prefix?, colorAs?, toggleAs? })` | Returns `(config) => uniforms` for raw WebGL / `ShaderMount.setUniforms`. |
-| `createR3FAdapter({ uniforms, fields, mapping?, prefix? })` | Returns `apply(config)` that mutates Three.js uniform `.value` slots in place. |
-| `hexToRgb01(hex)` | `"#rrggbb"` → `[r, g, b]` in `[0, 1]`. Used internally by the WebGL adapter; exported for ad-hoc use. |
-| `ShaderDevFieldDef<T>` | Field schema — discriminated union of `section` / `slider` / `color` / `toggle` / `select` / `vec2`. |
-| `patchShaderConfigDefaults(source, exportName, json)` | Server helper that rewrites a defaults block between `@shader-config-start` / `@shader-config-end` markers. |
-| `SHADER_DEV_CSS` / `SHADER_DEV_STYLE_ID` | Raw stylesheet + id for custom SSR injection (rare; the components inject automatically). |
-| `ShaderDevPanel` / `ShaderDevFloatingPanel` | Low-level panel primitives if you want to render the panel directly without the registration system. |
-| `ControlSlider` / `ControlColorInput` / `ControlSection` | Standalone control primitives — drop into your own UI if you don't want the floating panel. |
+| `useShaderDev({ id, title, defaults, fields, ... })` | The one-call hook. Owns state, registers, auto-injects the panel. Returns `[config, setConfig]`. |
+| `registerShaderDev(reg)` | Lower-level: register a shader manually. Returns an unregister fn. Pair with `<ShaderDevRoot/>`. |
+| `ShaderDevRoot` | The panel root. Rendered for you by the hook; mount it yourself only with `autoMount: false`. |
+| `createWebGLAdapter({ fields, mapping?, prefix? })` | Returns `(config) => uniforms` for WebGL / `ShaderMount`. |
+| `createR3FAdapter({ uniforms, fields, mapping? })` | Returns `apply(config)` that mutates Three.js `.value` slots. |
+| `hexToRgb01(hex)` | `"#rrggbb"` → `[r,g,b]` in `[0,1]`. |
+| `loadPersistedShaderDevValues(id, defaults)` | Manual localStorage hydration (the hook does this for you). |
+| `patchShaderConfigDefaults(src, name, json)` | Rewrites a defaults block between `@shader-config-start/end` markers. |
+| `setActiveShaderDev` / `getActiveShaderDev` / `getShaderDevRegistrations` | Multi-shader registry access. |
+| `DEFAULT_SHADER_DEV_PROMPTS` / `fillShaderDevPrompt` | The built-in AI prompts + the `{{shader}}` token filler. |
+| `ShaderDevPanel` / `ControlSlider` / `ControlColorInput` / … | Low-level primitives if you don't want the floating panel. |
+
+</details>
 
 ## License
 

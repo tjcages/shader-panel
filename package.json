@@ -25,6 +25,7 @@
   "files": [
     "dist",
     "README.md",
+    "SETUP_PROMPT.md",
     "LICENSE",
     "CHANGELOG.md"
   ],
