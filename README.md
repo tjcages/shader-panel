@@ -1,6 +1,6 @@
-# @tjcages/shader-dev
+# shader-panel
 
-[![npm version](https://img.shields.io/npm/v/@tjcages/shader-dev.svg)](https://www.npmjs.com/package/@tjcages/shader-dev) [![bundle size](https://img.shields.io/bundlephobia/minzip/@tjcages/shader-dev?label=min%2Bgzip)](https://bundlephobia.com/package/@tjcages/shader-dev) [![license](https://img.shields.io/npm/l/@tjcages/shader-dev.svg)](./LICENSE)
+[![npm version](https://img.shields.io/npm/v/shader-panel.svg)](https://www.npmjs.com/package/shader-panel) [![bundle size](https://img.shields.io/bundlephobia/minzip/shader-panel?label=min%2Bgzip)](https://bundlephobia.com/package/shader-panel) [![license](https://img.shields.io/npm/l/shader-panel.svg)](./LICENSE)
 
 A floating panel for tweaking shader uniforms live — sliders, color pickers, copy/paste JSON. Works with any **WebGL**, **Three.js**, or **React Three Fiber** shader.
 
@@ -11,7 +11,7 @@ A floating panel for tweaking shader uniforms live — sliders, color pickers, c
 No CSS framework, no animation library, two peer deps (`react`, `react-dom`), and it compiles out of production builds (~5 KB no-op). Toggle with <kbd>⌘⌥D</kbd>.
 
 ```sh
-npm install @tjcages/shader-dev
+npm install shader-panel
 ```
 
 ## Set it up in seconds
@@ -23,7 +23,7 @@ Open your shader file in Cursor / Claude Code and paste **[the setup prompt »](
 One hook. It owns the state, registers the shader, and injects the panel — no `<ShaderDevRoot/>`, no extra files.
 
 ```tsx
-import { useShaderDev, type ShaderDevFieldDef } from "@tjcages/shader-dev"
+import { useShaderDev, type ShaderDevFieldDef } from "shader-panel"
 
 type Config = { speed: number; bgColor: string }
 const DEFAULTS: Config = { speed: 1, bgColor: "#ff5e1f" }
@@ -77,7 +77,7 @@ Generate the `config → uniforms` mapping from your field schema instead of wri
 **WebGL / [`@paper-design/shaders`](https://github.com/paper-design/shaders):**
 
 ```tsx
-import { createWebGLAdapter } from "@tjcages/shader-dev"
+import { createWebGLAdapter } from "shader-panel"
 
 const toUniforms = createWebGLAdapter<Config>({ fields: FIELDS })
 useEffect(() => mount.setUniforms(toUniforms(config)), [config])
@@ -86,7 +86,7 @@ useEffect(() => mount.setUniforms(toUniforms(config)), [config])
 **React Three Fiber** (mutates `.value` slots in place — no recompile):
 
 ```tsx
-import { createR3FAdapter } from "@tjcages/shader-dev"
+import { createR3FAdapter } from "shader-panel"
 
 const apply = useMemo(() => createR3FAdapter<Config>({ uniforms, fields: FIELDS }), [uniforms])
 useEffect(() => apply(config), [config, apply])
@@ -101,7 +101,7 @@ Bundlers building with `NODE_ENV=production` automatically resolve a tiny no-op 
 Need the panel in a production build (e.g. staging)? Import from the `/dev` subpath:
 
 ```ts
-import { ShaderDevRoot } from "@tjcages/shader-dev/dev"
+import { ShaderDevRoot } from "shader-panel/dev"
 ```
 
 ---
@@ -114,7 +114,7 @@ import { ShaderDevRoot } from "@tjcages/shader-dev/dev"
 Prefer to own the wiring? Pass `autoMount: false` to the hook (or skip it entirely with `registerShaderDev`) and render the panel root yourself — once, anywhere (it portals to `<body>`):
 
 ```tsx
-import { ShaderDevRoot, registerShaderDev } from "@tjcages/shader-dev"
+import { ShaderDevRoot, registerShaderDev } from "shader-panel"
 
 // once, e.g. in your layout
 <ShaderDevRoot />

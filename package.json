@@ -1,5 +1,5 @@
 {
-  "name": "@tjcages/shader-dev",
+  "name": "shader-panel",
   "version": "1.0.0",
   "description": "Drop-in dev panel for tweaking shader uniforms live — sliders, color pickers, keyboard shortcut, copy/write JSON. Zero CSS framework, zero animation library.",
   "type": "module",

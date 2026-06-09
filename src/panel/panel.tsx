@@ -242,14 +242,19 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
 
       if (field.type === "slider") {
         pushField(
-          <ControlSlider
-            label={field.label}
-            value={values[key] as number}
-            min={field.min}
-            max={field.max}
-            step={field.step}
-            onChange={(v) => setKey(key, v as T[typeof key])}
-          />,
+          <>
+            {field.description && (
+              <div className="sd-field-description">{field.description}</div>
+            )}
+            <ControlSlider
+              label={field.label}
+              value={values[key] as number}
+              min={field.min}
+              max={field.max}
+              step={field.step}
+              onChange={(v) => setKey(key, v as T[typeof key])}
+            />
+          </>,
           key,
         )
         continue

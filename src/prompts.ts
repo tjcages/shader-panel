@@ -64,7 +64,7 @@ export const DEFAULT_SHADER_DEV_PROMPTS: ReadonlyArray<ShaderDevPrompt> = [
 6. EASING — linear interpolations read mechanical.
    - Use smoothstep, or smootherstep \`t*t*t*(t*(t*6.0-15.0)+10.0)\` (C2-continuous → velocity-continuous motion). Apply to reveal/fade/pulse curves.
 
-Constraints: do NOT rename uniforms, restructure the render pipeline, or break existing @tjcages/shader-dev field bindings. Report which items you applied and which you skipped, with reasons.`,
+Constraints: do NOT rename uniforms, restructure the render pipeline, or break existing shader-panel field bindings. Report which items you applied and which you skipped, with reasons.`,
   },
   {
     id: "optimize-perf",
@@ -168,7 +168,7 @@ For each: state the trigger condition (when it actually bites) and the minimal f
     id: "expose-missing",
     title: "Expose missing parameters",
     description: "Detect every uniform, add panel fields with smart ranges + sections.",
-    prompt: `Wire every tweakable uniform of the {{shader}} in this project into its @tjcages/shader-dev field schema. Locate the GLSL source and the fields file (the \`ShaderDevFieldDef[]\` array) in the project.
+    prompt: `Wire every tweakable uniform of the {{shader}} in this project into its shader-panel field schema. Locate the GLSL source and the fields file (the \`ShaderDevFieldDef[]\` array) in the project.
 
 1. PARSE — list every \`uniform\` declaration in the GLSL (vertex + fragment), with type and the JS-side literal currently passed for it (that literal is the default).
 
@@ -202,7 +202,7 @@ Show the diff for the fields file, the config type, and DEFAULTS.`,
     id: "use-adapters",
     title: "Switch to shader-dev adapters",
     description: "Replace hand-rolled uniform mapping with createWebGL/R3FAdapter.",
-    prompt: `Convert the {{shader}} component in this project to use \`createWebGLAdapter\` (raw WebGL / @paper-design/shaders ShaderMount) or \`createR3FAdapter\` (React Three Fiber) from @tjcages/shader-dev instead of its hand-rolled config→uniform mapping.
+    prompt: `Convert the {{shader}} component in this project to use \`createWebGLAdapter\` (raw WebGL / @paper-design/shaders ShaderMount) or \`createR3FAdapter\` (React Three Fiber) from shader-panel instead of its hand-rolled config→uniform mapping.
 
 Requirements:
 - Match existing uniform names EXACTLY. The adapters default to \`u_\${key}\`; for any uniform that doesn't follow that, pass per-key overrides via the \`mapping\` option rather than renaming.

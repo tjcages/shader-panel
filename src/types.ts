@@ -10,6 +10,9 @@ export type ShaderDevSliderField<T extends Record<string, unknown>> = {
   min: number
   max: number
   step: number
+  /** Optional one-line hint rendered as small muted text above the slider.
+   *  Use sparingly — only when behaviour can't be conveyed in the label. */
+  description?: string
 }
 
 export type ShaderDevColorField<T extends Record<string, unknown>> = {

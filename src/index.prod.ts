@@ -1,5 +1,5 @@
 /**
- * Production no-op entry for @tjcages/shader-dev.
+ * Production no-op entry for shader-panel.
  *
  * Resolved automatically when bundlers (Vite, Webpack, Rollup, esbuild) build
  * with the `production` condition. The full panel — controls, store, styles,

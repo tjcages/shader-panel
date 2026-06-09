@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to `@tjcages/shader-dev` are documented here.
+All notable changes to `shader-panel` are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [1.0.0] — 2026-06-08
@@ -19,7 +19,7 @@ First stable release. API surface is now considered stable; subsequent breaking 
 - Paste JSON textarea auto-focuses + scrolls into view on open; font size reduced and de-bled (specificity fix).
 
 ### Notes
-- `@tjcages/shader-dev` is the package name; the repository moved to `tjcages/shader-panel` on GitHub.
+- `shader-panel` is the package name; the repository moved to `tjcages/shader-panel` on GitHub.
 
 ## [0.5.0] — 2026-06-08
 
@@ -27,7 +27,7 @@ First stable release. API surface is now considered stable; subsequent breaking 
 - **localStorage persistence** — `loadPersistedShaderDevValues(id, defaults)` hydrates a shader's config on mount; the panel auto-persists on every change. "Reset to defaults" clears the storage entry.
 - **Saved indicator** — "● Edits saved locally" appears below the action buttons whenever current values differ from defaults.
 - **Paste JSON action** — bottom-of-panel button reveals a textarea for pasting a config blob; on Apply, known keys merge into the current config with inline validation.
-- **Production zero-weight stub** — dual-entry build emits `dist/index.prod.js` (~5.6 KB) that bundlers auto-resolve under the `production` condition. Panel UI, store, keyboard, styles, and persistence I/O become no-ops; `createWebGLAdapter` / `createR3FAdapter` / `hexToRgb01` / `patchShaderConfigDefaults` stay functional. Subpath `@tjcages/shader-dev/dev` forces the full panel in any environment.
+- **Production zero-weight stub** — dual-entry build emits `dist/index.prod.js` (~5.6 KB) that bundlers auto-resolve under the `production` condition. Panel UI, store, keyboard, styles, and persistence I/O become no-ops; `createWebGLAdapter` / `createR3FAdapter` / `hexToRgb01` / `patchShaderConfigDefaults` stay functional. Subpath `shader-panel/dev` forces the full panel in any environment.
 - **Auto-height animations** — sections, prompt previews, the saved indicator, and the paste textarea use the CSS Grid `0fr → 1fr` trick with a 280 ms spring bezier; opacity fades in over the same window.
 
 ### Fixed

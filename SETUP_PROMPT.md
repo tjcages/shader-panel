@@ -3,7 +3,7 @@
 Open your shader file in Cursor / Claude Code / Copilot and paste the prompt below. It detects the renderer, finds your tweakable uniforms, builds the panel fields, and wires up the `useShaderDev` hook — no manual setup.
 
 ```text
-Add @tjcages/shader-dev to my open shader file so I can tweak its uniforms live.
+Add shader-panel to my open shader file so I can tweak its uniforms live.
 
 1. Detect the renderer:
    - ShaderMount (@paper-design/shaders) → WebGL

@@ -443,6 +443,14 @@ export const SHADER_DEV_CSS = `
   padding-bottom: 10px;
 }
 
+.sd-field-description {
+  font-size: 10.5px;
+  line-height: 1.35;
+  color: var(--sd-label-muted);
+  padding: 4px 4px 2px;
+  letter-spacing: 0.01em;
+}
+
 .sd-slider {
   position: relative;
   height: 36px;
