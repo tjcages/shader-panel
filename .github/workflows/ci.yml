@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm build
+      - name: Verify dev + prod entries export the same names
+        run: |
+          node -e "
+          Promise.all([
+            import('./dist/index.js'),
+            import('./dist/index.prod.js'),
+          ]).then(([dev, prod]) => {
+            const d = new Set(Object.keys(dev));
+            const p = new Set(Object.keys(prod));
+            const missing = [...d].filter(x => !p.has(x));
+            const extra = [...p].filter(x => !d.has(x));
+            if (missing.length || extra.length) {
+              console.error('Export mismatch.');
+              if (missing.length) console.error('  Missing from prod:', missing.join(', '));
+              if (extra.length)   console.error('  Extra in prod:    ', extra.join(', '));
+              process.exit(1);
+            }
+            console.log('Dev/prod exports match:', d.size, 'symbols');
+          })"

@@ -1,0 +1,65 @@
+# Changelog
+
+All notable changes to `@tjcages/shader-dev` are documented here.
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.0.0] — 2026-06-08
+
+First stable release. API surface is now considered stable; subsequent breaking changes will bump the major.
+
+### Added (since 0.5.0)
+- Auto-height animations on the saved indicator, sections, prompt previews, and the paste textarea using the CSS Grid `0fr ↔ 1fr` trick + delayed opacity fade.
+
+### Notes
+- `@tjcages/shader-dev` is the package name; the repository moved to `tjcages/shader-panel` on GitHub.
+
+## [0.5.0] — 2026-06-08
+
+### Added
+- **localStorage persistence** — `loadPersistedShaderDevValues(id, defaults)` hydrates a shader's config on mount; the panel auto-persists on every change. "Reset to defaults" clears the storage entry.
+- **Saved indicator** — "● Edits saved locally" appears below the action buttons whenever current values differ from defaults.
+- **Paste JSON action** — bottom-of-panel button reveals a textarea for pasting a config blob; on Apply, known keys merge into the current config with inline validation.
+- **Production zero-weight stub** — dual-entry build emits `dist/index.prod.js` (~5.6 KB) that bundlers auto-resolve under the `production` condition. Panel UI, store, keyboard, styles, and persistence I/O become no-ops; `createWebGLAdapter` / `createR3FAdapter` / `hexToRgb01` / `patchShaderConfigDefaults` stay functional. Subpath `@tjcages/shader-dev/dev` forces the full panel in any environment.
+- **Auto-height animations** — sections, prompt previews, the saved indicator, and the paste textarea use the CSS Grid `0fr → 1fr` trick with a 280 ms spring bezier; opacity fades in over the same window.
+
+### Fixed
+- Action button background was transparent until hovered — same `[data-shader-dev] button` specificity bug that hit the color hex earlier. Scoped `.sd-action-btn` to win cleanly.
+- "Edits saved locally" indicator now sits below the three action buttons and is horizontally centered.
+
+## [0.4.0] — 2026-06-08
+
+### Added
+- **Quick actions / AI prompts rail** with five built-in templates (improve quality, expose missing parameters, optimize GPU, find bugs, switch to adapters). Each row expands inline to preview the prompt; floating copy icon writes to clipboard with brief feedback. Customize per-shader via `registerShaderDev({ prompts: [...] })`.
+- **Per-section reset** — hover-revealed `↻` on each section header resets only that section's keys.
+
+### Changed
+- Section headers restyled as 10 px / 600 weight / 0.1 em letter-spacing uppercase category labels; chevron extracted into its own button so the reset can sit between title and caret.
+- Prompt rows match slider row visuals (36 px surface row, no awkward bg darkening on hover).
+- Keyboard shortcut hint disabled by default — pass `shortcutHint` to `ShaderDevPanel` to opt back in.
+
+## [0.3.0] — 2026-06-08
+
+### Added
+- **Multi-shader registry** — `registerShaderDev(reg)` now returns its own cleanup fn (idiomatic `useEffect` pattern). Internal `Map<id, registration>` plus an active-shader switcher in the panel header when 2+ shaders are mounted.
+- **New field types** — `toggle` (boolean switch), `select` (typed dropdown), `vec2` (paired sliders for `[x, y]` tuples).
+- **Adapter helpers** — `createWebGLAdapter` returns `(config) => uniforms` for raw WebGL / `ShaderMount`; `createR3FAdapter` returns `apply(config)` that mutates Three.js uniform `.value` slots in place. Both auto-handle hex → vec3 and `.set(...)` detection.
+
+## [0.2.0] — 2026-06-08
+
+### Changed
+- **Replaced Tailwind v4 with a self-contained CSS module.** Single `<style>` injection on first mount; theming via `--sd-*` custom properties on `[data-shader-dev]`. No build setup required for consumers.
+- **Replaced `motion` peer dep with CSS transitions.** Slider drag still uses direct DOM mutation via CSS variables; spring-like feel via `cubic-bezier(0.34, 1.16, 0.64, 1)`.
+
+### Added
+- **tsup build pipeline** emitting ESM + `.d.ts`. Proper `exports` map, MIT license, repository / keywords / homepage metadata.
+
+## [0.1.0] — Initial
+
+- Single-shader registration store, floating panel with slider / color controls, keyboard shortcut, copy/write JSON. Tailwind-class-based styling, `motion` for spring animations.
+
+[1.0.0]: https://github.com/tjcages/shader-panel/releases/tag/v1.0.0
+[0.5.0]: https://github.com/tjcages/shader-panel/releases/tag/v0.5.0
+[0.4.0]: https://github.com/tjcages/shader-panel/releases/tag/v0.4.0
+[0.3.0]: https://github.com/tjcages/shader-panel/releases/tag/v0.3.0
+[0.2.0]: https://github.com/tjcages/shader-panel/releases/tag/v0.2.0
+[0.1.0]: https://github.com/tjcages/shader-panel/releases/tag/v0.1.0
