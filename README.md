@@ -1,10 +1,14 @@
 # @tjcages/shader-dev
 
+[![npm version](https://img.shields.io/npm/v/@tjcages/shader-dev.svg)](https://www.npmjs.com/package/@tjcages/shader-dev) [![bundle size](https://img.shields.io/bundlephobia/minzip/@tjcages/shader-dev?label=min%2Bgzip)](https://bundlephobia.com/package/@tjcages/shader-dev) [![license](https://img.shields.io/npm/l/@tjcages/shader-dev.svg)](./LICENSE)
+
 A floating panel for tweaking shader uniforms live — sliders, color pickers, copy/paste JSON. Works with any **WebGL**, **Three.js**, or **React Three Fiber** shader.
 
-No CSS framework, no animation library, two peer deps (`react`, `react-dom`), and it compiles out of production builds (~5 KB no-op). Toggle with <kbd>⌘⌥D</kbd>.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/tjcages/shader-panel/main/assets/hero.png" alt="shader-dev panel open over a shader" width="720">
+</p>
 
-<!-- TODO: hero screenshot of the panel open over a shader -->
+No CSS framework, no animation library, two peer deps (`react`, `react-dom`), and it compiles out of production builds (~5 KB no-op). Toggle with <kbd>⌘⌥D</kbd>.
 
 ```sh
 npm install @tjcages/shader-dev
