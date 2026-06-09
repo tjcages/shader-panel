@@ -8,7 +8,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 First stable release. API surface is now considered stable; subsequent breaking changes will bump the major.
 
 ### Added (since 0.5.0)
+- **Six built-in AI prompts, written as senior-graphics-engineer briefs** (~2k chars each): improve quality, optimize GPU, reduce shimmer / temporal aliasing, find runtime bugs & leaks, expose missing parameters, switch to adapters. Each has a prioritized checklist with concrete GLSL patterns and thresholds — linear-space color math, Reinhard/ACES tone mapping, TPDF dithering, derivative-based edge AA, portable integer hashes, warp-divergence and `mediump` tradeoffs, tiler/mobile pitfalls, the Three.js disposal chain, GLSL NaN/Inf hazards, and `fwidth` prefiltering for temporal stability.
+- **Zero-edit prompts** — prompts reference files by project context (no paths to fill in) and auto-name the active shader via a `{{shader}}` token resolved at copy/preview time. New `fillShaderDevPrompt(text, name)` helper, exported.
 - Auto-height animations on the saved indicator, sections, prompt previews, and the paste textarea using the CSS Grid `0fr ↔ 1fr` trick + delayed opacity fade.
+
+### Fixed (since 0.5.0)
+- Floating prompt copy button is now fully opaque (stacked `--sd-bg` gradients) so prompt text no longer bleeds through behind the icon.
+- Slider overscroll spring no longer clipped by the collapse wrapper (`clip-path: inset(0 -9999px)` clips vertically only).
+- Paste JSON textarea auto-focuses + scrolls into view on open; font size reduced and de-bled (specificity fix).
 
 ### Notes
 - `@tjcages/shader-dev` is the package name; the repository moved to `tjcages/shader-panel` on GitHub.

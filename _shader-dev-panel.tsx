@@ -72,6 +72,21 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
   const [pasteOpen, setPasteOpen] = useState(false)
   const [pasteText, setPasteText] = useState("")
   const [pasteError, setPasteError] = useState<string | null>(null)
+  const pasteTextareaRef = useRef<HTMLTextAreaElement | null>(null)
+
+  // Focus + scroll-into-view when the paste sheet opens. Wait until the open
+  // transition has progressed (~half the 280ms duration) so the textarea has
+  // measurable height — browsers skip focus on zero-rendered-size elements.
+  useEffect(() => {
+    if (!pasteOpen) return
+    const id = window.setTimeout(() => {
+      const el = pasteTextareaRef.current
+      if (!el) return
+      el.focus({ preventScroll: true })
+      el.scrollIntoView({ behavior: "smooth", block: "nearest" })
+    }, 150)
+    return () => window.clearTimeout(id)
+  }, [pasteOpen])
 
   // Detect "modified" by comparing serialized snapshots. Flat configs are
   // cheap and the rendered indicator only flips on real change.
@@ -284,7 +299,9 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
       defaultTheme={defaultTheme}
     >
       <div className="sd-fields">
-        {prompts.length > 0 ? <ControlQuickActions prompts={prompts} /> : null}
+        {prompts.length > 0 ? (
+          <ControlQuickActions prompts={prompts} shaderName={title} />
+        ) : null}
 
         {shortcutHint ? (
           <div className="sd-shortcut-hint">
@@ -346,6 +363,7 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
             <div className="sd-collapse-inner">
               <div className="sd-paste">
                 <textarea
+                  ref={pasteTextareaRef}
                   className="sd-paste-textarea"
                   value={pasteText}
                   onChange={(e) => {

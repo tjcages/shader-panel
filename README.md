@@ -126,12 +126,13 @@ import { ShaderDevRoot } from "@tjcages/shader-dev/dev"
 
 ## AI prompts rail
 
-A "Quick actions" row at the top of every panel surfaces copy-pasteable AI prompts. Built-in templates cover the common dev loops:
+A "Quick actions" row at the top of every panel surfaces copy-pasteable AI prompts. These aren't one-liners — each is a senior-graphics-engineer brief (~2k chars) with a concrete checklist, specific techniques, and code patterns, so the receiving model has real guidance instead of vibes:
 
-- **Improve visual quality** — propose 3–5 tweaks to color, AA, noise, easing
-- **Expose missing parameters** — add panel fields for every uniform that isn't yet tweakable
-- **Optimize GPU performance** — find cost reductions that don't change the visual output
-- **Find runtime bugs & leaks** — context loss, dispose gaps, NaN paths, re-render storms
+- **Improve visual quality** — color-space correctness, tone mapping (Reinhard/ACES), TPDF dithering, derivative-based edge AA, portable hashes, FBM/domain-warp, smootherstep easing
+- **Optimize GPU performance** — classify the bottleneck first, then cut ALU / transcendentals, warp-divergent branches, `mediump` precision wins, dependent texture reads, and tiler/mobile pitfalls
+- **Reduce shimmer / temporal aliasing** — prefilter high-frequency detail with `fwidth`, fade sub-Nyquist octaves, mip/anisotropy, specular roughness clamping (analytic before temporal)
+- **Find runtime bugs & leaks** — GL disposal chains, context-loss handling, R3F uniform/`useFrame`/`setState` hot-path traps, and GLSL NaN/Inf + `mediump` overflow hazards
+- **Expose missing parameters** — detect every uniform, exclude runtime-driven ones, infer field type + min/max/step, group into sections, keep config/DEFAULTS in sync
 - **Switch to shader-dev adapters** — replace a hand-rolled `configToShaderUniforms` with `createWebGLAdapter` / `createR3FAdapter`
 
 Click a row → preview the full prompt. Click the copy icon → it's on the clipboard, ready to paste into Claude / Cursor / Codex.

@@ -7,6 +7,7 @@ export {
 } from "./_adapters"
 export {
   DEFAULT_SHADER_DEV_PROMPTS,
+  fillShaderDevPrompt,
   type ShaderDevPrompt,
 } from "./_default-prompts"
 export {

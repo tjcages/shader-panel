@@ -1,13 +1,15 @@
 "use client"
 
-import { useCallback, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { cn } from "../lib/cn"
-import type { ShaderDevPrompt } from "../_default-prompts"
+import { fillShaderDevPrompt, type ShaderDevPrompt } from "../_default-prompts"
 import { ControlSection } from "./control-section"
 
 export interface ControlQuickActionsProps {
   title?: string
   prompts: ReadonlyArray<ShaderDevPrompt>
+  /** Active shader name — substituted for the `{{shader}}` token in prompts. */
+  shaderName?: string
   className?: string
   /** Initial open state of the parent section. Defaults to closed. */
   defaultOpen?: boolean
@@ -16,11 +18,23 @@ export interface ControlQuickActionsProps {
 export function ControlQuickActions({
   title = "AI prompts",
   prompts,
+  shaderName,
   className,
   defaultOpen = false,
 }: ControlQuickActionsProps) {
   const [expanded, setExpanded] = useState<string | null>(null)
   const [copiedId, setCopiedId] = useState<string | null>(null)
+
+  // Pre-resolve {{shader}} once per prompt so the preview and the clipboard
+  // copy are always identical (and editing-free).
+  const resolved = useMemo(
+    () =>
+      prompts.map((p) => ({
+        ...p,
+        prompt: fillShaderDevPrompt(p.prompt, shaderName),
+      })),
+    [prompts, shaderName],
+  )
 
   const copy = useCallback((p: ShaderDevPrompt) => {
     void navigator.clipboard.writeText(p.prompt)
@@ -30,7 +44,7 @@ export function ControlQuickActions({
     }, 1400)
   }, [])
 
-  if (prompts.length === 0) return null
+  if (resolved.length === 0) return null
 
   return (
     <ControlSection
@@ -38,7 +52,7 @@ export function ControlQuickActions({
       defaultOpen={defaultOpen}
       className={cn("sd-quick-section", className)}
     >
-      {prompts.map((p) => {
+      {resolved.map((p) => {
         const isOpen = expanded === p.id
         const isCopied = copiedId === p.id
         return (

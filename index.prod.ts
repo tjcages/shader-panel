@@ -50,6 +50,16 @@ export type { ShaderDevTheme } from "./_use-shader-dev-theme"
 const NOOP = (): void => {}
 const NULL_COMPONENT = (): null => null
 
+// Pure string util — inlined (not imported) so the prompt-text array stays
+// out of the prod bundle entirely.
+export function fillShaderDevPrompt(
+  prompt: string,
+  shaderName?: string,
+): string {
+  const name = shaderName?.trim() || "shader"
+  return prompt.replace(/\{\{\s*shader\s*\}\}/g, name)
+}
+
 // Constants
 export const DEFAULT_SHADER_DEV_PROMPTS: ReadonlyArray<unknown> = []
 export const SHADER_DEV_CSS = ""

@@ -273,7 +273,10 @@ export const SHADER_DEV_CSS = `
   grid-template-rows: 1fr;
 }
 .sd-collapse-inner {
-  overflow: hidden;
+  /* Vertical clipping via clip-path so the height animation still works,
+     but horizontal overshoot (e.g. the slider's overscroll scaleX spring)
+     can render outside the inner without being cropped. */
+  clip-path: inset(0 -9999px);
   min-height: 0;
   opacity: 0;
   transition: opacity 200ms ease;
@@ -308,7 +311,9 @@ export const SHADER_DEV_CSS = `
   gap: 6px;
   padding: 4px 0;
 }
-.sd-paste-textarea {
+/* Scoped under [data-shader-dev] to beat the global textarea reset on
+   specificity — otherwise the explicit small font-size loses. */
+[data-shader-dev] .sd-paste-textarea {
   width: 100%;
   min-height: 96px;
   resize: vertical;
@@ -318,13 +323,16 @@ export const SHADER_DEV_CSS = `
   color: var(--sd-text);
   border: 1px solid var(--sd-border);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 11px;
+  font-size: 10px;
   line-height: 1.5;
   outline: none;
   transition: border-color 150ms ease;
 }
-.sd-paste-textarea:focus {
+[data-shader-dev] .sd-paste-textarea:focus {
   border-color: var(--sd-handle);
+}
+[data-shader-dev] .sd-paste-textarea::placeholder {
+  color: var(--sd-muted-icon);
 }
 .sd-paste-error {
   padding: 0 4px;
@@ -760,7 +768,11 @@ export const SHADER_DEV_CSS = `
 }
 .sd-prompt-pre::-webkit-scrollbar { width: 6px; }
 .sd-prompt-pre::-webkit-scrollbar-thumb { background: var(--sd-surface-active); border-radius: 999px; }
-.sd-prompt-copy {
+/* Scoped under [data-shader-dev] to beat the global button reset
+   (background: transparent) on specificity — otherwise the button is
+   transparent and the prompt text shows through behind the icon. The text
+   field (--sd-bg) is ~95% opaque, so stack two copies → ~99.8% opaque, same hue. */
+[data-shader-dev] .sd-prompt-copy {
   position: absolute;
   bottom: 6px;
   right: 6px;
@@ -770,14 +782,20 @@ export const SHADER_DEV_CSS = `
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--sd-bg);
+  background:
+    linear-gradient(var(--sd-bg), var(--sd-bg)),
+    linear-gradient(var(--sd-bg), var(--sd-bg));
   color: var(--sd-label);
   border: 1px solid var(--sd-border);
-  transition: background-color 150ms ease, color 150ms ease, transform 200ms cubic-bezier(0.34, 1.16, 0.64, 1);
+  transition: color 150ms ease, transform 200ms cubic-bezier(0.34, 1.16, 0.64, 1);
 }
 .sd-prompt-copy svg { width: 14px; height: 14px; }
-.sd-prompt-copy:hover {
-  background: var(--sd-surface);
+[data-shader-dev] .sd-prompt-copy:hover {
+  /* Subtle surface tint over the opaque base. */
+  background:
+    linear-gradient(var(--sd-surface), var(--sd-surface)),
+    linear-gradient(var(--sd-bg), var(--sd-bg)),
+    linear-gradient(var(--sd-bg), var(--sd-bg));
   color: var(--sd-label-active);
   transform: scale(1.05);
 }
