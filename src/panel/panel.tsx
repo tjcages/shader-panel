@@ -8,7 +8,12 @@ import {
   useRef,
   useState,
 } from "react"
+import { ControlAction } from "../controls/action"
+import { ControlAnimation } from "../controls/animation-controls"
 import { ControlColorInput } from "../controls/color-input"
+import { ControlExport } from "../controls/export-controls"
+import { ControlImageInput } from "../controls/image-input"
+import { ControlPath, type PathPoint } from "../controls/path-input"
 import { ControlQuickActions } from "../controls/quick-actions"
 import { ControlSection } from "../controls/section"
 import { ControlSelect } from "../controls/select"
@@ -38,6 +43,7 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
   titleSlot,
   open,
   onClose,
+  onOpen,
   values,
   defaults,
   fields,
@@ -48,6 +54,7 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
   prompts = DEFAULT_SHADER_DEV_PROMPTS,
   persist = true,
   defaultTheme,
+  actionHandlers,
 }: {
   /** Used as the localStorage key (`shader-dev:<id>`) when `persist` is true. */
   id?: string
@@ -56,6 +63,8 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
   titleSlot?: React.ReactNode
   open: boolean
   onClose: () => void
+  /** Open the panel — used by the edge-hover peek preview. */
+  onOpen?: () => void
   values: T
   defaults: T
   fields: ShaderDevFieldDef<T>[]
@@ -68,6 +77,8 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
   /** Persist values to `localStorage["shader-dev:<id>"]`. Requires `id`. Default true. */
   persist?: boolean
   defaultTheme?: ShaderDevTheme
+  /** Handlers for `type: "action"` fields, keyed by `actionId`. */
+  actionHandlers?: Record<string, () => void>
 }) {
   const [writing, setWriting] = useState(false)
   const [status, setStatus] = useState<string | null>(null)
@@ -90,10 +101,37 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
     return () => window.clearTimeout(id)
   }, [pasteOpen])
 
+  // Image values (object URLs) are excluded from persistence, modified
+  // detection, and Copy JSON — an object URL is dead after reload, and a
+  // data URL would blow the localStorage quota.
+  const imageKeys = useMemo(() => {
+    const keys = new Set<string>()
+    for (const f of fields) {
+      if (!isShaderDevSection(f) && f.type === "image") keys.add(f.key)
+    }
+    return keys
+  }, [fields])
+
+  const stripImages = useCallback(
+    (obj: Record<string, unknown>): Record<string, unknown> => {
+      if (imageKeys.size === 0) return obj
+      const out = { ...obj }
+      for (const k of imageKeys) delete out[k]
+      return out
+    },
+    [imageKeys],
+  )
+
   // Detect "modified" by comparing serialized snapshots. Flat configs are
   // cheap and the rendered indicator only flips on real change.
-  const valuesJson = useMemo(() => JSON.stringify(values), [values])
-  const defaultsJson = useMemo(() => JSON.stringify(defaults), [defaults])
+  const valuesJson = useMemo(
+    () => JSON.stringify(stripImages(values)),
+    [values, stripImages],
+  )
+  const defaultsJson = useMemo(
+    () => JSON.stringify(stripImages(defaults)),
+    [defaults, stripImages],
+  )
   const isModified = valuesJson !== defaultsJson
 
   const persistKey = persist && id ? id : null
@@ -102,8 +140,8 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
   // values back through onChange. This makes persistence "just work" without
   // the consumer wiring `loadPersistedShaderDevValues` into its useState
   // initializer (that path still works and avoids the one-frame flash).
-  const liveRef = useRef({ onChange, defaults, valuesJson })
-  liveRef.current = { onChange, defaults, valuesJson }
+  const liveRef = useRef({ onChange, defaults, values, valuesJson, stripImages })
+  liveRef.current = { onChange, defaults, values, valuesJson, stripImages }
   const hydratedIdRef = useRef<string | null>(null)
   useEffect(() => {
     if (!persistKey) return
@@ -112,10 +150,17 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
     if (!hasPersistedShaderDevValues(persistKey)) return
     const live = liveRef.current
     const saved = loadPersistedShaderDevValues(persistKey, live.defaults)
-    if (JSON.stringify(saved) !== live.valuesJson) {
+    // Image keys are never persisted — keep whatever the app currently holds
+    // (a consumer may have set an object URL before hydration ran).
+    for (const k of imageKeys) {
+      if (k in live.values) {
+        ;(saved as Record<string, unknown>)[k] = live.values[k]
+      }
+    }
+    if (JSON.stringify(live.stripImages(saved)) !== live.valuesJson) {
       live.onChange(saved as T)
     }
-  }, [persistKey])
+  }, [persistKey, imageKeys])
 
   // Write to localStorage whenever values change (debounce-free — these are
   // tiny blobs and the user is hand-tweaking).
@@ -174,7 +219,10 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
     }
   }, [defaults, onChange, pasteText, values])
 
-  const configJson = useMemo(() => JSON.stringify(values, null, 2), [values])
+  const configJson = useMemo(
+    () => JSON.stringify(stripImages(values), null, 2),
+    [values, stripImages],
+  )
 
   const handleCopy = useCallback(() => {
     void navigator.clipboard.writeText(configJson)
@@ -238,6 +286,22 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
         continue
       }
 
+      if (field.type === "action") {
+        if (field.when && !field.when(values)) continue
+        const handler = actionHandlers?.[field.actionId]
+        pushField(
+          <ControlAction
+            label={field.label}
+            description={field.description}
+            variant={field.variant}
+            disabled={!handler}
+            onClick={() => handler?.()}
+          />,
+          field.actionId,
+        )
+        continue
+      }
+
       const key = field.key
 
       if (field.type === "slider") {
@@ -262,11 +326,16 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
 
       if (field.type === "toggle") {
         pushField(
-          <ControlToggle
-            label={field.label}
-            value={values[key] as boolean}
-            onChange={(v) => setKey(key, v as T[typeof key])}
-          />,
+          <>
+            {field.description && (
+              <div className="sd-field-description">{field.description}</div>
+            )}
+            <ControlToggle
+              label={field.label}
+              value={values[key] as boolean}
+              onChange={(v) => setKey(key, v as T[typeof key])}
+            />
+          </>,
           key,
         )
         continue
@@ -274,12 +343,18 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
 
       if (field.type === "select") {
         pushField(
-          <ControlSelect
-            label={field.label}
-            value={values[key] as string | number}
-            options={field.options}
-            onChange={(v) => setKey(key, v as T[typeof key])}
-          />,
+          <>
+            {field.description && (
+              <div className="sd-field-description">{field.description}</div>
+            )}
+            <ControlSelect
+              label={field.label}
+              value={values[key] as string | number}
+              options={field.options}
+              layout={field.layout}
+              onChange={(v) => setKey(key, v as T[typeof key])}
+            />
+          </>,
           key,
         )
         continue
@@ -302,6 +377,53 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
         continue
       }
 
+      if (field.type === "image") {
+        pushField(
+          <>
+            {field.description && (
+              <div className="sd-field-description">{field.description}</div>
+            )}
+            <ControlImageInput
+              label={field.label}
+              value={(values[key] as string) ?? ""}
+              readonly={field.readonly}
+              accept={field.accept}
+              emptyLabel={field.emptyLabel}
+              onChange={
+                field.readonly
+                  ? undefined
+                  : (v) => setKey(key, v as T[typeof key])
+              }
+            />
+          </>,
+          key,
+        )
+        continue
+      }
+
+      if (field.type === "path") {
+        const anchor = field.anchorKey
+          ? (values[field.anchorKey] as PathPoint | undefined)
+          : undefined
+        pushField(
+          <>
+            {field.description && (
+              <div className="sd-field-description">{field.description}</div>
+            )}
+            <ControlPath
+              label={field.label}
+              value={(values[key] as ReadonlyArray<PathPoint>) ?? []}
+              min={field.min}
+              max={field.max}
+              anchor={anchor}
+              onChange={(v) => setKey(key, v as T[typeof key])}
+            />
+          </>,
+          key,
+        )
+        continue
+      }
+
       // type === "color"
       pushField(
         <ControlColorInput
@@ -314,18 +436,21 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
     }
 
     return out
-  }, [fields, setKey, values])
+  }, [actionHandlers, fields, setKey, values])
 
   return (
     <ShaderDevFloatingPanel
       side="right"
       collapsed={!open}
       onToggle={onClose}
+      onOpen={onOpen}
       title={title}
       titleSlot={titleSlot}
       defaultTheme={defaultTheme}
     >
       <div className="sd-fields">
+        <ControlAnimation />
+
         {prompts.length > 0 ? (
           <ControlQuickActions prompts={prompts} shaderName={title} />
         ) : null}
@@ -351,6 +476,10 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
         ))}
 
         <div className="sd-actions">
+          {/* Image / video export sits at the top of the actions block, above
+              the reset / copy / paste JSON controls. */}
+          <ControlExport name={title} />
+
           <button type="button" onClick={resetAll} className="sd-action-btn">
             Reset to defaults
           </button>

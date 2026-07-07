@@ -122,7 +122,7 @@ export const SHADER_DEV_CSS = `
   display: flex;
   width: 280px;
   flex-direction: column;
-  transition: transform 300ms ease;
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -131,6 +131,45 @@ export const SHADER_DEV_CSS = `
 .sd-floating[data-sd-side="right"] { right: 16px; }
 .sd-floating[data-sd-collapsed="true"][data-sd-side="left"] { transform: translateX(calc(-100% - 16px)); }
 .sd-floating[data-sd-collapsed="true"][data-sd-side="right"] { transform: translateX(calc(100% + 16px)); }
+
+/* Peek preview — a scaled-down sliver slides in when the viewport edge is
+   hovered while collapsed. Overrides the fully-hidden collapsed transform. */
+.sd-floating[data-sd-collapsed="true"][data-sd-peek="true"] { cursor: pointer; }
+.sd-floating[data-sd-collapsed="true"][data-sd-peek="true"][data-sd-side="right"] {
+  transform: translateX(calc(100% - 56px)) scale(0.9);
+  transform-origin: right center;
+}
+.sd-floating[data-sd-collapsed="true"][data-sd-peek="true"][data-sd-side="left"] {
+  transform: translateX(calc(-100% + 56px)) scale(0.9);
+  transform-origin: left center;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sd-floating { transition: none; }
+}
+
+/* Invisible hover/click strip pinned to the viewport edge — reveals the peek
+   (and reopens on click) while the panel is collapsed. */
+.sd-edge-sensor {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 24px;
+  z-index: 9998;
+  cursor: pointer;
+}
+.sd-edge-sensor[data-sd-side="right"] { right: 0; }
+.sd-edge-sensor[data-sd-side="left"] { left: 0; }
+
+/* Transparent click-catcher over the peeking panel — any click opens it fully
+   instead of hitting a control in the scaled-down preview. */
+.sd-peek-catch {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: 14px;
+  background: transparent;
+  cursor: pointer;
+}
 
 .sd-panel {
   display: flex;
@@ -217,6 +256,71 @@ export const SHADER_DEV_CSS = `
   padding-bottom: 8px;
 }
 
+/* Animation transport — pinned at the top of the panel body. */
+.sd-animation {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 10px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid var(--sd-divider);
+}
+.sd-animation-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sd-text-muted);
+  padding: 0 2px;
+}
+.sd-animation-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+[data-shader-dev] .sd-animation-btn {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--sd-action-text);
+  background: var(--sd-action-bg);
+  transition: background-color 150ms ease, color 150ms ease;
+}
+[data-shader-dev] .sd-animation-btn svg {
+  width: 14px;
+  height: 14px;
+}
+[data-shader-dev] .sd-animation-btn:hover {
+  background: var(--sd-action-bg-hover);
+  color: var(--sd-action-text-hover);
+}
+[data-shader-dev] .sd-animation-btn-primary {
+  width: 36px;
+  background: var(--sd-surface-active);
+  color: var(--sd-label-active);
+}
+[data-shader-dev] .sd-animation-btn-primary:hover {
+  background: var(--sd-handle);
+  color: #ffffff;
+}
+[data-shader-dev] .sd-animation-btn-reset {
+  margin-left: auto;
+}
+.sd-animation-time {
+  flex: 1;
+  min-width: 0;
+  padding: 0 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--sd-text-muted);
+  text-align: center;
+}
+
 .sd-shortcut-hint {
   font-size: 12px;
   color: var(--sd-text-muted);
@@ -255,11 +359,101 @@ export const SHADER_DEV_CSS = `
   color: var(--sd-action-text-hover);
 }
 [data-shader-dev] .sd-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+[data-shader-dev] .sd-action-btn-primary {
+  background: var(--sd-handle);
+  color: var(--sd-bg);
+  border-color: transparent;
+}
+[data-shader-dev] .sd-action-btn-primary:hover {
+  filter: brightness(1.08);
+  color: var(--sd-bg);
+}
+.sd-action-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
 .sd-status {
   padding: 0 4px;
   font-size: 12px;
   color: var(--sd-text-muted);
+}
+
+/* Export group — pinned at the top of the actions block, separated from the
+   JSON/reset buttons by a hairline divider. */
+.sd-export {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--sd-divider);
+}
+.sd-export-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sd-text-muted);
+  padding: 0 2px;
+}
+.sd-export-row {
+  display: flex;
+  gap: 6px;
+}
+.sd-export-row .sd-action-btn {
+  flex: 1;
+}
+
+/* Segmented resolution selector for the hi-res PNG. */
+.sd-export-res {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 8px;
+  background: var(--sd-surface);
+}
+[data-shader-dev] .sd-export-res-btn {
+  flex: 1;
+  height: 26px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--sd-text-muted);
+  transition: background-color 150ms ease, color 150ms ease;
+}
+[data-shader-dev] .sd-export-res-btn:hover {
+  color: var(--sd-action-text-hover);
+}
+[data-shader-dev] .sd-export-res-active,
+[data-shader-dev] .sd-export-res-active:hover {
+  background: var(--sd-surface-active);
+  color: var(--sd-label-active);
+}
+[data-shader-dev] .sd-export-rec,
+[data-shader-dev] .sd-export-rec:hover {
+  background: #e5484d;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.sd-export-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #ffffff;
+  animation: sd-export-pulse 1s ease-in-out infinite;
+}
+@keyframes sd-export-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sd-export-dot { animation: none; }
 }
 
 /* Auto-height animation via CSS Grid: parent transitions
@@ -582,6 +776,7 @@ export const SHADER_DEV_CSS = `
   color: var(--sd-label);
 }
 .sd-color-right {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -607,7 +802,224 @@ export const SHADER_DEV_CSS = `
   transition: transform 150ms ease;
 }
 .sd-color-swatch:hover { transform: scale(1.1); }
+/* Sized + positioned over the swatch (not 0x0) so showPicker()/click() has a
+   real anchor rect — pickers anchor to the input's position. */
 .sd-color-native {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  margin-top: -10px;
+  height: 20px;
+  width: 20px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sd-path {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sd-path-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sd-path-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--sd-label);
+}
+.sd-path-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sd-path-count {
+  font-size: 11px;
+  color: var(--sd-muted-icon);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+[data-shader-dev] .sd-path-clear {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--sd-border);
+  background: var(--sd-action-bg);
+  color: var(--sd-action-text);
+  cursor: pointer;
+  transition: background-color 150ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+[data-shader-dev] .sd-path-clear:hover {
+  background: var(--sd-action-bg-hover);
+  color: var(--sd-action-text-hover);
+}
+.sd-path-pad {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  border: 1px solid var(--sd-border);
+  background: var(--sd-surface);
+  touch-action: none;
+  cursor: crosshair;
+  overflow: visible;
+}
+.sd-path-grid {
+  stroke: var(--sd-divider);
+  stroke-width: 0.5;
+}
+.sd-path-frame {
+  fill: none;
+  stroke: var(--sd-border);
+  stroke-width: 0.5;
+}
+.sd-path-line {
+  fill: none;
+  stroke: var(--sd-handle);
+  stroke-width: 1;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  opacity: 0.55;
+}
+.sd-path-line-close {
+  stroke: var(--sd-handle);
+  stroke-width: 0.8;
+  stroke-dasharray: 2 2;
+  opacity: 0.3;
+}
+.sd-path-anchor circle {
+  fill: none;
+  stroke: var(--sd-handle);
+  stroke-width: 1;
+  opacity: 0.7;
+}
+.sd-path-anchor .sd-path-anchor-dot {
+  fill: var(--sd-handle);
+  stroke: none;
+  opacity: 0.9;
+}
+.sd-path-point {
+  cursor: grab;
+}
+.sd-path-point:active {
+  cursor: grabbing;
+}
+.sd-path-point-hit {
+  fill: transparent;
+}
+.sd-path-point-ring {
+  fill: var(--sd-bg);
+  stroke: var(--sd-handle);
+  stroke-width: 1.2;
+  transition: r 120ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sd-path-point.is-selected .sd-path-point-ring {
+  fill: var(--sd-handle);
+}
+.sd-path-point-num {
+  fill: var(--sd-label);
+  font-size: 3.4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  text-anchor: middle;
+  pointer-events: none;
+  user-select: none;
+}
+.sd-path-point.is-selected .sd-path-point-num {
+  fill: var(--sd-bg);
+}
+.sd-path-selected {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--sd-text-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+[data-shader-dev] .sd-path-remove {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--sd-border);
+  background: var(--sd-action-bg);
+  color: var(--sd-action-text);
+  cursor: pointer;
+  transition: background-color 150ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+[data-shader-dev] .sd-path-remove:hover {
+  background: var(--sd-action-bg-hover);
+  color: var(--sd-action-text-hover);
+}
+.sd-path-hint {
+  font-size: 10.5px;
+  color: var(--sd-muted-icon);
+  text-align: center;
+}
+
+.sd-image {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sd-image-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sd-image-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--sd-label);
+}
+.sd-image-upload {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--sd-border);
+  background: var(--sd-action-bg);
+  color: var(--sd-action-text);
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+.sd-image-upload:hover {
+  background: var(--sd-action-bg-hover);
+  color: var(--sd-action-text-hover);
+}
+.sd-image-frame {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  border-radius: 8px;
+  border: 1px solid var(--sd-border);
+  background: var(--sd-surface);
+  overflow: hidden;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+.sd-image-frame[data-sd-interactive="true"] { cursor: pointer; }
+.sd-image-frame[data-sd-interactive="true"]:hover,
+.sd-image-frame[data-sd-drag="true"] {
+  border-color: var(--sd-handle);
+  background: var(--sd-surface-active);
+}
+.sd-image-preview {
+  display: block;
+  width: 75%;
+  height: auto;
+  border-radius: 4px;
+}
+.sd-image-empty {
+  font-size: 11px;
+  color: var(--sd-muted-icon);
+  padding: 14px 0;
+}
+.sd-image-native {
   position: absolute;
   height: 0;
   width: 0;
@@ -615,18 +1027,24 @@ export const SHADER_DEV_CSS = `
   pointer-events: none;
 }
 
-.sd-toggle {
+/* Scoped under [data-shader-dev] so it beats the global button reset
+   (which zeroes padding/background). The negative margin + matching padding
+   full-bleeds the hover highlight ~8px past the label on each side, so the
+   label stays aligned with the other rows but the highlight never touches its
+   left edge. */
+[data-shader-dev] .sd-toggle {
   display: flex;
   height: 36px;
-  width: 100%;
+  width: calc(100% + 16px);
+  margin: 0 -8px;
   align-items: center;
   justify-content: space-between;
   border-radius: 8px;
-  padding: 0 12px;
-  background: var(--sd-surface);
-  transition: background-color 150ms ease;
+  padding: 0 8px;
+  background: transparent;
+  transition: background-color 150ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-.sd-toggle:hover { background: var(--sd-surface-active); }
+[data-shader-dev] .sd-toggle:hover { background: var(--sd-surface-active); }
 .sd-toggle-label {
   font-size: 13px;
   font-weight: 500;
@@ -663,7 +1081,7 @@ export const SHADER_DEV_CSS = `
 
 .sd-select {
   display: flex;
-  height: 36px;
+  min-height: 36px;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
@@ -671,35 +1089,160 @@ export const SHADER_DEV_CSS = `
   padding: 0 4px 0 12px;
   background: var(--sd-surface);
 }
+.sd-select[data-sd-layout="stacked"] {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  padding: 8px 12px;
+}
 .sd-select-label {
   font-size: 13px;
   font-weight: 500;
   color: var(--sd-label);
+  min-width: 0;
 }
-.sd-select-input {
-  appearance: none;
-  -webkit-appearance: none;
+.sd-select[data-sd-layout="stacked"] .sd-select-label {
+  white-space: normal;
+  line-height: 1.35;
+}
+.sd-select[data-sd-layout="inline"] .sd-select-label {
+  flex: 1 1 auto;
+  white-space: normal;
+  line-height: 1.35;
+}
+[data-shader-dev] .sd-select-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 168px;
+  flex-shrink: 0;
   border: 0;
   outline: 0;
   background: transparent;
   color: var(--sd-label);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 13px;
+  font-size: 11.5px;
   font-weight: 500;
   line-height: 1;
   cursor: pointer;
-  padding: 4px 18px 4px 6px;
-  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
-  background-position: calc(100% - 7px) 50%, calc(100% - 3px) 50%;
-  background-size: 4px 4px, 4px 4px;
-  background-repeat: no-repeat;
-  text-align: right;
-  text-align-last: right;
+  padding: 6px 8px;
   border-radius: 6px;
+  transition: color 150ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 150ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-.sd-select-input:hover { color: var(--sd-label-active); }
-.sd-select-input:focus { color: var(--sd-label-active); outline: 2px solid var(--sd-handle); outline-offset: 1px; }
-[data-shader-dev] select.sd-select-input { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 13px; }
+.sd-select[data-sd-layout="stacked"] .sd-select-btn {
+  align-self: stretch;
+  max-width: none;
+  justify-content: space-between;
+}
+.sd-select[data-sd-layout="inline"] .sd-select-btn {
+  align-self: center;
+}
+/* Selected value stays on a single line — truncate rather than wrap. */
+.sd-select-value {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+[data-shader-dev] .sd-select-btn:hover {
+  color: var(--sd-label-active);
+  background: var(--sd-surface-active);
+}
+[data-shader-dev] .sd-select-btn:focus-visible {
+  color: var(--sd-label-active);
+  outline: 2px solid var(--sd-handle);
+  outline-offset: 1px;
+}
+[data-shader-dev] .sd-select-btn:active { transform: scale(0.98); }
+.sd-select-chevron {
+  width: 12px;
+  height: 12px;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+.sd-select-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  pointer-events: none;
+}
+.sd-select-menu {
+  pointer-events: auto;
+  overflow-y: auto;
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid var(--sd-border);
+  background: var(--sd-bg);
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.2);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  animation: sd-menu-in 160ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sd-select-menu[data-sd-up="true"] {
+  animation-name: sd-menu-in-up;
+}
+@keyframes sd-menu-in {
+  from {
+    opacity: 0;
+    transform: translate(-100%, 0) translateY(-4px);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-100%, 0) translateY(0);
+    filter: blur(0);
+  }
+}
+@keyframes sd-menu-in-up {
+  from {
+    opacity: 0;
+    transform: translate(-100%, -100%) translateY(4px);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-100%, -100%) translateY(0);
+    filter: blur(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sd-select-menu { animation: none; }
+}
+[data-shader-dev] .sd-select-option {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border: 0;
+  background: transparent;
+  color: var(--sd-label);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11.5px;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  padding: 7px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 120ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 120ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+[data-shader-dev] .sd-select-option[data-sd-active="true"] {
+  background: var(--sd-surface-active);
+  color: var(--sd-label-active);
+}
+[data-shader-dev] .sd-select-option[aria-selected="true"] {
+  color: var(--sd-text);
+}
+.sd-select-check {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  opacity: 0.9;
+}
 
 .sd-prompt {
   display: flex;

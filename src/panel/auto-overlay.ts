@@ -3,6 +3,7 @@
 import { createElement, type FunctionComponent } from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { ShaderDevRoot } from "./root"
+import { initShaderDevOpenFlag } from "../hooks/use-shortcut"
 import type { ShaderDevTheme } from "../hooks/use-theme"
 
 type RootProps = { defaultTheme?: ShaderDevTheme; emptyMessage?: string }
@@ -20,10 +21,16 @@ let container: HTMLElement | null = null
 let refCount = 0
 let mountedTheme: ShaderDevTheme | undefined
 
-export function mountShaderDevOverlay(defaultTheme?: ShaderDevTheme): void {
+export function mountShaderDevOverlay(
+  defaultTheme?: ShaderDevTheme,
+  defaultOpen?: boolean,
+): void {
   if (typeof document === "undefined") return
   refCount += 1
   if (root) return
+  // Seed the open flag before the first render so a `defaultOpen` panel starts
+  // open with no closed→open flash (the overlay is its own React root).
+  if (defaultOpen !== undefined) initShaderDevOpenFlag(defaultOpen)
   mountedTheme = defaultTheme
   container = document.createElement("div")
   container.setAttribute("data-shader-dev-overlay", "")

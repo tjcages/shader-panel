@@ -23,6 +23,8 @@ export type ShaderDevRegistration<T extends ShaderDevValues = ShaderDevValues> =
    * defaults)` as your `useState` initializer to hydrate on mount.
    */
   persist?: boolean
+  /** Handlers for `type: "action"` fields, keyed by `actionId`. */
+  actionHandlers?: Record<string, () => void>
 }
 
 const registrations = new Map<string, ShaderDevRegistration>()

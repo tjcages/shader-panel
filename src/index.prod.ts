@@ -28,6 +28,8 @@ export { patchShaderConfigDefaults } from "./patch-config"
 export type {
   ShaderDevColorField,
   ShaderDevFieldDef,
+  ShaderDevImageField,
+  ShaderDevPathField,
   ShaderDevSectionField,
   ShaderDevSelectField,
   ShaderDevSelectOption,
@@ -92,6 +94,54 @@ export function subscribeShaderDevRegistration(): () => void {
   return NOOP
 }
 
+// Capture registry — no-op in prod (no export panel to drive it).
+export type { ShaderCaptureFn } from "./hooks/capture-registry"
+export function registerShaderCapture(): () => void {
+  return NOOP
+}
+export function getShaderCapture(): null {
+  return null
+}
+export function subscribeShaderCapture(): () => void {
+  return NOOP
+}
+
+// Animation clock — always runs on real time in prod (no panel to pause).
+export type { ShaderDevAnimationSnapshot } from "./hooks/animation-clock"
+export const SHADER_DEV_ANIMATION_STEP = 1 / 30
+let prodAnimStart = typeof performance !== "undefined" ? performance.now() : 0
+export function getShaderDevAnimationTime(): number {
+  return (performance.now() - prodAnimStart) / 1000
+}
+export function advanceShaderDevAnimationDelta(previousTime: number): {
+  time: number
+  delta: number
+} {
+  const nextTime = getShaderDevAnimationTime()
+  const delta = Math.min(Math.max(0, nextTime - previousTime), 0.1)
+  return { time: nextTime, delta }
+}
+export function getShaderDevAnimationSnapshot() {
+  return { playing: true, time: getShaderDevAnimationTime(), rate: 1 }
+}
+export const playShaderDevAnimation = NOOP
+export const pauseShaderDevAnimation = NOOP
+export const toggleShaderDevAnimation = NOOP
+export const stepShaderDevAnimationForward = NOOP
+export const stepShaderDevAnimationBackward = NOOP
+export const resetShaderDevAnimation = (): void => {
+  prodAnimStart = performance.now()
+}
+export const setShaderDevAnimationTime = NOOP
+export const setShaderDevAnimationRate = NOOP
+export function getShaderDevAnimationRevision(): number {
+  return 0
+}
+export function subscribeShaderDevAnimation(): () => void {
+  return NOOP
+}
+export const initShaderDevAnimationClock = NOOP
+
 // Persistence — return defaults, never touch storage.
 export function loadPersistedShaderDevValues<T>(_id: string, defaults: T): T {
   return { ...(defaults as object) } as T
@@ -145,7 +195,11 @@ export const ShaderDevShortcutBridge = NULL_COMPONENT
 export const ControlSlider = NULL_COMPONENT
 export const ControlSection = NULL_COMPONENT
 export const ControlColorInput = NULL_COMPONENT
+export const ControlImageInput = NULL_COMPONENT
+export const ControlPath = NULL_COMPONENT
+export type { ControlPathProps, PathPoint } from "./controls/path-input"
 export const ControlToggle = NULL_COMPONENT
 export const ControlSelect = NULL_COMPONENT
 export const ControlVec2 = NULL_COMPONENT
 export const ControlQuickActions = NULL_COMPONENT
+export const ControlAnimation = NULL_COMPONENT

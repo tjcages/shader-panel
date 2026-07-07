@@ -22,6 +22,12 @@ export type UseShaderDevOptions<T extends ShaderDevValues> = Omit<
   autoMount?: boolean
   /** Initial theme passed to the auto-mounted panel. */
   defaultTheme?: ShaderDevTheme
+  /**
+   * Open the panel by default the first time it mounts this session. Once the
+   * user toggles it, their choice sticks (persisted in sessionStorage). Only
+   * honored when `autoMount` is true. Default `false`.
+   */
+  defaultOpen?: boolean
 }
 
 /**
@@ -46,7 +52,14 @@ export type UseShaderDevOptions<T extends ShaderDevValues> = Omit<
 export function useShaderDev<T extends ShaderDevValues>(
   options: UseShaderDevOptions<T>,
 ): [T, (next: T) => void] {
-  const { id, defaults, persist, autoMount = true, defaultTheme } = options
+  const {
+    id,
+    defaults,
+    persist,
+    autoMount = true,
+    defaultTheme,
+    defaultOpen,
+  } = options
 
   const [values, setValues] = useState<T>(() =>
     persist === false
@@ -72,7 +85,7 @@ export function useShaderDev<T extends ShaderDevValues>(
 
   // Unregister once on unmount, and own the auto-mounted overlay lifecycle.
   useEffect(() => {
-    if (autoMount) mountShaderDevOverlay(defaultTheme)
+    if (autoMount) mountShaderDevOverlay(defaultTheme, defaultOpen)
     return () => {
       unregisterShaderDev(optionsRef.current.id)
       if (autoMount) unmountShaderDevOverlay()

@@ -22,8 +22,11 @@ export { ShaderDevRoot } from "./panel/root"
 export { patchShaderConfigDefaults } from "./patch-config"
 
 export type {
+  ShaderDevActionField,
   ShaderDevColorField,
   ShaderDevFieldDef,
+  ShaderDevImageField,
+  ShaderDevPathField,
   ShaderDevSectionField,
   ShaderDevSelectField,
   ShaderDevSelectOption,
@@ -52,6 +55,37 @@ export {
   useShaderDev,
   type UseShaderDevOptions,
 } from "./hooks/use-shader-dev"
+
+export {
+  getShaderCapture,
+  registerShaderCapture,
+  subscribeShaderCapture,
+  type ShaderCaptureFn,
+} from "./hooks/capture-registry"
+
+export {
+  SHADER_DEV_ANIMATION_STEP,
+  advanceShaderDevAnimationDelta,
+  getShaderDevAnimationRevision,
+  getShaderDevAnimationSnapshot,
+  getShaderDevAnimationTime,
+  initShaderDevAnimationClock,
+  pauseShaderDevAnimation,
+  playShaderDevAnimation,
+  resetShaderDevAnimation,
+  setShaderDevAnimationRate,
+  setShaderDevAnimationTime,
+  stepShaderDevAnimationBackward,
+  stepShaderDevAnimationForward,
+  subscribeShaderDevAnimation,
+  toggleShaderDevAnimation,
+  type ShaderDevAnimationSnapshot,
+} from "./hooks/animation-clock"
+
+export {
+  ControlAnimation,
+  type ControlAnimationProps,
+} from "./controls/animation-controls"
 
 export {
   dispatchShaderDevToggle,
@@ -84,12 +118,25 @@ export {
  */
 export { SHADER_DEV_CSS, SHADER_DEV_STYLE_ID } from "./styles"
 
+export {
+  ControlAction,
+  type ControlActionProps,
+} from "./controls/action"
 export { ControlSlider, type ControlSliderProps } from "./controls/slider"
 export { ControlSection, type ControlSectionProps } from "./controls/section"
 export {
   ControlColorInput,
   type ControlColorInputProps,
 } from "./controls/color-input"
+export {
+  ControlImageInput,
+  type ControlImageInputProps,
+} from "./controls/image-input"
+export {
+  ControlPath,
+  type ControlPathProps,
+  type PathPoint,
+} from "./controls/path-input"
 export { ControlToggle, type ControlToggleProps } from "./controls/toggle"
 export { ControlSelect, type ControlSelectProps } from "./controls/select"
 export { ControlVec2, type ControlVec2Props } from "./controls/vec2"

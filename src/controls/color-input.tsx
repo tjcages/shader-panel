@@ -17,6 +17,23 @@ export function ControlColorInput({
   className,
 }: ControlColorInputProps) {
   const hiddenRef = useRef<HTMLInputElement>(null)
+
+  const openPicker = () => {
+    const input = hiddenRef.current
+    if (!input) return
+    // showPicker() is the reliable way to open the native swatch — click()
+    // on a zero-size hidden input is ignored by some browsers.
+    try {
+      if (typeof input.showPicker === "function") {
+        input.showPicker()
+        return
+      }
+    } catch {
+      /* fall through to click() */
+    }
+    input.click()
+  }
+
   return (
     <div className={cn("sd-color", className)}>
       <span className="sd-color-label">{label}</span>
@@ -29,7 +46,7 @@ export function ControlColorInput({
         />
         <button
           type="button"
-          onClick={() => hiddenRef.current?.click()}
+          onClick={openPicker}
           className="sd-color-swatch"
           style={{ background: value }}
           aria-label={`Pick color for ${label}`}

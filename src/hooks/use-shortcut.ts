@@ -21,6 +21,25 @@ export function writeShaderDevOpenFlag(open: boolean): void {
   }
 }
 
+/**
+ * Seed the open flag from an app-provided default the first time it's read this
+ * session. If the user has already toggled the panel (flag present), their
+ * choice wins. Returns the effective open state. Call synchronously before the
+ * panel's first render to avoid an open/close flash.
+ */
+export function initShaderDevOpenFlag(defaultOpen: boolean): boolean {
+  try {
+    const raw = sessionStorage.getItem(SHADER_DEV_OPEN_KEY)
+    if (raw === null) {
+      sessionStorage.setItem(SHADER_DEV_OPEN_KEY, defaultOpen ? "true" : "false")
+      return defaultOpen
+    }
+    return raw === "true"
+  } catch {
+    return defaultOpen
+  }
+}
+
 function isEditableTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false
   if (

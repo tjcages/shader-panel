@@ -119,6 +119,7 @@ export function ShaderDevRoot({
       titleSlot={switcher}
       open={open}
       onClose={() => setOpen(false)}
+      onOpen={() => setOpen(true)}
       values={registration.values}
       defaults={registration.defaults}
       fields={registration.fields}
@@ -128,6 +129,7 @@ export function ShaderDevRoot({
       prompts={registration.prompts}
       persist={registration.persist}
       defaultTheme={defaultTheme}
+      actionHandlers={registration.actionHandlers}
     />
   )
 }

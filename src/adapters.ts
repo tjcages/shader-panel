@@ -66,7 +66,7 @@ export function createWebGLAdapter<T extends Record<string, unknown>>({
   return function configToUniforms(config: T): Record<string, unknown> {
     const out: Record<string, unknown> = {}
     for (const field of fields) {
-      if (field.type === "section") continue
+      if (field.type === "section" || field.type === "action") continue
       const key = field.key
       const name = uniformNameFor<T>(key, mapping, prefix)
       const value = config[key]
@@ -122,7 +122,7 @@ export function createR3FAdapter<T extends Record<string, unknown>>({
 }: CreateR3FAdapterOptions<T>) {
   return function applyConfig(config: T): void {
     for (const field of fields) {
-      if (field.type === "section") continue
+      if (field.type === "section" || field.type === "action") continue
       const key = field.key
       const name = uniformNameFor<T>(key, mapping, prefix)
       const slot = uniforms[name]
