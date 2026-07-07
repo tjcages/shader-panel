@@ -7,6 +7,7 @@
  */
 
 const PERSIST_PREFIX = "shader-dev:"
+const SECTIONS_SUFFIX = ":sections"
 
 function storage(): Storage | null {
   if (typeof window === "undefined") return null
@@ -80,6 +81,73 @@ export function hasPersistedShaderDevValues(id: string): boolean {
   if (!s) return false
   try {
     return s.getItem(PERSIST_PREFIX + id) !== null
+  } catch {
+    return false
+  }
+}
+
+/** localStorage key for section expand/collapse UI state (`shader-dev:<id>:sections`). */
+function sectionsStorageKey(id: string): string {
+  return PERSIST_PREFIX + id + SECTIONS_SUFFIX
+}
+
+/**
+ * Load which panel sections are open. Missing keys default to open (`true`).
+ */
+export function loadPersistedShaderDevSections(
+  id: string,
+): Record<string, boolean> {
+  const s = storage()
+  if (!s) return {}
+  try {
+    const raw = s.getItem(sectionsStorageKey(id))
+    if (!raw) return {}
+    const parsed = JSON.parse(raw) as Record<string, unknown>
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return {}
+    }
+    const out: Record<string, boolean> = {}
+    for (const [title, value] of Object.entries(parsed)) {
+      if (typeof value === "boolean") out[title] = value
+    }
+    return out
+  } catch {
+    return {}
+  }
+}
+
+export function persistShaderDevSections(
+  id: string,
+  sections: Record<string, boolean>,
+): void {
+  const s = storage()
+  if (!s) return
+  try {
+    if (Object.keys(sections).length === 0) {
+      s.removeItem(sectionsStorageKey(id))
+      return
+    }
+    s.setItem(sectionsStorageKey(id), JSON.stringify(sections))
+  } catch {
+    /* quota exceeded, private mode — silent */
+  }
+}
+
+export function clearPersistedShaderDevSections(id: string): void {
+  const s = storage()
+  if (!s) return
+  try {
+    s.removeItem(sectionsStorageKey(id))
+  } catch {
+    /* ignore */
+  }
+}
+
+export function hasPersistedShaderDevSections(id: string): boolean {
+  const s = storage()
+  if (!s) return false
+  try {
+    return s.getItem(sectionsStorageKey(id)) !== null
   } catch {
     return false
   }

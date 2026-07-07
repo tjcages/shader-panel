@@ -151,6 +151,10 @@ export const clearPersistedShaderDevValues = NOOP
 export function hasPersistedShaderDevValues(): boolean {
   return false
 }
+export function loadPersistedShaderDevSections(): Record<string, boolean> {
+  return {}
+}
+export const persistShaderDevSections = NOOP
 
 // Keyboard / shortcut
 export const dispatchShaderDevToggle = NOOP

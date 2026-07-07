@@ -7,6 +7,9 @@ export interface ControlSectionProps {
   title: string
   children: React.ReactNode
   defaultOpen?: boolean
+  /** Controlled open state — pair with `onOpenChange`. */
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
   className?: string
   /** Called when the user clicks the ↻ icon in the section header. */
   onReset?: () => void
@@ -16,10 +19,18 @@ export function ControlSection({
   title,
   children,
   defaultOpen = true,
+  open: openProp,
+  onOpenChange,
   className,
   onReset,
 }: ControlSectionProps) {
-  const [open, setOpen] = useState(defaultOpen)
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen)
+  const controlled = openProp !== undefined
+  const open = controlled ? openProp : uncontrolledOpen
+  const setOpen = (next: boolean) => {
+    if (controlled) onOpenChange?.(next)
+    else setUncontrolledOpen(next)
+  }
   const toggle = () => setOpen(!open)
   return (
     <div

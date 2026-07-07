@@ -28,7 +28,9 @@ import { ShaderDevFloatingPanel } from "./floating-panel"
 import {
   clearPersistedShaderDevValues,
   hasPersistedShaderDevValues,
+  loadPersistedShaderDevSections,
   loadPersistedShaderDevValues,
+  persistShaderDevSections,
   persistShaderDevValues,
 } from "../persist"
 import type { ShaderDevTheme } from "../hooks/use-theme"
@@ -85,6 +87,7 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
   const [pasteOpen, setPasteOpen] = useState(false)
   const [pasteText, setPasteText] = useState("")
   const [pasteError, setPasteError] = useState<string | null>(null)
+  const [sectionOpen, setSectionOpen] = useState<Record<string, boolean>>({})
   const pasteTextareaRef = useRef<HTMLTextAreaElement | null>(null)
 
   // Focus + scroll-into-view when the paste sheet opens. Wait until the open
@@ -177,6 +180,29 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
       clearPersistedShaderDevValues(persistKey)
     }
   }, [persistKey, valuesJson, isModified])
+
+  // Hydrate section expand/collapse from localStorage on first mount for this id.
+  const sectionHydratedIdRef = useRef<string | null>(null)
+  useEffect(() => {
+    if (!persistKey) return
+    if (sectionHydratedIdRef.current === persistKey) return
+    sectionHydratedIdRef.current = persistKey
+    setSectionOpen(loadPersistedShaderDevSections(persistKey))
+  }, [persistKey])
+
+  const setSectionOpenState = useCallback((title: string, open: boolean) => {
+    setSectionOpen((prev) => ({ ...prev, [title]: open }))
+  }, [])
+
+  const skipNextSectionPersistRef = useRef(true)
+  useEffect(() => {
+    if (!persistKey) return
+    if (skipNextSectionPersistRef.current) {
+      skipNextSectionPersistRef.current = false
+      return
+    }
+    persistShaderDevSections(persistKey, sectionOpen)
+  }, [persistKey, sectionOpen])
 
   const setKey = useCallback(
     <K extends keyof T>(key: K, val: T[K]) => {
@@ -474,6 +500,8 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
           <ControlSection
             key={section.title}
             title={section.title}
+            open={sectionOpen[section.title] ?? true}
+            onOpenChange={(open) => setSectionOpenState(section.title, open)}
             onReset={
               section.keys.length > 0
                 ? () => resetKeys(section.keys)

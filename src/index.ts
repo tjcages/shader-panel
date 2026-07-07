@@ -13,7 +13,9 @@ export {
 export {
   clearPersistedShaderDevValues,
   hasPersistedShaderDevValues,
+  loadPersistedShaderDevSections,
   loadPersistedShaderDevValues,
+  persistShaderDevSections,
   persistShaderDevValues,
 } from "./persist"
 export { ShaderDevFloatingPanel } from "./panel/floating-panel"
