@@ -2,14 +2,48 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { cn } from "../lib/cn"
+import { embedPngDpi, printMaxEdgePx } from "../lib/png-dpi"
 import { getShaderCapture } from "../hooks/capture-registry"
 
-/** Longest-edge pixel targets for the hi-res PNG export. */
-const RES_PRESETS = [
+const EXPORT_DPI = 300
+
+type ResPreset = {
+  label: string
+  maxEdge: number
+  /** When set, included in export status / filename hints. */
+  printHint?: string
+}
+
+/** Screen + print targets — print presets size the longest edge at 300 DPI. */
+const RES_PRESETS: ResPreset[] = [
   { label: "4K", maxEdge: 3840 },
   { label: "8K", maxEdge: 7680 },
   { label: "16K", maxEdge: 15360 },
-] as const
+  {
+    label: "8″",
+    maxEdge: printMaxEdgePx(8, 4.5, EXPORT_DPI),
+    printHint: `8″ @ ${EXPORT_DPI}dpi`,
+  },
+  {
+    label: "11″",
+    maxEdge: printMaxEdgePx(11, 8.5, EXPORT_DPI),
+    printHint: `11″ @ ${EXPORT_DPI}dpi`,
+  },
+  {
+    label: "16″",
+    maxEdge: printMaxEdgePx(16, 9, EXPORT_DPI),
+    printHint: `16″ @ ${EXPORT_DPI}dpi`,
+  },
+  {
+    label: "24″",
+    maxEdge: printMaxEdgePx(24, 13.5, EXPORT_DPI),
+    printHint: `24″ @ ${EXPORT_DPI}dpi`,
+  },
+]
+
+async function withExportDpi(blob: Blob): Promise<Blob> {
+  return embedPngDpi(blob, EXPORT_DPI)
+}
 
 /**
  * Export the live shader as a PNG (copy to clipboard / download) or a WebM
@@ -121,11 +155,15 @@ function fileBase(name: string): string {
   return `${slug}-${stamp}`
 }
 
+function presetExportLabel(preset: ResPreset): string {
+  return preset.printHint ?? preset.label
+}
+
 export function ControlExport({ name = "shader" }: { name?: string }) {
   const [status, setStatus] = useState<string | null>(null)
   const [recording, setRecording] = useState(false)
   const [elapsed, setElapsed] = useState(0)
-  const [resIndex, setResIndex] = useState(0) // default 4K
+  const [resIndex, setResIndex] = useState(3) // default 8″ @ 300dpi
   const [busy, setBusy] = useState(false)
   const recorderRef = useRef<MediaRecorder | null>(null)
   const chunksRef = useRef<Blob[]>([])
@@ -140,32 +178,36 @@ export function ControlExport({ name = "shader" }: { name?: string }) {
   const copyImage = useCallback(async () => {
     setBusy(true)
     try {
+      const preset = RES_PRESETS[resIndex]!
+      const exportLabel = presetExportLabel(preset)
       const capture = getShaderCapture()
       if (capture) {
-        const { maxEdge, label } = RES_PRESETS[resIndex]
-        flash(`Rendering ${label}…`, 30000)
-        const blob = await capture({ maxEdge })
+        flash(`Rendering ${exportLabel}…`, 30000)
+        const blob = await withExportDpi(await capture({ maxEdge: preset.maxEdge }))
         try {
           await navigator.clipboard.write([
             new ClipboardItem({ "image/png": blob }),
           ])
-          flash(`Image copied (${label})`)
+          flash(`Image copied (${exportLabel}, ${EXPORT_DPI} DPI)`)
         } catch {
-          downloadBlob(blob, `${fileBase(name)}-${label}.png`)
-          flash(`Clipboard blocked — downloaded PNG (${label})`)
+          downloadBlob(
+            blob,
+            `${fileBase(name)}-${preset.label.replace(/″/g, "in")}-${EXPORT_DPI}dpi.png`,
+          )
+          flash(`Clipboard blocked — downloaded PNG (${exportLabel})`)
         }
         return
       }
       const canvas = findShaderCanvas()
       if (!canvas) return flash("No shader canvas found")
-      const blob = await canvasToPngBlob(canvas)
+      const blob = await withExportDpi(await canvasToPngBlob(canvas))
       try {
         await navigator.clipboard.write([
           new ClipboardItem({ "image/png": blob }),
         ])
-        flash("Image copied to clipboard")
+        flash(`Image copied (${EXPORT_DPI} DPI)`)
       } catch {
-        downloadBlob(blob, `${fileBase(name)}.png`)
+        downloadBlob(blob, `${fileBase(name)}-${EXPORT_DPI}dpi.png`)
         flash("Clipboard blocked — downloaded PNG")
       }
     } catch (e) {
@@ -178,22 +220,24 @@ export function ControlExport({ name = "shader" }: { name?: string }) {
   const saveImage = useCallback(async () => {
     setBusy(true)
     try {
-      // Prefer the registered hi-res capture (re-renders the real scene at the
-      // requested super-resolution). Falls back to the visible canvas.
+      const preset = RES_PRESETS[resIndex]!
+      const exportLabel = presetExportLabel(preset)
       const capture = getShaderCapture()
       if (capture) {
-        const { maxEdge, label } = RES_PRESETS[resIndex]
-        flash(`Rendering ${label}…`, 30000)
-        const blob = await capture({ maxEdge })
-        downloadBlob(blob, `${fileBase(name)}-${label}.png`)
-        flash(`PNG saved (${label})`)
+        flash(`Rendering ${exportLabel}…`, 30000)
+        const blob = await withExportDpi(await capture({ maxEdge: preset.maxEdge }))
+        downloadBlob(
+          blob,
+          `${fileBase(name)}-${preset.label.replace(/″/g, "in")}-${EXPORT_DPI}dpi.png`,
+        )
+        flash(`PNG saved (${exportLabel}, ${EXPORT_DPI} DPI)`)
         return
       }
       const canvas = findShaderCanvas()
       if (!canvas) return flash("No shader canvas found")
-      const blob = await canvasToPngBlob(canvas)
-      downloadBlob(blob, `${fileBase(name)}.png`)
-      flash("PNG downloaded")
+      const blob = await withExportDpi(await canvasToPngBlob(canvas))
+      downloadBlob(blob, `${fileBase(name)}-${EXPORT_DPI}dpi.png`)
+      flash(`PNG downloaded (${EXPORT_DPI} DPI)`)
     } catch (e) {
       flash(e instanceof Error ? e.message : "Image export failed")
     } finally {
@@ -291,8 +335,9 @@ export function ControlExport({ name = "shader" }: { name?: string }) {
           {busy ? "Rendering…" : "Save PNG"}
         </button>
       </div>
-      {/* Super-resolution target for Copy/Save PNG — the frame is re-rendered at
-          this longest edge, so it's real detail, not an upscale. */}
+      <div className="sd-export-hint">
+        PNG exports embed {EXPORT_DPI} DPI metadata for print.
+      </div>
       <div className="sd-export-res" role="group" aria-label="PNG resolution">
         {RES_PRESETS.map((preset, i) => (
           <button
@@ -303,6 +348,10 @@ export function ControlExport({ name = "shader" }: { name?: string }) {
               i === resIndex && "sd-export-res-active",
             )}
             aria-pressed={i === resIndex}
+            title={
+              preset.printHint ??
+              `${preset.maxEdge}px longest edge · ${EXPORT_DPI} DPI metadata`
+            }
             onClick={() => setResIndex(i)}
           >
             {preset.label}

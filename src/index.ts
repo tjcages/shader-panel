@@ -104,7 +104,7 @@ export {
 } from "./hooks/keyboard"
 
 /** @deprecated Use layout inline script + ShaderDevRoot */
-export { ShaderDevShortcutBridge } from "./hooks/shortcut-bridge"
+export { embedPngDpi, printMaxEdgePx } from "./lib/png-dpi"
 
 export {
   ShaderDevThemeProvider,

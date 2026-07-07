@@ -459,17 +459,25 @@ export const SHADER_DEV_CSS = `
 .sd-export-row .sd-action-btn {
   flex: 1;
 }
+.sd-export-hint {
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--sd-text-muted);
+  padding: 0 2px;
+}
 
 /* Segmented resolution selector for the hi-res PNG. */
 .sd-export-res {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
   padding: 3px;
   border-radius: 8px;
   background: var(--sd-surface);
 }
 [data-shader-dev] .sd-export-res-btn {
-  flex: 1;
+  flex: 1 1 calc(25% - 4px);
+  min-width: 2.75rem;
   height: 26px;
   border-radius: 6px;
   font-size: 12px;
