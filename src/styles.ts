@@ -354,7 +354,7 @@ export const SHADER_DEV_CSS = `
   color: var(--sd-action-text);
   transition: background-color 150ms ease, color 150ms ease;
 }
-[data-shader-dev] .sd-action-btn:hover {
+[data-shader-dev] .sd-action-btn:hover:not(.sd-action-btn-primary):not(:disabled) {
   background: var(--sd-action-bg-hover);
   color: var(--sd-action-text-hover);
 }
@@ -364,7 +364,8 @@ export const SHADER_DEV_CSS = `
   color: var(--sd-bg);
   border-color: transparent;
 }
-[data-shader-dev] .sd-action-btn-primary:hover {
+[data-shader-dev] .sd-action-btn-primary:hover:not(:disabled) {
+  background: var(--sd-handle);
   filter: brightness(1.08);
   color: var(--sd-bg);
 }
