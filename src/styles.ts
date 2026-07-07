@@ -122,15 +122,25 @@ export const SHADER_DEV_CSS = `
   display: flex;
   width: 280px;
   flex-direction: column;
-  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  opacity: 1;
+  filter: blur(0);
+  transition-property: transform, opacity, filter;
+  transition-duration: 280ms, 200ms, 200ms;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1), ease-in, ease-in;
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 .sd-floating[data-sd-side="left"] { left: 16px; }
 .sd-floating[data-sd-side="right"] { right: 16px; }
 .sd-floating[data-sd-collapsed="true"][data-sd-side="left"] { transform: translateX(calc(-100% - 16px)); }
 .sd-floating[data-sd-collapsed="true"][data-sd-side="right"] { transform: translateX(calc(100% + 16px)); }
+.sd-floating[data-sd-collapsed="true"]:not([data-sd-peek="true"]) {
+  opacity: 0;
+  filter: blur(4px);
+  pointer-events: none;
+}
 
 /* Peek preview — a scaled-down sliver slides in when the viewport edge is
    hovered while collapsed. Overrides the fully-hidden collapsed transform. */
@@ -138,13 +148,53 @@ export const SHADER_DEV_CSS = `
 .sd-floating[data-sd-collapsed="true"][data-sd-peek="true"][data-sd-side="right"] {
   transform: translateX(calc(100% - 56px)) scale(0.9);
   transform-origin: right center;
+  opacity: 1;
+  filter: blur(0);
+  pointer-events: auto;
 }
 .sd-floating[data-sd-collapsed="true"][data-sd-peek="true"][data-sd-side="left"] {
   transform: translateX(calc(-100% + 56px)) scale(0.9);
   transform-origin: left center;
+  opacity: 1;
+  filter: blur(0);
+  pointer-events: auto;
 }
 @media (prefers-reduced-motion: reduce) {
   .sd-floating { transition: none; }
+  .sd-floating[data-sd-collapsed="true"]:not([data-sd-peek="true"]) {
+    opacity: 0;
+    filter: none;
+  }
+  .sd-panel,
+  .sd-floating[data-sd-collapsed="true"]:not([data-sd-peek="true"]) .sd-panel {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.sd-panel {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid var(--sd-border);
+  background: var(--sd-bg);
+  color: var(--sd-text);
+  box-shadow: var(--sd-shadow);
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition-property: opacity, transform;
+  transition-duration: 220ms;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sd-floating[data-sd-collapsed="true"]:not([data-sd-peek="true"]) .sd-panel {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.98);
+  transition-timing-function: ease-in;
+  transition-duration: 180ms;
 }
 
 /* Invisible hover/click strip pinned to the viewport edge — reveals the peek
@@ -169,19 +219,6 @@ export const SHADER_DEV_CSS = `
   border-radius: 14px;
   background: transparent;
   cursor: pointer;
-}
-
-.sd-panel {
-  display: flex;
-  min-height: 0;
-  flex: 1;
-  flex-direction: column;
-  overflow: hidden;
-  border-radius: 14px;
-  border: 1px solid var(--sd-border);
-  background: var(--sd-bg);
-  color: var(--sd-text);
-  box-shadow: var(--sd-shadow);
 }
 
 .sd-panel-header {
@@ -228,6 +265,7 @@ export const SHADER_DEV_CSS = `
 .sd-switcher:focus { outline: 2px solid var(--sd-handle); outline-offset: 1px; }
 
 .sd-close-btn {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -235,7 +273,17 @@ export const SHADER_DEV_CSS = `
   height: 20px;
   border-radius: 4px;
   color: var(--sd-close-icon);
-  transition: color 150ms ease;
+  transition-property: color, scale;
+  transition-duration: 150ms;
+  transition-timing-function: ease-out;
+}
+.sd-close-btn::before {
+  content: "";
+  position: absolute;
+  inset: -10px;
+}
+.sd-close-btn:active {
+  scale: 0.96;
 }
 .sd-close-btn:hover { color: var(--sd-close-icon-hover); }
 .sd-close-btn svg { width: 16px; height: 16px; }
@@ -352,7 +400,12 @@ export const SHADER_DEV_CSS = `
   line-height: 1;
   background: var(--sd-action-bg);
   color: var(--sd-action-text);
-  transition: background-color 150ms ease, color 150ms ease;
+  transition-property: background-color, color, scale;
+  transition-duration: 150ms;
+  transition-timing-function: ease-out;
+}
+[data-shader-dev] .sd-action-btn:active:not(:disabled) {
+  scale: 0.96;
 }
 [data-shader-dev] .sd-action-btn:hover:not(.sd-action-btn-primary):not(:disabled) {
   background: var(--sd-action-bg-hover);
