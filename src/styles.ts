@@ -866,6 +866,10 @@ export const SHADER_DEV_CSS = `
   cursor: crosshair;
   overflow: visible;
 }
+.sd-path-bg {
+  fill: transparent;
+  cursor: crosshair;
+}
 .sd-path-grid {
   stroke: var(--sd-divider);
   stroke-width: 0.5;
@@ -896,6 +900,9 @@ export const SHADER_DEV_CSS = `
   opacity: 0.7;
 }
 .sd-path-anchor.is-draggable {
+  cursor: grab;
+}
+.sd-path-anchor.is-draggable .sd-path-point-hit {
   cursor: grab;
 }
 .sd-path-anchor.is-draggable:active {

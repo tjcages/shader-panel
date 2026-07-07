@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { mountShaderDevOverlay, unmountShaderDevOverlay } from "../panel/auto-overlay"
 import { loadPersistedShaderDevValues } from "../persist"
 import {
@@ -71,17 +71,16 @@ export function useShaderDev<T extends ShaderDevValues>(
   const optionsRef = useRef(options)
   optionsRef.current = options
 
-  // Register / update on every value change. We do NOT return the unregister
-  // cleanup here — re-registering with the same id just replaces the entry, so
-  // there's no flicker. Unregistering on each tick would.
-  useEffect(() => {
+  // Keep the registry in sync with the latest fields / handlers / values.
+  // Re-registering with the same id just replaces the entry — no flicker.
+  useLayoutEffect(() => {
     const o = optionsRef.current
     registerShaderDev<T>({
       ...o,
       values,
       onChange: setValues,
     })
-  }, [values])
+  })
 
   // Unregister once on unmount, and own the auto-mounted overlay lifecycle.
   useEffect(() => {

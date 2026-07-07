@@ -22,13 +22,15 @@ export interface ControlPathProps {
 const VB = 100 // svg viewBox units
 /** `dragRef` sentinel — anchor/home point (not a waypoint index). */
 const ANCHOR_DRAG = -1
+/** Pad-space radius for grabbing dots (viewBox units). */
+const HIT_RADIUS_PAD = 8
+/** Min distance in value space before a new waypoint is accepted. */
+const MIN_ADD_DISTANCE = 0.06
 
 /**
- * 2D waypoint editor. Click empty space to append a point, drag to move,
- * double-click to remove. When `anchor` is set it's drawn as the start of the
- * path and the waypoints chain off it (a dashed segment closes back to the
- * anchor to hint the forward loop). Pass `onAnchorChange` to drag the home
- * point on the pad.
+ * 2D waypoint editor. Click empty pad to append a point, drag dots to move,
+ * double-click to remove. The home/anchor point is always draggable when
+ * `onAnchorChange` is set — it never spawns a duplicate waypoint.
  */
 export function ControlPath({
   label,
@@ -44,10 +46,10 @@ export function ControlPath({
   const svgRef = useRef<SVGSVGElement>(null)
   const dragRef = useRef<number | null>(null)
   const movedRef = useRef(false)
+  const pendingAddRef = useRef<PathPoint | null>(null)
   const [selected, setSelected] = useState<number | "anchor" | null>(null)
 
   const span = max - min || 1
-  // value/pad space conversions. Pad y is flipped so +y points up.
   const toPad = useCallback(
     (p: PathPoint): [number, number] => [
       ((p[0] - min) / span) * VB,
@@ -70,12 +72,27 @@ export function ControlPath({
     [min, max, span],
   )
 
+  const distance = (a: PathPoint, b: PathPoint): number =>
+    Math.hypot(a[0] - b[0], a[1] - b[1])
+
+  const tooCloseToAnchor = useCallback(
+    (p: PathPoint): boolean => {
+      if (!anchor || !onAnchorChange) return false
+      return distance(p, anchor) < MIN_ADD_DISTANCE
+    },
+    [anchor, onAnchorChange],
+  )
+
   const setPoint = (i: number, p: PathPoint) => {
     const next = value.map((pt, idx) => (idx === i ? p : pt))
     onChange(next as PathPoint[])
   }
 
   const addPoint = (p: PathPoint) => {
+    if (tooCloseToAnchor(p)) return
+    for (const pt of value) {
+      if (distance(p, pt) < MIN_ADD_DISTANCE) return
+    }
     onChange([...value, p] as PathPoint[])
     setSelected(value.length)
   }
@@ -85,46 +102,70 @@ export function ControlPath({
     setSelected(null)
   }
 
+  const beginPointer = (e: React.PointerEvent) => {
+    pendingAddRef.current = null
+    movedRef.current = false
+    svgRef.current?.setPointerCapture(e.pointerId)
+  }
+
   const onPointerDownPoint = (e: React.PointerEvent, i: number) => {
     e.stopPropagation()
+    beginPointer(e)
     dragRef.current = i
-    movedRef.current = false
     setSelected(i)
-    svgRef.current?.setPointerCapture(e.pointerId)
   }
 
   const onPointerDownAnchor = (e: React.PointerEvent) => {
     if (!onAnchorChange) return
     e.stopPropagation()
+    beginPointer(e)
     dragRef.current = ANCHOR_DRAG
-    movedRef.current = false
     setSelected("anchor")
-    svgRef.current?.setPointerCapture(e.pointerId)
+  }
+
+  const onPointerDownBackground = (e: React.PointerEvent) => {
+    e.stopPropagation()
+    beginPointer(e)
+    dragRef.current = null
+    pendingAddRef.current = fromEvent(e)
+    setSelected(null)
   }
 
   const onPointerMove = (e: React.PointerEvent) => {
-    if (dragRef.current === null) return
+    if (dragRef.current === null && pendingAddRef.current === null) return
     movedRef.current = true
     const next = fromEvent(e)
     if (dragRef.current === ANCHOR_DRAG) {
       onAnchorChange?.(next)
       return
     }
-    setPoint(dragRef.current, next)
-  }
-
-  const onPointerUp = (e: React.PointerEvent) => {
     if (dragRef.current !== null) {
-      svgRef.current?.releasePointerCapture(e.pointerId)
-      dragRef.current = null
+      setPoint(dragRef.current, next)
     }
   }
 
-  // Points that make up the drawn polyline: [anchor?, ...waypoints].
+  const onPointerUp = (e: React.PointerEvent) => {
+    svgRef.current?.releasePointerCapture(e.pointerId)
+
+    if (dragRef.current !== null) {
+      dragRef.current = null
+      movedRef.current = false
+      pendingAddRef.current = null
+      return
+    }
+
+    if (pendingAddRef.current !== null && !movedRef.current) {
+      addPoint(pendingAddRef.current)
+    }
+
+    dragRef.current = null
+    movedRef.current = false
+    pendingAddRef.current = null
+  }
+
   const chain: PathPoint[] = anchor ? [anchor, ...value] : [...value]
   const chainPad = chain.map(toPad)
   const polyline = chainPad.map(([x, y]) => `${x},${y}`).join(" ")
-  // Dashed closing segment back to the start (forward-loop hint).
   const closeFrom = chainPad[chainPad.length - 1]
   const closeTo = chainPad[0]
 
@@ -159,25 +200,49 @@ export function ControlPath({
         preserveAspectRatio="none"
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
-        onPointerDown={(e) => {
-          // Click on empty pad appends a point.
-          if (dragRef.current !== null) return
-          addPoint(fromEvent(e))
-        }}
+        onPointerCancel={onPointerUp}
       >
-        {/* grid */}
-        <line x1="50" y1="0" x2="50" y2={VB} className="sd-path-grid" />
-        <line x1="0" y1="50" x2={VB} y2="50" className="sd-path-grid" />
+        {/* Background — only receives clicks that miss dots (they render above). */}
+        <rect
+          x="0"
+          y="0"
+          width={VB}
+          height={VB}
+          className="sd-path-bg"
+          onPointerDown={onPointerDownBackground}
+        />
+
+        <line
+          x1="50"
+          y1="0"
+          x2="50"
+          y2={VB}
+          className="sd-path-grid"
+          pointerEvents="none"
+        />
+        <line
+          x1="0"
+          y1="50"
+          x2={VB}
+          y2="50"
+          className="sd-path-grid"
+          pointerEvents="none"
+        />
         <rect
           x="0.5"
           y="0.5"
           width={VB - 1}
           height={VB - 1}
           className="sd-path-frame"
+          pointerEvents="none"
         />
 
         {chain.length > 1 ? (
-          <polyline points={polyline} className="sd-path-line" />
+          <polyline
+            points={polyline}
+            className="sd-path-line"
+            pointerEvents="none"
+          />
         ) : null}
         {chain.length > 1 ? (
           <line
@@ -186,44 +251,9 @@ export function ControlPath({
             x2={closeTo[0]}
             y2={closeTo[1]}
             className="sd-path-line-close"
+            pointerEvents="none"
           />
         ) : null}
-
-        {anchor
-          ? (() => {
-              const [ax, ay] = toPad(anchor)
-              const anchorDraggable = Boolean(onAnchorChange)
-              return (
-                <g
-                  className={cn(
-                    "sd-path-anchor",
-                    anchorDraggable && "is-draggable",
-                    selected === "anchor" && "is-selected",
-                  )}
-                  pointerEvents={anchorDraggable ? "auto" : "none"}
-                  onPointerDown={
-                    anchorDraggable ? onPointerDownAnchor : undefined
-                  }
-                >
-                  {anchorDraggable ? (
-                    <circle
-                      cx={ax}
-                      cy={ay}
-                      r="4.2"
-                      className="sd-path-point-hit"
-                    />
-                  ) : null}
-                  <circle cx={ax} cy={ay} r="3.4" />
-                  <circle
-                    cx={ax}
-                    cy={ay}
-                    r="1.1"
-                    className="sd-path-anchor-dot"
-                  />
-                </g>
-              )
-            })()
-          : null}
 
         {value.map((p, i) => {
           const [x, y] = toPad(p)
@@ -240,14 +270,73 @@ export function ControlPath({
                 removePoint(i)
               }}
             >
-              <circle cx={x} cy={y} r="4.2" className="sd-path-point-hit" />
-              <circle cx={x} cy={y} r="3" className="sd-path-point-ring" />
-              <text x={x} y={y} className="sd-path-point-num" dy="0.35em">
+              <circle
+                cx={x}
+                cy={y}
+                r={HIT_RADIUS_PAD}
+                className="sd-path-point-hit"
+              />
+              <circle
+                cx={x}
+                cy={y}
+                r="3"
+                className="sd-path-point-ring"
+                pointerEvents="none"
+              />
+              <text
+                x={x}
+                y={y}
+                className="sd-path-point-num"
+                dy="0.35em"
+                pointerEvents="none"
+              >
                 {i + 1}
               </text>
             </g>
           )
         })}
+
+        {anchor
+          ? (() => {
+              const [ax, ay] = toPad(anchor)
+              const anchorDraggable = Boolean(onAnchorChange)
+              return (
+                <g
+                  className={cn(
+                    "sd-path-anchor",
+                    anchorDraggable && "is-draggable",
+                    selected === "anchor" && "is-selected",
+                  )}
+                  style={{ pointerEvents: anchorDraggable ? "auto" : "none" }}
+                  onPointerDown={
+                    anchorDraggable ? onPointerDownAnchor : undefined
+                  }
+                >
+                  {anchorDraggable ? (
+                    <circle
+                      cx={ax}
+                      cy={ay}
+                      r={HIT_RADIUS_PAD}
+                      className="sd-path-point-hit"
+                    />
+                  ) : null}
+                  <circle
+                    cx={ax}
+                    cy={ay}
+                    r="3.4"
+                    pointerEvents="none"
+                  />
+                  <circle
+                    cx={ax}
+                    cy={ay}
+                    r="1.1"
+                    className="sd-path-anchor-dot"
+                    pointerEvents="none"
+                  />
+                </g>
+              )
+            })()
+          : null}
       </svg>
       {selected === "anchor" && anchor ? (
         <div className="sd-path-selected">
@@ -271,8 +360,7 @@ export function ControlPath({
         </div>
       ) : (
         <div className="sd-path-hint">
-          Click to add · drag to move
-          {onAnchorChange ? " · drag home to reposition start" : ""} ·
+          Click empty space to add · drag home or waypoints to move ·
           double-click to remove
         </div>
       )}
