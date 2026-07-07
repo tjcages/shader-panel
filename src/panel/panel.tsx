@@ -417,6 +417,15 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
               max={field.max}
               anchor={anchor}
               onChange={(v) => setKey(key, v as T[typeof key])}
+              onAnchorChange={
+                field.anchorKey
+                  ? (v) =>
+                      setKey(
+                        field.anchorKey as keyof T & string,
+                        v as T[keyof T & string],
+                      )
+                  : undefined
+              }
             />
           </>,
           key,

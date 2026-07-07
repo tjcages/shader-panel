@@ -895,6 +895,16 @@ export const SHADER_DEV_CSS = `
   stroke-width: 1;
   opacity: 0.7;
 }
+.sd-path-anchor.is-draggable {
+  cursor: grab;
+}
+.sd-path-anchor.is-draggable:active {
+  cursor: grabbing;
+}
+.sd-path-anchor.is-selected circle:not(.sd-path-point-hit) {
+  stroke-width: 1.4;
+  opacity: 1;
+}
 .sd-path-anchor .sd-path-anchor-dot {
   fill: var(--sd-handle);
   stroke: none;

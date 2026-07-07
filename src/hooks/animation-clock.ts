@@ -138,7 +138,9 @@ export function advanceShaderDevAnimationDelta(previousTime: number): {
   delta: number
 } {
   const nextTime = getShaderDevAnimationTime()
-  const delta = Math.min(Math.max(0, nextTime - previousTime), 0.1)
+  // Allow negative deltas so panel step-backward rewinds shaders; still cap
+  // magnitude so a tab-background jump or seek doesn't explode uTime.
+  const delta = Math.max(-0.1, Math.min(nextTime - previousTime, 0.1))
   return { time: nextTime, delta }
 }
 

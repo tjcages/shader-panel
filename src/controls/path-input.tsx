@@ -12,19 +12,23 @@ export interface ControlPathProps {
   onChange: (v: PathPoint[]) => void
   min: number
   max: number
-  /** Fixed "home" point drawn as the non-editable start of the path. */
+  /** Home point drawn as the start of the path. Draggable when `onAnchorChange` is set. */
   anchor?: PathPoint
+  onAnchorChange?: (v: PathPoint) => void
   emptyLabel?: string
   className?: string
 }
 
 const VB = 100 // svg viewBox units
+/** `dragRef` sentinel — anchor/home point (not a waypoint index). */
+const ANCHOR_DRAG = -1
 
 /**
  * 2D waypoint editor. Click empty space to append a point, drag to move,
  * double-click to remove. When `anchor` is set it's drawn as the start of the
  * path and the waypoints chain off it (a dashed segment closes back to the
- * anchor to hint the forward loop).
+ * anchor to hint the forward loop). Pass `onAnchorChange` to drag the home
+ * point on the pad.
  */
 export function ControlPath({
   label,
@@ -33,13 +37,14 @@ export function ControlPath({
   min,
   max,
   anchor,
+  onAnchorChange,
   emptyLabel,
   className,
 }: ControlPathProps) {
   const svgRef = useRef<SVGSVGElement>(null)
   const dragRef = useRef<number | null>(null)
   const movedRef = useRef(false)
-  const [selected, setSelected] = useState<number | null>(null)
+  const [selected, setSelected] = useState<number | "anchor" | null>(null)
 
   const span = max - min || 1
   // value/pad space conversions. Pad y is flipped so +y points up.
@@ -88,10 +93,24 @@ export function ControlPath({
     svgRef.current?.setPointerCapture(e.pointerId)
   }
 
+  const onPointerDownAnchor = (e: React.PointerEvent) => {
+    if (!onAnchorChange) return
+    e.stopPropagation()
+    dragRef.current = ANCHOR_DRAG
+    movedRef.current = false
+    setSelected("anchor")
+    svgRef.current?.setPointerCapture(e.pointerId)
+  }
+
   const onPointerMove = (e: React.PointerEvent) => {
     if (dragRef.current === null) return
     movedRef.current = true
-    setPoint(dragRef.current, fromEvent(e))
+    const next = fromEvent(e)
+    if (dragRef.current === ANCHOR_DRAG) {
+      onAnchorChange?.(next)
+      return
+    }
+    setPoint(dragRef.current, next)
   }
 
   const onPointerUp = (e: React.PointerEvent) => {
@@ -173,10 +192,34 @@ export function ControlPath({
         {anchor
           ? (() => {
               const [ax, ay] = toPad(anchor)
+              const anchorDraggable = Boolean(onAnchorChange)
               return (
-                <g className="sd-path-anchor" pointerEvents="none">
+                <g
+                  className={cn(
+                    "sd-path-anchor",
+                    anchorDraggable && "is-draggable",
+                    selected === "anchor" && "is-selected",
+                  )}
+                  pointerEvents={anchorDraggable ? "auto" : "none"}
+                  onPointerDown={
+                    anchorDraggable ? onPointerDownAnchor : undefined
+                  }
+                >
+                  {anchorDraggable ? (
+                    <circle
+                      cx={ax}
+                      cy={ay}
+                      r="4.2"
+                      className="sd-path-point-hit"
+                    />
+                  ) : null}
                   <circle cx={ax} cy={ay} r="3.4" />
-                  <circle cx={ax} cy={ay} r="1.1" className="sd-path-anchor-dot" />
+                  <circle
+                    cx={ax}
+                    cy={ay}
+                    r="1.1"
+                    className="sd-path-anchor-dot"
+                  />
                 </g>
               )
             })()
@@ -206,7 +249,13 @@ export function ControlPath({
           )
         })}
       </svg>
-      {selected !== null && value[selected] ? (
+      {selected === "anchor" && anchor ? (
+        <div className="sd-path-selected">
+          <span>
+            Home: {anchor[0].toFixed(2)}, {anchor[1].toFixed(2)}
+          </span>
+        </div>
+      ) : selected !== null && typeof selected === "number" && value[selected] ? (
         <div className="sd-path-selected">
           <span>
             Point {selected + 1}: {value[selected][0].toFixed(2)},{" "}
@@ -222,7 +271,9 @@ export function ControlPath({
         </div>
       ) : (
         <div className="sd-path-hint">
-          Click to add · drag to move · double-click to remove
+          Click to add · drag to move
+          {onAnchorChange ? " · drag home to reposition start" : ""} ·
+          double-click to remove
         </div>
       )}
     </div>

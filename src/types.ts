@@ -87,9 +87,9 @@ export type ShaderDevImageField<T extends Record<string, unknown>> = {
  * light (or anything) travels through. Click the pad to append a point, drag a
  * point to move it, double-click to remove it.
  *
- * `anchorKey` optionally names another config key holding a fixed `[x, y]`
- * "home" position, drawn as the non-editable start of the path (the travel
- * points chain off it). Useful when the resting position lives on its own key.
+ * `anchorKey` optionally names another config key holding the `[x, y]` home
+ * position, drawn as the start of the path (waypoints chain off it). When set,
+ * the home point is draggable on the path pad and writes back to that key.
  */
 export type ShaderDevPathField<T extends Record<string, unknown>> = {
   type: "path"
