@@ -1105,7 +1105,7 @@ export const SHADER_DEV_CSS = `
   gap: 12px;
   border-radius: 8px;
   padding: 0 4px 0 12px;
-  background: var(--sd-bg);
+  background: var(--sd-surface);
 }
 .sd-select[data-sd-layout="stacked"] {
   flex-direction: column;
@@ -1137,7 +1137,7 @@ export const SHADER_DEV_CSS = `
   flex-shrink: 0;
   border: 0;
   outline: 0;
-  background: transparent;
+  background: var(--sd-bg);
   color: var(--sd-label);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 11.5px;
