@@ -1104,7 +1104,7 @@ export const SHADER_DEV_CSS = `
   gap: 12px;
   border-radius: 8px;
   padding: 0 4px 0 12px;
-  background: var(--sd-surface);
+  background: var(--sd-bg);
 }
 .sd-select[data-sd-layout="stacked"] {
   flex-direction: column;
