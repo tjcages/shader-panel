@@ -16,9 +16,13 @@
 
 // Re-export types (zero runtime cost — type-only imports are erased).
 export type {
+  PanelActionField,
+  PanelCollectionField,
+  PanelCollectionItem,
   PanelColorField,
   PanelField,
   PanelImageField,
+  PanelReferenceField,
   PanelSide,
   PanelPathField,
   PanelPresetOption,
@@ -244,6 +248,8 @@ export const ControlToggle = NULL_COMPONENT
 export const ControlSelect = NULL_COMPONENT
 export const ControlVec2 = NULL_COMPONENT
 export const ControlPresets = NULL_COMPONENT
+export const ControlCollection = NULL_COMPONENT
+export const ControlReference = NULL_COMPONENT
 export const ControlQuickActions = NULL_COMPONENT
 export const ControlAnimation = NULL_COMPONENT
 

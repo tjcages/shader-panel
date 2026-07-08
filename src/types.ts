@@ -137,6 +137,78 @@ export type PanelPresetsField<T extends Record<string, unknown>> = {
   presets: ReadonlyArray<PanelPresetOption<T>>
 }
 
+/** Minimum contract for a collection item — a stable string id. */
+export type PanelCollectionItem = { id: string }
+
+/**
+ * A managed list of items stored as an array at `key` (`T[key]` is `Item[]`).
+ * Each item is edited through its own `itemFields`, rendered recursively via
+ * the same field renderer every other control uses — so sliders, selects,
+ * colors, references, etc. all work unchanged inside an item.
+ *
+ * Items MUST carry a stable `id: string`. On add, if `newItem()` omits it the
+ * collection assigns one (`crypto.randomUUID()` with a counter fallback). `id`
+ * is what React keys, reorder, selection, and references use.
+ */
+export type PanelCollectionField<
+  T extends Record<string, unknown>,
+  Item extends PanelCollectionItem = PanelCollectionItem,
+> = {
+  type: "collection"
+  /** `T[key]` must be `Item[]`. */
+  key: keyof T & string
+  label: string
+  /**
+   * Fields rendered for each item. A function receives the item + its index so
+   * you can return per-item / per-type schemas (e.g. branch on `item.kind`).
+   */
+  itemFields:
+    | PanelField<Item>[]
+    | ((item: Item, index: number) => PanelField<Item>[])
+  /** Row title. Default `${label} ${i + 1}`. */
+  itemLabel?: (item: Item, index: number) => string
+  /** "Add" factory. Omit to hide the add button (list becomes read-only-size). */
+  newItem?: () => Omit<Item, "id"> | Item
+  /** Add-button label. Default `Add ${singular(label)}`. */
+  addLabel?: string
+  /** Block remove below this count. */
+  min?: number
+  /** Block add above this count. */
+  max?: number
+  /** Show a drag handle to reorder. Default `true`. */
+  reorderable?: boolean
+  /** Allow several rows open at once. Default `false` (single-open selection). */
+  multiOpen?: boolean
+  /**
+   * Applied to `T[key]` on load (after persistence merge) for versioned
+   * item-shape changes — e.g. renaming a field across a schema bump.
+   */
+  migrate?: (items: Item[]) => Item[]
+  description?: string
+}
+
+/**
+ * Points at an item (or items) in a sibling collection. The value at `key` is
+ * a string id, or `string[]` when `multiple`. Resolving the label needs the
+ * sibling collection, so the renderer receives the ROOT state, not just the
+ * item being edited.
+ */
+export type PanelReferenceField<T extends Record<string, unknown>> = {
+  type: "reference"
+  /** Value is a string id, or `string[]` when `multiple`. */
+  key: keyof T & string
+  label: string
+  /** The sibling collection key whose items are the choices. */
+  collection: keyof T & string
+  /** Allow multiple targets. Default `false`. */
+  multiple?: boolean
+  /** How each choice reads. Default `itemLabel` / the item's `id`. */
+  optionLabel?: (item: PanelCollectionItem) => string
+  /** Shown when unset. */
+  placeholder?: string
+  description?: string
+}
+
 export type PanelField<T extends Record<string, unknown>> =
   | PanelSectionField
   | PanelSliderField<T>
@@ -148,6 +220,8 @@ export type PanelField<T extends Record<string, unknown>> =
   | PanelPathField<T>
   | PanelActionField
   | PanelPresetsField<T>
+  | PanelCollectionField<T>
+  | PanelReferenceField<T>
 
 export type PanelWriteResult = { ok: boolean; message: string }
 

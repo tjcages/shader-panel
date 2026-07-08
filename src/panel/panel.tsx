@@ -8,19 +8,11 @@ import {
   useRef,
   useState,
 } from "react"
-import { ControlAction } from "../controls/action"
 import { ControlAnimation } from "../controls/animation-controls"
-import { ControlColorInput } from "../controls/color-input"
 import { ControlExport } from "../controls/export-controls"
-import { ControlImageInput } from "../controls/image-input"
-import { ControlPath, type PathPoint } from "../controls/path-input"
-import { ControlPresets } from "../controls/presets"
 import { ControlQuickActions } from "../controls/quick-actions"
 import { ControlSection } from "../controls/section"
-import { ControlSelect } from "../controls/select"
-import { ControlSlider } from "../controls/slider"
-import { ControlToggle } from "../controls/toggle"
-import { ControlVec2 } from "../controls/vec2"
+import { renderPanelField, type AnyRenderableField } from "./render-field"
 import type { PanelPrompt } from "../prompts"
 import { FloatingPanel } from "./floating-panel"
 import {
@@ -66,6 +58,7 @@ export function Panel<T extends Record<string, unknown>>({
   peek,
   showAnimation = true,
   showExport = true,
+  onSelect,
 }: {
   /** Used as the localStorage key (`shader-dev:<id>`) when `persist` is true. */
   id?: string
@@ -106,6 +99,12 @@ export function Panel<T extends Record<string, unknown>>({
   showAnimation?: boolean
   /** Show canvas PNG/video export in the actions footer. Default true. */
   showExport?: boolean
+  /**
+   * Fires with the open item's id (or null) of a `collection` field. The
+   * collection key is the first argument. Used by canvas overlays to highlight
+   * the selected item and vice-versa.
+   */
+  onSelect?: (collectionKey: string, id: string | null) => void
 }) {
   const [writing, setWriting] = useState(false)
   const [status, setStatus] = useState<string | null>(null)
@@ -138,6 +137,19 @@ export function Panel<T extends Record<string, unknown>>({
       if (f.type === "image") keys.add(f.key)
     }
     return keys
+  }, [fields])
+
+  // Collection `migrate` hooks, keyed by the collection field's key. Applied
+  // to that key's array after the persistence merge on load (OFF-137) — for
+  // versioned item-shape changes.
+  const collectionMigrations = useMemo(() => {
+    const out = new Map<string, (items: { id: string }[]) => { id: string }[]>()
+    for (const f of fields) {
+      if (f.type === "collection" && f.migrate) {
+        out.set(f.key, f.migrate as (i: { id: string }[]) => { id: string }[])
+      }
+    }
+    return out
   }, [fields])
 
   const stripImages = useCallback(
@@ -187,10 +199,19 @@ export function Panel<T extends Record<string, unknown>>({
         ;(saved as Record<string, unknown>)[k] = live.values[k]
       }
     }
+    // Apply collection migrations to any restored arrays (versioned shapes).
+    for (const [k, migrate] of collectionMigrations) {
+      const arr = (saved as Record<string, unknown>)[k]
+      if (Array.isArray(arr)) {
+        ;(saved as Record<string, unknown>)[k] = migrate(
+          arr as { id: string }[],
+        )
+      }
+    }
     if (JSON.stringify(live.stripImages(saved)) !== live.valuesJson) {
       live.onChange(saved as T)
     }
-  }, [persistKey, imageKeys])
+  }, [persistKey, imageKeys, collectionMigrations])
 
   // Write to localStorage whenever values change (debounce-free — these are
   // tiny blobs and the user is hand-tweaking).
@@ -230,13 +251,6 @@ export function Panel<T extends Record<string, unknown>>({
     }
     persistPanelSections(sectionsKey, sectionOpen)
   }, [sectionsKey, sectionOpen])
-
-  const setKey = useCallback(
-    <K extends keyof T>(key: K, val: T[K]) => {
-      onChange({ ...values, [key]: val })
-    },
-    [onChange, values],
-  )
 
   const resetAll = useCallback(() => {
     onChange({ ...defaults })
@@ -322,25 +336,16 @@ export function Panel<T extends Record<string, unknown>>({
       keys: (keyof T & string)[]
     } | null = null
 
-    const pushField = (
-      node: ReactNode,
-      key: keyof T & string,
-    ) => {
+    const ensureCurrent = () => {
       if (!current) {
         current = { title: "Parameters", children: [], keys: [] }
         out.push(current)
       }
-      current.children.push(<div key={key} className="panel-field">{node}</div>)
-      current.keys.push(key)
+      return current
     }
 
-    const pushContent = (node: ReactNode, reactKey: string) => {
-      if (!current) {
-        current = { title: "Parameters", children: [], keys: [] }
-        out.push(current)
-      }
-      current.children.push(<div key={reactKey} className="panel-field">{node}</div>)
-    }
+    const rootValues = values as Record<string, unknown>
+    const setRootValues = (next: Record<string, unknown>) => onChange(next as T)
 
     for (const field of fields) {
       if (field.type === "section") {
@@ -349,180 +354,29 @@ export function Panel<T extends Record<string, unknown>>({
         continue
       }
 
-      if (field.type === "action") {
-        if (field.when && !field.when(values)) continue
-        const handler = actionHandlers?.[field.actionId]
-        pushContent(
-          <ControlAction
-            label={field.label}
-            description={field.description}
-            variant={field.variant}
-            disabled={!handler}
-            onClick={() => handler?.()}
-          />,
-          field.actionId,
-        )
-        continue
-      }
+      const rendered = renderPanelField(field as AnyRenderableField, {
+        values: rootValues,
+        setValues: setRootValues,
+        rootValues,
+        setRootValues,
+        actionHandlers,
+        onCollectionSelect: onSelect,
+      })
+      if (!rendered) continue
 
-      if (field.type === "presets") {
-        pushContent(
-          <ControlPresets
-            label={field.label}
-            presets={field.presets}
-            values={values}
-            onChange={onChange}
-            actionHandlers={actionHandlers}
-          />,
-          `presets-${field.presets.map((p) => p.label).join("-")}`,
-        )
-        continue
-      }
-
-      const key = field.key
-
-      if (field.type === "slider") {
-        pushField(
-          <>
-            {field.description && (
-              <div className="panel-field-description">{field.description}</div>
-            )}
-            <ControlSlider
-              label={field.label}
-              value={values[key] as number}
-              min={field.min}
-              max={field.max}
-              step={field.step}
-              onChange={(v) => setKey(key, v as T[typeof key])}
-            />
-          </>,
-          key,
-        )
-        continue
-      }
-
-      if (field.type === "toggle") {
-        pushField(
-          <>
-            {field.description && (
-              <div className="panel-field-description">{field.description}</div>
-            )}
-            <ControlToggle
-              label={field.label}
-              value={values[key] as boolean}
-              onChange={(v) => setKey(key, v as T[typeof key])}
-            />
-          </>,
-          key,
-        )
-        continue
-      }
-
-      if (field.type === "select") {
-        pushField(
-          <>
-            {field.description && (
-              <div className="panel-field-description">{field.description}</div>
-            )}
-            <ControlSelect
-              label={field.label}
-              value={values[key] as string | number}
-              options={field.options}
-              layout={field.layout}
-              onChange={(v) => setKey(key, v as T[typeof key])}
-            />
-          </>,
-          key,
-        )
-        continue
-      }
-
-      if (field.type === "vec2") {
-        pushField(
-          <ControlVec2
-            label={field.label}
-            value={values[key] as readonly [number, number]}
-            min={field.min}
-            max={field.max}
-            step={field.step}
-            xLabel={field.xLabel}
-            yLabel={field.yLabel}
-            onChange={(v) => setKey(key, v as T[typeof key])}
-          />,
-          key,
-        )
-        continue
-      }
-
-      if (field.type === "image") {
-        pushField(
-          <>
-            {field.description && (
-              <div className="panel-field-description">{field.description}</div>
-            )}
-            <ControlImageInput
-              label={field.label}
-              value={(values[key] as string) ?? ""}
-              readonly={field.readonly}
-              accept={field.accept}
-              emptyLabel={field.emptyLabel}
-              onChange={
-                field.readonly
-                  ? undefined
-                  : (v) => setKey(key, v as T[typeof key])
-              }
-            />
-          </>,
-          key,
-        )
-        continue
-      }
-
-      if (field.type === "path") {
-        const anchor = field.anchorKey
-          ? (values[field.anchorKey] as PathPoint | undefined)
-          : undefined
-        pushField(
-          <>
-            {field.description && (
-              <div className="panel-field-description">{field.description}</div>
-            )}
-            <ControlPath
-              label={field.label}
-              value={(values[key] as ReadonlyArray<PathPoint>) ?? []}
-              min={field.min}
-              max={field.max}
-              anchor={anchor}
-              onChange={(v) => setKey(key, v as T[typeof key])}
-              onAnchorChange={
-                field.anchorKey
-                  ? (v) =>
-                      setKey(
-                        field.anchorKey as keyof T & string,
-                        v as T[keyof T & string],
-                      )
-                  : undefined
-              }
-            />
-          </>,
-          key,
-        )
-        continue
-      }
-
-      // type === "color"
-      pushField(
-        <ControlColorInput
-          label={field.label}
-          value={values[key] as string}
-          onChange={(v) => setKey(key, v as T[typeof key])}
-        />,
-        key,
+      const group = ensureCurrent()
+      group.children.push(
+        <div key={rendered.reactKey} className="panel-field">
+          {rendered.node}
+        </div>,
       )
+      // Track scalar keys for section-level reset. Field types with a `key`
+      // (everything except section/action/presets) opt into reset.
+      if ("key" in field) group.keys.push(field.key)
     }
 
     return out
-  }, [actionHandlers, fields, onChange, setKey, values])
+  }, [actionHandlers, fields, onChange, onSelect, values])
 
   const resolvedPeek = peek ?? !inline
 

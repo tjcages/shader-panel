@@ -29,9 +29,12 @@ export {
 
 export type {
   PanelActionField,
+  PanelCollectionField,
+  PanelCollectionItem,
   PanelColorField,
   PanelField,
   PanelImageField,
+  PanelReferenceField,
   PanelSide,
   PanelPathField,
   PanelPresetOption,
@@ -192,6 +195,14 @@ export {
   ControlDisclosure,
   type ControlDisclosureProps,
 } from "./controls/disclosure"
+export {
+  ControlCollection,
+  type ControlCollectionProps,
+} from "./controls/collection"
+export {
+  ControlReference,
+  type ControlReferenceProps,
+} from "./controls/reference"
 export {
   ControlHint,
   type ControlHintProps,
