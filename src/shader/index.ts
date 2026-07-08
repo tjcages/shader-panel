@@ -27,5 +27,13 @@ export {
 export {
   PanelOverlay,
   createR3FBinding,
+  raycastSurface,
   type PanelOverlayProps,
+  type RaycastSurface,
 } from "./overlay"
+export {
+  useDragHandle,
+  type UseDragHandleOptions,
+  type UseDragHandleReturn,
+  type DragHandleProps,
+} from "./drag"

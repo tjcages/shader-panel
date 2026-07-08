@@ -20,9 +20,44 @@
 import { useFrame, useThree } from "@react-three/fiber"
 import { useEffect, useMemo, useRef, type ReactNode } from "react"
 import { createPortal } from "react-dom"
-import { Vector3, type Camera, type Object3D } from "three"
+import {
+  Plane,
+  Raycaster,
+  Sphere,
+  Vector2,
+  Vector3,
+  type Camera,
+  type Object3D,
+} from "three"
 
 import type { ProjectedPoint, RendererBinding, Vec3 } from "../overlay/types"
+
+/**
+ * A target surface for `unproject` (screen → world raycast). One of:
+ *
+ * - `THREE.Plane` — hit that exact plane.
+ * - `THREE.Object3D` (mesh/group) — hit its geometry (recursive).
+ * - `{ radius }` — hit a sphere of that radius centered at `center` (default
+ *   origin). This is region-earth's globe case.
+ * - `{ point, normal? }` — hit a plane through `point` (default origin) with
+ *   the given `normal` (default: faces the camera, recomputed per raycast).
+ * - omitted → a plane through the world origin facing the camera.
+ */
+export type RaycastSurface =
+  | Plane
+  | Object3D
+  | { radius: number; center?: Vec3 }
+  | { point?: Vec3; normal?: Vec3 }
+
+function isPlane(v: unknown): v is Plane {
+  return (v as { isPlane?: boolean } | null)?.isPlane === true
+}
+
+function isSphereSurface(
+  v: RaycastSurface | undefined,
+): v is { radius: number; center?: Vec3 } {
+  return typeof v === "object" && v !== null && "radius" in v
+}
 
 /** The overlay-layer element, created lazily per container and reused. */
 function ensureOverlayLayer(container: HTMLElement): HTMLElement {
@@ -65,6 +100,76 @@ function isObject3D(v: unknown): v is Object3D {
 }
 
 /**
+ * Raycast from screen px onto a target surface and return the first world-space
+ * hit, or `null` on a miss. Shared by `createR3FBinding().unproject` and the
+ * drag helpers.
+ *
+ * `screen` is px relative to the canvas top-left (matching `project`'s output).
+ */
+export function raycastSurface(
+  screen: { x: number; y: number },
+  camera: Camera,
+  rect: { width: number; height: number },
+  surface: RaycastSurface | undefined,
+  scratch: {
+    raycaster: Raycaster
+    ndc: Vector2
+    hit: Vector3
+    plane: Plane
+    normal: Vector3
+  },
+): Vec3 | null {
+  const { raycaster, ndc, hit, plane, normal } = scratch
+  if (!rect.width || !rect.height) return null
+
+  // Screen px → NDC (-1..1). Y flips (screen down = NDC up).
+  ndc.set((screen.x / rect.width) * 2 - 1, -(screen.y / rect.height) * 2 + 1)
+  raycaster.setFromCamera(ndc, camera)
+
+  // Object3D surface: intersect geometry, take the nearest hit.
+  if (isObject3D(surface)) {
+    const hits = raycaster.intersectObject(surface, true)
+    if (hits.length === 0) return null
+    const p = hits[0].point
+    return [p.x, p.y, p.z]
+  }
+
+  // Sphere surface (globe case): intersect an analytic sphere.
+  if (isSphereSurface(surface)) {
+    const c = surface.center
+    const sphere = new Sphere(
+      c ? new Vector3(c[0], c[1], c[2]) : new Vector3(0, 0, 0),
+      surface.radius,
+    )
+    const p = raycaster.ray.intersectSphere(sphere, hit)
+    if (!p) return null
+    return [p.x, p.y, p.z]
+  }
+
+  // Plane surface: an explicit THREE.Plane, or one built from point + normal.
+  if (isPlane(surface)) {
+    plane.copy(surface)
+  } else {
+    // { point?, normal? } or undefined → plane through the point (default
+    // origin) with the given normal, or one facing the camera.
+    const pt = surface?.point ?? [0, 0, 0]
+    if (surface?.normal) {
+      normal.set(surface.normal[0], surface.normal[1], surface.normal[2])
+    } else {
+      // Face the camera: use the camera's forward direction (negated).
+      camera.getWorldDirection(normal).negate()
+    }
+    normal.normalize()
+    hit.set(pt[0], pt[1], pt[2])
+    plane.setFromNormalAndCoplanarPoint(normal, hit)
+  }
+
+  const p = raycaster.ray.intersectPlane(plane, hit)
+  if (!p) return null
+  return [p.x, p.y, p.z]
+}
+
+/**
  * Build a `RendererBinding` for an R3F scene. `project` reads the current
  * camera + canvas size on each call; `onFrame` registers via a passed-in
  * subscribe fn (in R3F this is driven by `useFrame` — see `PanelOverlay`).
@@ -81,13 +186,35 @@ export function createR3FBinding(opts: {
    * external `useFrame` tick; the core only needs it to be called each frame.
    */
   onFrame: RendererBinding["onFrame"]
+  /**
+   * Default surface for `unproject` (screen → world raycast). Omit for a plane
+   * through the world origin facing the camera. See {@link RaycastSurface}.
+   */
+  surface?: RaycastSurface
 }): RendererBinding {
   const scratch = new Vector3()
+  const rayScratch = {
+    raycaster: new Raycaster(),
+    ndc: new Vector2(),
+    hit: new Vector3(),
+    plane: new Plane(),
+    normal: new Vector3(),
+  }
   return {
     project: (world: Vec3) => {
       const rect = opts.canvas.getBoundingClientRect()
       scratch.set(world[0], world[1], world[2])
       return projectWorld(scratch, opts.camera, rect)
+    },
+    unproject: (screen: { x: number; y: number }) => {
+      const rect = opts.canvas.getBoundingClientRect()
+      return raycastSurface(
+        screen,
+        opts.camera,
+        { width: rect.width, height: rect.height },
+        opts.surface,
+        rayScratch,
+      )
     },
     onFrame: opts.onFrame,
   }
