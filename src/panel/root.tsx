@@ -1,11 +1,12 @@
 "use client"
 
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react"
+import type { ShaderDevPanelSide } from "../types"
 import { ShaderDevPanel } from "./panel"
 import {
-  getActiveShaderDev,
-  getActiveShaderDevId,
-  getShaderDevRegistrations,
+  getActiveShaderDevForSide,
+  getActiveShaderDevIdForSide,
+  getShaderDevRegistrationsForSide,
   getShaderDevRevision,
   setActiveShaderDev,
   subscribeShaderDevRegistration,
@@ -13,6 +14,7 @@ import {
 import { installShaderDevKeyboard } from "../hooks/keyboard"
 import { useInjectShaderDevStyles } from "../hooks/use-inject-styles"
 import {
+  initShaderDevOpenFlag,
   readShaderDevOpenFlag,
   SHADER_DEV_TOGGLE_EVENT,
   writeShaderDevOpenFlag,
@@ -22,14 +24,26 @@ import {
   type ShaderDevTheme,
 } from "../hooks/use-theme"
 
-function subscribeOpen(listener: () => void): () => void {
+function subscribeSideOpen(side: ShaderDevPanelSide, listener: () => void): () => void {
   const onToggle = () => listener()
   window.addEventListener(SHADER_DEV_TOGGLE_EVENT, onToggle)
   return () => window.removeEventListener(SHADER_DEV_TOGGLE_EVENT, onToggle)
 }
 
-function getOpenSnapshot(): boolean {
-  return readShaderDevOpenFlag()
+function getSideOpenSnapshot(side: ShaderDevPanelSide): boolean {
+  return readShaderDevOpenFlag(side)
+}
+
+function useSideOpen(side: ShaderDevPanelSide): boolean {
+  const subscribe = useCallback(
+    (listener: () => void) => subscribeSideOpen(side, listener),
+    [side],
+  )
+  return useSyncExternalStore(
+    subscribe,
+    () => getSideOpenSnapshot(side),
+    () => false,
+  )
 }
 
 // Only one root renders the panel — whether mounted explicitly via
@@ -39,63 +53,82 @@ let primaryClaimed = false
 
 /**
  * Mounts once in the app layout. Owns the keyboard shortcut + renders whichever
- * shader is currently active. Shaders register themselves on hydrate via
- * `registerShaderDev({ id, title, values, defaults, fields, onChange })`.
+ * shader is currently active on each side. Shaders register themselves on
+ * hydrate via `registerShaderDev({ id, title, side, values, defaults, fields, onChange })`.
  *
- * When 2+ shaders are registered simultaneously, a switcher appears in the
- * panel header to flip between them.
+ * When 2+ shaders are registered on the same side, a switcher appears in that
+ * panel's header.
  */
 export function ShaderDevRoot({
   emptyMessage = "No shader registered on this page.",
   defaultTheme,
+  themeStorageKey,
+  defaultLeftOpen = false,
+  defaultRightOpen,
 }: {
   emptyMessage?: string
   /** Initial theme when no user override + no `html.dark` are set. Falls back to OS preference if omitted. */
   defaultTheme?: ShaderDevTheme
+  /** sessionStorage key for the header theme toggle. */
+  themeStorageKey?: string
+  /** Initial open state for the left panel this session. Default false. */
+  defaultLeftOpen?: boolean
+  /** Initial open state for the right panel. Defaults to closed unless seeded by `useShaderDev({ defaultOpen: true })`. */
+  defaultRightOpen?: boolean
 } = {}) {
-  // Claim the single "primary" slot. Non-primary instances render nothing.
   const [isPrimary, setIsPrimary] = useState(false)
   useEffect(() => {
     if (primaryClaimed) return
     primaryClaimed = true
     setIsPrimary(true)
+    initShaderDevOpenFlag(defaultLeftOpen, "left")
+    if (defaultRightOpen !== undefined) {
+      initShaderDevOpenFlag(defaultRightOpen, "right")
+    }
     return () => {
       primaryClaimed = false
     }
-  }, [])
+  }, [defaultLeftOpen, defaultRightOpen])
 
   useInjectShaderDevStyles()
   const theme = useShaderDevTheme(defaultTheme)
-  const open = useSyncExternalStore(subscribeOpen, getOpenSnapshot, () => false)
+  const leftOpen = useSideOpen("left")
+  const rightOpen = useSideOpen("right")
 
-  // Re-render whenever the registry changes — revision is monotonic + cheap.
   useSyncExternalStore(
     subscribeShaderDevRegistration,
     getShaderDevRevision,
     () => 0,
   )
 
-  const registration = getActiveShaderDev()
-  const activeId = getActiveShaderDevId()
-  const allRegistrations = getShaderDevRegistrations()
+  const leftRegistration = getActiveShaderDevForSide("left")
+  const rightRegistration = getActiveShaderDevForSide("right")
+  const leftRegistrations = getShaderDevRegistrationsForSide("left")
+  const rightRegistrations = getShaderDevRegistrationsForSide("right")
 
   useEffect(() => installShaderDevKeyboard(), [])
 
-  const setOpen = useCallback((next: boolean) => {
-    writeShaderDevOpenFlag(next)
-    window.dispatchEvent(new CustomEvent(SHADER_DEV_TOGGLE_EVENT))
+  const setSideOpen = useCallback((side: ShaderDevPanelSide, next: boolean) => {
+    writeShaderDevOpenFlag(next, side)
+    window.dispatchEvent(new CustomEvent(SHADER_DEV_TOGGLE_EVENT, { detail: { side } }))
   }, [])
 
   if (!isPrimary) return null
 
-  if (!registration) {
-    return open ? (
+  const hasAnyRegistration = leftRegistration ?? rightRegistration
+  const anyOpen = leftOpen || rightOpen
+
+  if (!hasAnyRegistration) {
+    return anyOpen ? (
       <div data-shader-dev="" data-sd-theme={theme} className="sd-empty">
         {emptyMessage}
         <button
           type="button"
           className="sd-empty-close"
-          onClick={() => setOpen(false)}
+          onClick={() => {
+            setSideOpen("left", false)
+            setSideOpen("right", false)
+          }}
         >
           Close
         </button>
@@ -103,8 +136,65 @@ export function ShaderDevRoot({
     ) : null
   }
 
+  return (
+    <>
+      {leftRegistration ? (
+        <RegisteredSidePanel
+          side="left"
+          registration={leftRegistration}
+          activeId={getActiveShaderDevIdForSide("left")}
+          allRegistrations={leftRegistrations}
+          open={leftOpen}
+          onClose={() => setSideOpen("left", false)}
+          onOpen={() => setSideOpen("left", true)}
+          defaultTheme={defaultTheme}
+          themeStorageKey={themeStorageKey}
+          showThemeToggle
+        />
+      ) : null}
+      {rightRegistration ? (
+        <RegisteredSidePanel
+          side="right"
+          registration={rightRegistration}
+          activeId={getActiveShaderDevIdForSide("right")}
+          allRegistrations={rightRegistrations}
+          open={rightOpen}
+          onClose={() => setSideOpen("right", false)}
+          onOpen={() => setSideOpen("right", true)}
+          defaultTheme={defaultTheme}
+          themeStorageKey={themeStorageKey}
+          showThemeToggle={false}
+        />
+      ) : null}
+    </>
+  )
+}
+
+function RegisteredSidePanel({
+  side,
+  registration,
+  activeId,
+  allRegistrations,
+  open,
+  onClose,
+  onOpen,
+  defaultTheme,
+  themeStorageKey,
+  showThemeToggle,
+}: {
+  side: ShaderDevPanelSide
+  registration: NonNullable<ReturnType<typeof getActiveShaderDevForSide>>
+  activeId: string | null
+  allRegistrations: ReturnType<typeof getShaderDevRegistrationsForSide>
+  open: boolean
+  onClose: () => void
+  onOpen: () => void
+  defaultTheme?: ShaderDevTheme
+  themeStorageKey?: string
+  showThemeToggle?: boolean
+}) {
   const switcher =
-    allRegistrations.size > 1 ? (
+    allRegistrations.length > 1 ? (
       <ShaderSwitcher
         activeId={activeId}
         registrations={allRegistrations}
@@ -115,11 +205,12 @@ export function ShaderDevRoot({
   return (
     <ShaderDevPanel
       id={registration.id}
+      side={side}
       title={registration.title}
       titleSlot={switcher}
       open={open}
-      onClose={() => setOpen(false)}
-      onOpen={() => setOpen(true)}
+      onClose={onClose}
+      onOpen={onOpen}
       values={registration.values}
       defaults={registration.defaults}
       fields={registration.fields}
@@ -129,6 +220,8 @@ export function ShaderDevRoot({
       prompts={registration.prompts}
       persist={registration.persist}
       defaultTheme={defaultTheme}
+      themeStorageKey={themeStorageKey}
+      showThemeToggle={showThemeToggle}
       actionHandlers={registration.actionHandlers}
     />
   )
@@ -140,7 +233,7 @@ function ShaderSwitcher({
   onSelect,
 }: {
   activeId: string | null
-  registrations: ReadonlyMap<string, { id: string; title: string }>
+  registrations: ReadonlyArray<{ id: string; title: string }>
   onSelect: (id: string) => void
 }) {
   return (
@@ -150,7 +243,7 @@ function ShaderSwitcher({
       onChange={(e) => onSelect(e.target.value)}
       aria-label="Active shader"
     >
-      {Array.from(registrations.values()).map((reg) => (
+      {registrations.map((reg) => (
         <option key={reg.id} value={reg.id}>
           {reg.title}
         </option>

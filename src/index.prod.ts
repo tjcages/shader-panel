@@ -29,7 +29,10 @@ export type {
   ShaderDevColorField,
   ShaderDevFieldDef,
   ShaderDevImageField,
+  ShaderDevPanelSide,
   ShaderDevPathField,
+  ShaderDevPresetOption,
+  ShaderDevPresetsField,
   ShaderDevSectionField,
   ShaderDevSelectField,
   ShaderDevSelectOption,
@@ -80,12 +83,21 @@ export function getActiveShaderDev(): null {
 export function getActiveShaderDevId(): null {
   return null
 }
+export function getActiveShaderDevIdForSide(): null {
+  return null
+}
+export function getActiveShaderDevForSide(): null {
+  return null
+}
 export function getShaderDevRegistration(): null {
   return null
 }
 const EMPTY_MAP: ReadonlyMap<string, never> = new Map<string, never>()
 export function getShaderDevRegistrations(): ReadonlyMap<string, never> {
   return EMPTY_MAP
+}
+export function getShaderDevRegistrationsForSide(): never[] {
+  return []
 }
 export function getShaderDevRevision(): number {
   return 0
@@ -195,6 +207,11 @@ export function useShaderDev<T>(options: {
 export const ShaderDevRoot = NULL_COMPONENT
 export const ShaderDevPanel = NULL_COMPONENT
 export const ShaderDevFloatingPanel = NULL_COMPONENT
+export const ToolShell = NULL_COMPONENT
+export const ToolPanel = NULL_COMPONENT
+export const ShaderDevToolPanel = NULL_COMPONENT
+export const PanelToggleButton = NULL_COMPONENT
+export const EyeToggle = NULL_COMPONENT
 export const ShaderDevShortcutBridge = NULL_COMPONENT
 export const ControlSlider = NULL_COMPONENT
 export const ControlSection = NULL_COMPONENT
@@ -205,5 +222,10 @@ export type { ControlPathProps, PathPoint } from "./controls/path-input"
 export const ControlToggle = NULL_COMPONENT
 export const ControlSelect = NULL_COMPONENT
 export const ControlVec2 = NULL_COMPONENT
+export const ControlPresets = NULL_COMPONENT
 export const ControlQuickActions = NULL_COMPONENT
 export const ControlAnimation = NULL_COMPONENT
+
+export const TOOL_PANEL_WIDTH = 280
+export const TOOL_PANEL_INSET = 16
+export const TOOL_PANEL_FULL = 296

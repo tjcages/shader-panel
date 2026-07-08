@@ -14,6 +14,7 @@ import { ControlColorInput } from "../controls/color-input"
 import { ControlExport } from "../controls/export-controls"
 import { ControlImageInput } from "../controls/image-input"
 import { ControlPath, type PathPoint } from "../controls/path-input"
+import { ControlPresets } from "../controls/presets"
 import { ControlQuickActions } from "../controls/quick-actions"
 import { ControlSection } from "../controls/section"
 import { ControlSelect } from "../controls/select"
@@ -27,6 +28,7 @@ import {
 import { ShaderDevFloatingPanel } from "./floating-panel"
 import {
   clearPersistedShaderDevValues,
+  clearPersistedShaderDevSections,
   hasPersistedShaderDevValues,
   loadPersistedShaderDevSections,
   loadPersistedShaderDevValues,
@@ -34,8 +36,7 @@ import {
   persistShaderDevValues,
 } from "../persist"
 import type { ShaderDevTheme } from "../hooks/use-theme"
-import type { ShaderDevFieldDef } from "../types"
-import { isShaderDevSection } from "../types"
+import type { ShaderDevFieldDef, ShaderDevPanelSide } from "../types"
 
 export type ShaderDevWriteResult = { ok: boolean; message: string }
 
@@ -43,6 +44,7 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
   id,
   title,
   titleSlot,
+  side = "right",
   open,
   onClose,
   onOpen,
@@ -56,11 +58,20 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
   prompts = DEFAULT_SHADER_DEV_PROMPTS,
   persist = true,
   defaultTheme,
+  themeStorageKey,
+  showThemeToggle,
   actionHandlers,
+  container,
+  inline = false,
+  peek,
+  showAnimation = true,
+  showExport = true,
 }: {
   /** Used as the localStorage key (`shader-dev:<id>`) when `persist` is true. */
   id?: string
   title: string
+  /** Which side of the viewport the panel docks to. Default `"right"`. */
+  side?: ShaderDevPanelSide
   /** Rendered next to the title — used by ShaderDevRoot for the multi-shader switcher. */
   titleSlot?: React.ReactNode
   open: boolean
@@ -79,8 +90,22 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
   /** Persist values to `localStorage["shader-dev:<id>"]`. Requires `id`. Default true. */
   persist?: boolean
   defaultTheme?: ShaderDevTheme
+  /** sessionStorage key for the header theme toggle. */
+  themeStorageKey?: string
+  /** Show the light/dark toggle in the panel header. Default true. */
+  showThemeToggle?: boolean
   /** Handlers for `type: "action"` fields, keyed by `actionId`. */
   actionHandlers?: Record<string, () => void>
+  /** Portal target for the floating shell. Ignored when `inline` is true. */
+  container?: HTMLElement | null
+  /** Render in-place instead of portaling to body. */
+  inline?: boolean
+  /** Edge-hover peek preview while collapsed. Defaults to false when inline. */
+  peek?: boolean
+  /** Show the shader animation clock block. Default true. */
+  showAnimation?: boolean
+  /** Show canvas PNG/video export in the actions footer. Default true. */
+  showExport?: boolean
 }) {
   const [writing, setWriting] = useState(false)
   const [status, setStatus] = useState<string | null>(null)
@@ -110,7 +135,7 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
   const imageKeys = useMemo(() => {
     const keys = new Set<string>()
     for (const f of fields) {
-      if (!isShaderDevSection(f) && f.type === "image") keys.add(f.key)
+      if (f.type === "image") keys.add(f.key)
     }
     return keys
   }, [fields])
@@ -138,6 +163,8 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
   const isModified = valuesJson !== defaultsJson
 
   const persistKey = persist && id ? id : null
+  /** Section expand/collapse always persists when `id` is set — even if `persist: false`. */
+  const sectionsKey = id ?? null
 
   // Auto-hydrate from localStorage on first mount for this id — push saved
   // values back through onChange. This makes persistence "just work" without
@@ -184,11 +211,11 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
   // Hydrate section expand/collapse from localStorage on first mount for this id.
   const sectionHydratedIdRef = useRef<string | null>(null)
   useEffect(() => {
-    if (!persistKey) return
-    if (sectionHydratedIdRef.current === persistKey) return
-    sectionHydratedIdRef.current = persistKey
-    setSectionOpen(loadPersistedShaderDevSections(persistKey))
-  }, [persistKey])
+    if (!sectionsKey) return
+    if (sectionHydratedIdRef.current === sectionsKey) return
+    sectionHydratedIdRef.current = sectionsKey
+    setSectionOpen(loadPersistedShaderDevSections(sectionsKey))
+  }, [sectionsKey])
 
   const setSectionOpenState = useCallback((title: string, open: boolean) => {
     setSectionOpen((prev) => ({ ...prev, [title]: open }))
@@ -196,13 +223,13 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
 
   const skipNextSectionPersistRef = useRef(true)
   useEffect(() => {
-    if (!persistKey) return
+    if (!sectionsKey) return
     if (skipNextSectionPersistRef.current) {
       skipNextSectionPersistRef.current = false
       return
     }
-    persistShaderDevSections(persistKey, sectionOpen)
-  }, [persistKey, sectionOpen])
+    persistShaderDevSections(sectionsKey, sectionOpen)
+  }, [sectionsKey, sectionOpen])
 
   const setKey = useCallback(
     <K extends keyof T>(key: K, val: T[K]) => {
@@ -214,8 +241,10 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
   const resetAll = useCallback(() => {
     onChange({ ...defaults })
     if (persistKey) clearPersistedShaderDevValues(persistKey)
+    if (sectionsKey) clearPersistedShaderDevSections(sectionsKey)
+    setSectionOpen({})
     setStatus(null)
-  }, [defaults, onChange, persistKey])
+  }, [defaults, onChange, persistKey, sectionsKey])
 
   const handleApplyPaste = useCallback(() => {
     try {
@@ -301,12 +330,20 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
         current = { title: "Parameters", children: [], keys: [] }
         out.push(current)
       }
-      current.children.push(<div key={key}>{node}</div>)
+      current.children.push(<div key={key} className="sd-field">{node}</div>)
       current.keys.push(key)
     }
 
+    const pushContent = (node: ReactNode, reactKey: string) => {
+      if (!current) {
+        current = { title: "Parameters", children: [], keys: [] }
+        out.push(current)
+      }
+      current.children.push(<div key={reactKey} className="sd-field">{node}</div>)
+    }
+
     for (const field of fields) {
-      if (isShaderDevSection(field)) {
+      if (field.type === "section") {
         current = { title: field.title, children: [], keys: [] }
         out.push(current)
         continue
@@ -315,7 +352,7 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
       if (field.type === "action") {
         if (field.when && !field.when(values)) continue
         const handler = actionHandlers?.[field.actionId]
-        pushField(
+        pushContent(
           <ControlAction
             label={field.label}
             description={field.description}
@@ -324,6 +361,20 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
             onClick={() => handler?.()}
           />,
           field.actionId,
+        )
+        continue
+      }
+
+      if (field.type === "presets") {
+        pushContent(
+          <ControlPresets
+            label={field.label}
+            presets={field.presets}
+            values={values}
+            onChange={onChange}
+            actionHandlers={actionHandlers}
+          />,
+          `presets-${field.presets.map((p) => p.label).join("-")}`,
         )
         continue
       }
@@ -471,20 +522,27 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
     }
 
     return out
-  }, [actionHandlers, fields, setKey, values])
+  }, [actionHandlers, fields, onChange, setKey, values])
+
+  const resolvedPeek = peek ?? !inline
 
   return (
     <ShaderDevFloatingPanel
-      side="right"
+      side={side}
       collapsed={!open}
       onToggle={onClose}
       onOpen={onOpen}
       title={title}
       titleSlot={titleSlot}
       defaultTheme={defaultTheme}
+      themeStorageKey={themeStorageKey}
+      showThemeToggle={showThemeToggle}
+      container={container}
+      inline={inline}
+      peek={resolvedPeek}
     >
       <div className="sd-fields">
-        <ControlAnimation />
+        {showAnimation ? <ControlAnimation /> : null}
 
         {prompts.length > 0 ? (
           <ControlQuickActions prompts={prompts} shaderName={title} />
@@ -513,9 +571,7 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
         ))}
 
         <div className="sd-actions">
-          {/* Image / video export sits at the top of the actions block, above
-              the reset / copy / paste JSON controls. */}
-          <ControlExport name={title} />
+          {showExport ? <ControlExport name={title} /> : null}
 
           <button type="button" onClick={resetAll} className="sd-action-btn">
             Reset to defaults

@@ -1,3 +1,5 @@
+export type ShaderDevPanelSide = "left" | "right"
+
 export type ShaderDevSectionField = {
   type: "section"
   title: string
@@ -116,6 +118,25 @@ export type ShaderDevActionField = {
   when?: (values: Record<string, unknown>) => boolean
 }
 
+/**
+ * One-click preset that merges partial values or replaces the full config.
+ * Use a function for presets that need the current state (e.g. reset-all).
+ */
+export type ShaderDevPresetOption<T extends Record<string, unknown>> = {
+  label: string
+  /** Merge partial values or replace via function. Omit when using `actionId`. */
+  values?: Partial<T> | ((current: T) => T)
+  /** Call a handler from `actionHandlers` instead of merging values. */
+  actionId?: string
+}
+
+export type ShaderDevPresetsField<T extends Record<string, unknown>> = {
+  type: "presets"
+  /** Optional heading above the preset buttons. */
+  label?: string
+  presets: ReadonlyArray<ShaderDevPresetOption<T>>
+}
+
 export type ShaderDevFieldDef<T extends Record<string, unknown>> =
   | ShaderDevSectionField
   | ShaderDevSliderField<T>
@@ -126,6 +147,7 @@ export type ShaderDevFieldDef<T extends Record<string, unknown>> =
   | ShaderDevImageField<T>
   | ShaderDevPathField<T>
   | ShaderDevActionField
+  | ShaderDevPresetsField<T>
 
 export type ShaderDevWriteResult = { ok: boolean; message: string }
 

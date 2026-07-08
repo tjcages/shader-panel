@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { createPortal } from "react-dom"
 import { cn } from "../lib/cn"
+import { ControlThemeToggle } from "../controls/theme-toggle"
 import { useInjectShaderDevStyles } from "../hooks/use-inject-styles"
 import {
   ShaderDevThemeProvider,
@@ -20,6 +21,11 @@ export function ShaderDevFloatingPanel({
   children,
   className,
   defaultTheme,
+  themeStorageKey,
+  showThemeToggle = true,
+  container,
+  inline = false,
+  peek = true,
 }: {
   side: "left" | "right"
   collapsed: boolean
@@ -33,24 +39,31 @@ export function ShaderDevFloatingPanel({
   children: React.ReactNode
   className?: string
   defaultTheme?: ShaderDevTheme
+  /** sessionStorage key for the header theme toggle. */
+  themeStorageKey?: string
+  /** Show the light/dark toggle in the panel header. Default true. */
+  showThemeToggle?: boolean
+  /** Portal target. Defaults to `document.body`. Ignored when `inline` is true. */
+  container?: HTMLElement | null
+  /** Render in-place (absolute positioning) instead of portaling to body. */
+  inline?: boolean
+  /** Edge-hover peek preview while collapsed. Default true; disabled when inline. */
+  peek?: boolean
 }) {
   const open = onOpen ?? onToggle
   useInjectShaderDevStyles()
   const theme = useShaderDevTheme(defaultTheme)
   const [mounted, setMounted] = useState(false)
 
-  // Peek preview: while collapsed, hovering the viewport edge (or the peeking
-  // sliver itself) slides a scaled-down preview in. Clicking opens for real.
+  const showPeek = peek && !inline
   const [hoverSensor, setHoverSensor] = useState(false)
   const [hoverPanel, setHoverPanel] = useState(false)
-  const peeking = collapsed && (hoverSensor || hoverPanel)
+  const peeking = showPeek && collapsed && (hoverSensor || hoverPanel)
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  // Clear hover state whenever the panel opens so a later collapse doesn't
-  // resurface a stale peek.
   useEffect(() => {
     if (!collapsed) {
       setHoverSensor(false)
@@ -60,12 +73,13 @@ export function ShaderDevFloatingPanel({
 
   if (!mounted) return null
 
-  return createPortal(
+  const panel = (
     <ShaderDevThemeProvider value={theme}>
-      {collapsed ? (
+      {showPeek && collapsed ? (
         <div
           className="sd-edge-sensor"
           data-sd-side={side}
+          data-sd-inline={inline ? "true" : "false"}
           onMouseEnter={() => setHoverSensor(true)}
           onMouseLeave={() => setHoverSensor(false)}
           onClick={open}
@@ -78,6 +92,7 @@ export function ShaderDevFloatingPanel({
         data-sd-side={side}
         data-sd-collapsed={collapsed ? "true" : "false"}
         data-sd-peek={peeking ? "true" : "false"}
+        data-sd-inline={inline ? "true" : "false"}
         className={cn("sd-floating", className)}
         onMouseEnter={() => setHoverPanel(true)}
         onMouseLeave={() => setHoverPanel(false)}
@@ -88,14 +103,19 @@ export function ShaderDevFloatingPanel({
               <span className="sd-panel-title">{title}</span>
               {titleSlot}
             </div>
-            <button
-              type="button"
-              onClick={onToggle}
-              aria-label="Close shader dev panel"
-              className="sd-close-btn"
-            >
-              <CloseIcon />
-            </button>
+            <div className="sd-panel-header-end">
+              {showThemeToggle ? (
+                <ControlThemeToggle storageKey={themeStorageKey} />
+              ) : null}
+              <button
+                type="button"
+                onClick={onToggle}
+                aria-label="Close panel"
+                className="sd-close-btn"
+              >
+                <CloseIcon />
+              </button>
+            </div>
           </div>
           <div className="sd-panel-body">{children}</div>
         </div>
@@ -104,13 +124,20 @@ export function ShaderDevFloatingPanel({
             type="button"
             className="sd-peek-catch"
             onClick={open}
-            aria-label="Open shader dev panel"
+            aria-label="Open panel"
           />
         ) : null}
       </div>
-    </ShaderDevThemeProvider>,
-    document.body,
+    </ShaderDevThemeProvider>
   )
+
+  if (inline) return panel
+
+  const target =
+    container ?? (typeof document !== "undefined" ? document.body : null)
+  if (!target) return null
+
+  return createPortal(panel, target)
 }
 
 function CloseIcon() {

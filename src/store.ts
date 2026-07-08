@@ -1,11 +1,13 @@
 import type { ShaderDevPrompt } from "./prompts"
-import type { ShaderDevFieldDef, ShaderDevWriteResult } from "./types"
+import type { ShaderDevFieldDef, ShaderDevPanelSide, ShaderDevWriteResult } from "./types"
 
 export type ShaderDevValues = Record<string, unknown>
 
 export type ShaderDevRegistration<T extends ShaderDevValues = ShaderDevValues> = {
   id: string
   title: string
+  /** Which side of the viewport the panel docks to. Default `"right"`. */
+  side?: ShaderDevPanelSide
   values: T
   defaults: T
   fields: ShaderDevFieldDef<T>[]
@@ -18,9 +20,9 @@ export type ShaderDevRegistration<T extends ShaderDevValues = ShaderDevValues> =
    */
   prompts?: ReadonlyArray<ShaderDevPrompt>
   /**
-   * Persist values to `localStorage["shader-dev:<id>"]` so edits survive page
-   * reload. Defaults to `true`. Pair with `loadPersistedShaderDevValues(id,
-   * defaults)` as your `useState` initializer to hydrate on mount.
+   * Persist uniform values to `localStorage["shader-dev:<id>"]`. Defaults to
+   * `true`. Section expand/collapse is always persisted when `id` is set,
+   * even if `persist: false` (so hosts can use their own value storage).
    */
   persist?: boolean
   /** Handlers for `type: "action"` fields, keyed by `actionId`. */
@@ -28,14 +30,28 @@ export type ShaderDevRegistration<T extends ShaderDevValues = ShaderDevValues> =
 }
 
 const registrations = new Map<string, ShaderDevRegistration>()
-let activeId: string | null = null
+let activeLeftId: string | null = null
+let activeRightId: string | null = null
 let lastRegisteredId: string | null = null
 const listeners = new Set<() => void>()
 let snapshotRevision = 0
 
+function registrationSide(reg: ShaderDevRegistration): ShaderDevPanelSide {
+  return reg.side ?? "right"
+}
+
 function notify(): void {
   snapshotRevision += 1
   for (const listener of listeners) listener()
+}
+
+function promoteActiveForSide(side: ShaderDevPanelSide): void {
+  const remaining = Array.from(registrations.values()).filter(
+    (reg) => registrationSide(reg) === side,
+  )
+  const nextId = remaining.length ? remaining[remaining.length - 1].id : null
+  if (side === "left") activeLeftId = nextId
+  else activeRightId = nextId
 }
 
 /**
@@ -61,42 +77,70 @@ export function registerShaderDev<T extends ShaderDevValues>(
   }
 
   const reg = next as ShaderDevRegistration
+  const side = registrationSide(reg)
   registrations.set(reg.id, reg)
   lastRegisteredId = reg.id
-  if (activeId === null || !registrations.has(activeId)) {
-    activeId = reg.id
+
+  if (side === "left") {
+    if (activeLeftId === null || !registrations.has(activeLeftId)) {
+      activeLeftId = reg.id
+    }
+  } else if (activeRightId === null || !registrations.has(activeRightId)) {
+    activeRightId = reg.id
   }
+
   notify()
   return () => unregisterShaderDev(reg.id)
 }
 
 /** Remove a registration by id. No-op if id isn't registered. */
 export function unregisterShaderDev(id: string): void {
+  const reg = registrations.get(id)
   const had = registrations.delete(id)
-  if (!had) return
+  if (!had || !reg) return
   if (lastRegisteredId === id) lastRegisteredId = null
-  if (activeId === id) {
-    // Promote the next-most-recent registration to active, or clear if empty.
-    const remaining = Array.from(registrations.keys())
-    activeId = remaining.length ? remaining[remaining.length - 1] : null
+  const side = registrationSide(reg)
+  if (side === "left" && activeLeftId === id) promoteActiveForSide("left")
+  if (side === "right" && activeRightId === id) promoteActiveForSide("right")
+  notify()
+}
+
+/** Switch which registered shader the panel shows on the given side. */
+export function setActiveShaderDev(id: string): void {
+  const reg = registrations.get(id)
+  if (!reg) return
+  const side = registrationSide(reg)
+  if (side === "left") {
+    if (activeLeftId === id) return
+    activeLeftId = id
+  } else {
+    if (activeRightId === id) return
+    activeRightId = id
   }
   notify()
 }
 
-/** Switch which registered shader the panel shows. */
-export function setActiveShaderDev(id: string): void {
-  if (activeId === id) return
-  if (!registrations.has(id)) return
-  activeId = id
-  notify()
+export function getActiveShaderDevId(): string | null {
+  return activeRightId ?? activeLeftId
 }
 
-export function getActiveShaderDevId(): string | null {
-  return activeId
+export function getActiveShaderDevIdForSide(
+  side: ShaderDevPanelSide,
+): string | null {
+  return side === "left" ? activeLeftId : activeRightId
 }
 
 export function getActiveShaderDev(): ShaderDevRegistration | null {
-  return activeId ? (registrations.get(activeId) ?? null) : null
+  if (activeRightId) return registrations.get(activeRightId) ?? null
+  if (activeLeftId) return registrations.get(activeLeftId) ?? null
+  return null
+}
+
+export function getActiveShaderDevForSide(
+  side: ShaderDevPanelSide,
+): ShaderDevRegistration | null {
+  const id = getActiveShaderDevIdForSide(side)
+  return id ? (registrations.get(id) ?? null) : null
 }
 
 /** Snapshot of the registration map. */
@@ -105,6 +149,14 @@ export function getShaderDevRegistrations(): ReadonlyMap<
   ShaderDevRegistration
 > {
   return registrations
+}
+
+export function getShaderDevRegistrationsForSide(
+  side: ShaderDevPanelSide,
+): ShaderDevRegistration[] {
+  return Array.from(registrations.values()).filter(
+    (reg) => registrationSide(reg) === side,
+  )
 }
 
 /**

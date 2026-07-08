@@ -1,21 +1,30 @@
 "use client"
 
 import { useEffect } from "react"
+import type { ShaderDevPanelSide } from "../types"
 
 export const SHADER_DEV_TOGGLE_EVENT = "cf-shader-dev-toggle"
 const SHADER_DEV_OPEN_KEY = "cf-accent-shader-dev-open"
+const SHADER_DEV_OPEN_LEFT_KEY = "cf-accent-shader-dev-open-left"
 
-export function readShaderDevOpenFlag(): boolean {
+function openKeyForSide(side: ShaderDevPanelSide): string {
+  return side === "left" ? SHADER_DEV_OPEN_LEFT_KEY : SHADER_DEV_OPEN_KEY
+}
+
+export function readShaderDevOpenFlag(side: ShaderDevPanelSide = "right"): boolean {
   try {
-    return sessionStorage.getItem(SHADER_DEV_OPEN_KEY) === "true"
+    return sessionStorage.getItem(openKeyForSide(side)) === "true"
   } catch {
     return false
   }
 }
 
-export function writeShaderDevOpenFlag(open: boolean): void {
+export function writeShaderDevOpenFlag(
+  open: boolean,
+  side: ShaderDevPanelSide = "right",
+): void {
   try {
-    sessionStorage.setItem(SHADER_DEV_OPEN_KEY, open ? "true" : "false")
+    sessionStorage.setItem(openKeyForSide(side), open ? "true" : "false")
   } catch {
     /* ignore */
   }
@@ -27,11 +36,15 @@ export function writeShaderDevOpenFlag(open: boolean): void {
  * choice wins. Returns the effective open state. Call synchronously before the
  * panel's first render to avoid an open/close flash.
  */
-export function initShaderDevOpenFlag(defaultOpen: boolean): boolean {
+export function initShaderDevOpenFlag(
+  defaultOpen: boolean,
+  side: ShaderDevPanelSide = "right",
+): boolean {
   try {
-    const raw = sessionStorage.getItem(SHADER_DEV_OPEN_KEY)
+    const key = openKeyForSide(side)
+    const raw = sessionStorage.getItem(key)
     if (raw === null) {
-      sessionStorage.setItem(SHADER_DEV_OPEN_KEY, defaultOpen ? "true" : "false")
+      sessionStorage.setItem(key, defaultOpen ? "true" : "false")
       return defaultOpen
     }
     return raw === "true"
@@ -86,7 +99,7 @@ export function useShaderDevShortcut(onToggle: () => void, enabled = true) {
 }
 
 /** Dispatch from layout bridge; persists open state for late-hydrating shader islands. */
-export function dispatchShaderDevToggle(): void {
-  writeShaderDevOpenFlag(!readShaderDevOpenFlag())
-  window.dispatchEvent(new CustomEvent(SHADER_DEV_TOGGLE_EVENT))
+export function dispatchShaderDevToggle(side: ShaderDevPanelSide = "right"): void {
+  writeShaderDevOpenFlag(!readShaderDevOpenFlag(side), side)
+  window.dispatchEvent(new CustomEvent(SHADER_DEV_TOGGLE_EVENT, { detail: { side } }))
 }

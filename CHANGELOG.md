@@ -3,6 +3,29 @@
 All notable changes to `shader-panel` are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] — 2026-07-08
+
+### Added
+- **`ControlDisclosure`** — accordion row for nested editor panels (POIs, captions, etc.).
+- **`ControlTextInput`** — stacked or inline text field with proper panel styling.
+- **`ControlSearchField`** — search input with inline action button and error state.
+- **`ControlOptionList`** — compact scrollable picker for search results and link targets.
+- **`ControlReadout`** — label + truncated read-only value row.
+- **`ControlTextarea`** — labeled multiline input using the paste textarea styling.
+- **`ControlHint`** — muted helper copy for panel sections.
+
+## [1.1.0] — 2026-07-08
+
+### Added
+- **`ToolShell`** — generic playground layout with full-bleed viewport, left/right panel slots, optional top bar, panel toggle buttons, and eye toggle. Uses `pointer-events: none` on the overlay so the viewport stays interactive.
+- **`ToolPanel`** — floating panel shell for custom (non-schema) content such as POI editors.
+- **Dual-panel support** — `side: "left" | "right"` on `ShaderDevRegistration`, `ShaderDevPanel`, and `useShaderDev`. `ShaderDevRoot` renders one panel per side with per-side shader switchers.
+- **`{ type: "presets" }` field** — one-click preset buttons that merge partial values or replace the full config via a function.
+- **`ShaderDevFloatingPanel` inline mode** — `inline` prop renders panels in-place (absolute positioning) instead of portaling to `document.body`; optional `container` prop for custom portal targets.
+- **Layout constants** — `TOOL_PANEL_WIDTH`, `TOOL_PANEL_INSET`, `TOOL_PANEL_FULL` exported for top-bar padding.
+- **Per-side open state** — independent sessionStorage keys for left and right panels.
+- **`showAnimation` / `showExport` props** on `ShaderDevPanel` — hide shader-specific footer blocks in generic tool panels.
+
 ## [1.0.0] — 2026-06-08
 
 First stable release. API surface is now considered stable; subsequent breaking changes will bump the major.

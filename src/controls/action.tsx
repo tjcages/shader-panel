@@ -7,7 +7,7 @@ export interface ControlActionProps {
   description?: string
   onClick: () => void
   disabled?: boolean
-  variant?: "default" | "primary"
+  variant?: "default" | "primary" | "destructive"
   className?: string
 }
 
@@ -33,6 +33,7 @@ export function ControlAction({
         className={cn(
           "sd-action-btn",
           variant === "primary" && "sd-action-btn-primary",
+          variant === "destructive" && "sd-action-btn-destructive",
         )}
         disabled={disabled}
         onClick={onClick}

@@ -4,6 +4,29 @@ import { createContext, useContext, useEffect, useState } from "react"
 
 export type ShaderDevTheme = "light" | "dark"
 
+export const SHADER_DEV_THEME_STORAGE_KEY = "shader-dev-theme"
+
+declare global {
+  interface Window {
+    __themeOverride?: string
+  }
+}
+
+/** Apply light/dark to the document root and persist the user's choice. */
+export function applyShaderDevTheme(
+  mode: ShaderDevTheme,
+  storageKey: string = SHADER_DEV_THEME_STORAGE_KEY,
+): void {
+  if (typeof document === "undefined") return
+  window.__themeOverride = mode
+  document.documentElement.classList.toggle("dark", mode === "dark")
+  try {
+    sessionStorage.setItem(storageKey, mode)
+  } catch {
+    /* ignore quota / private mode */
+  }
+}
+
 function detectSystemPreference(): ShaderDevTheme {
   if (typeof window === "undefined") return "dark"
   return window.matchMedia("(prefers-color-scheme: light)").matches

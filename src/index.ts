@@ -11,6 +11,7 @@ export {
   type ShaderDevPrompt,
 } from "./prompts"
 export {
+  clearPersistedShaderDevSections,
   clearPersistedShaderDevValues,
   hasPersistedShaderDevValues,
   loadPersistedShaderDevSections,
@@ -21,14 +22,32 @@ export {
 export { ShaderDevFloatingPanel } from "./panel/floating-panel"
 export { ShaderDevPanel } from "./panel/panel"
 export { ShaderDevRoot } from "./panel/root"
+export {
+  EyeToggle,
+  PanelToggleButton,
+  ToolShell,
+  type EyeToggleProps,
+  type PanelToggleButtonProps,
+  type ToolShellProps,
+} from "./panel/tool-shell"
+export { ShaderDevToolPanel, ToolPanel, type ToolPanelProps } from "./panel/tool-panel"
 export { patchShaderConfigDefaults } from "./patch-config"
+
+export {
+  TOOL_PANEL_FULL,
+  TOOL_PANEL_INSET,
+  TOOL_PANEL_WIDTH,
+} from "./constants"
 
 export type {
   ShaderDevActionField,
   ShaderDevColorField,
   ShaderDevFieldDef,
   ShaderDevImageField,
+  ShaderDevPanelSide,
   ShaderDevPathField,
+  ShaderDevPresetOption,
+  ShaderDevPresetsField,
   ShaderDevSectionField,
   ShaderDevSelectField,
   ShaderDevSelectOption,
@@ -41,9 +60,12 @@ export { isShaderDevSection } from "./types"
 
 export {
   getActiveShaderDev,
+  getActiveShaderDevForSide,
   getActiveShaderDevId,
+  getActiveShaderDevIdForSide,
   getShaderDevRegistration,
   getShaderDevRegistrations,
+  getShaderDevRegistrationsForSide,
   getShaderDevRevision,
   registerShaderDev,
   setActiveShaderDev,
@@ -108,6 +130,8 @@ export { embedPngDpi, printMaxEdgePx } from "./lib/png-dpi"
 
 export {
   ShaderDevThemeProvider,
+  applyShaderDevTheme,
+  SHADER_DEV_THEME_STORAGE_KEY,
   useShaderDevTheme,
   useShaderDevThemeContext,
   type ShaderDevTheme,
@@ -124,6 +148,10 @@ export {
   ControlAction,
   type ControlActionProps,
 } from "./controls/action"
+export {
+  ControlActionGroup,
+  type ControlActionGroupProps,
+} from "./controls/action-group"
 export { ControlSlider, type ControlSliderProps } from "./controls/slider"
 export { ControlSection, type ControlSectionProps } from "./controls/section"
 export {
@@ -140,9 +168,43 @@ export {
   type PathPoint,
 } from "./controls/path-input"
 export { ControlToggle, type ControlToggleProps } from "./controls/toggle"
+export {
+  ControlThemeToggle,
+  type ControlThemeToggleProps,
+} from "./controls/theme-toggle"
 export { ControlSelect, type ControlSelectProps } from "./controls/select"
 export { ControlVec2, type ControlVec2Props } from "./controls/vec2"
 export {
-  ControlQuickActions,
-  type ControlQuickActionsProps,
-} from "./controls/quick-actions"
+  ControlPresets,
+  type ControlPresetOption,
+  type ControlPresetsProps,
+} from "./controls/presets"
+export {
+  ControlDisclosure,
+  type ControlDisclosureProps,
+} from "./controls/disclosure"
+export {
+  ControlHint,
+  type ControlHintProps,
+} from "./controls/hint"
+export {
+  ControlOptionList,
+  type ControlOptionListItem,
+  type ControlOptionListProps,
+} from "./controls/option-list"
+export {
+  ControlReadout,
+  type ControlReadoutProps,
+} from "./controls/readout"
+export {
+  ControlSearchField,
+  type ControlSearchFieldProps,
+} from "./controls/search-field"
+export {
+  ControlTextInput,
+  type ControlTextInputProps,
+} from "./controls/text-input"
+export {
+  ControlTextarea,
+  type ControlTextareaProps,
+} from "./controls/textarea"

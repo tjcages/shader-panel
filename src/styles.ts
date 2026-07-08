@@ -18,6 +18,7 @@ export const SHADER_DEV_CSS = `
   --sd-text-muted: rgba(255, 255, 255, 0.72);
   --sd-surface: rgba(255, 255, 255, 0.05);
   --sd-surface-active: rgba(255, 255, 255, 0.15);
+  --sd-toggle-hover: var(--sd-surface-active);
   --sd-surface-idle-fill: rgba(255, 255, 255, 0.11);
   --sd-hash: rgba(255, 255, 255, 0.15);
   --sd-handle: #ffffff;
@@ -31,6 +32,8 @@ export const SHADER_DEV_CSS = `
   --sd-action-bg-hover: rgba(255, 255, 255, 0.1);
   --sd-action-text: rgba(255, 255, 255, 0.72);
   --sd-action-text-hover: #ffffff;
+  --sd-danger: #f87171;
+  --sd-danger-hover: #fca5a5;
   --sd-header-border: rgba(255, 255, 255, 0.096);
   --sd-close-icon: rgba(255, 255, 255, 0.72);
   --sd-close-icon-hover: #ffffff;
@@ -44,6 +47,7 @@ export const SHADER_DEV_CSS = `
   --sd-text-muted: #4b5563;
   --sd-surface: #f3f4f6;
   --sd-surface-active: #d1d5db;
+  --sd-toggle-hover: rgba(17, 24, 39, 0.04);
   --sd-surface-idle-fill: #e5e7eb;
   --sd-hash: #d1d5db;
   --sd-handle: #111827;
@@ -57,6 +61,8 @@ export const SHADER_DEV_CSS = `
   --sd-action-bg-hover: #e5e7eb;
   --sd-action-text: #374151;
   --sd-action-text-hover: #111827;
+  --sd-danger: #dc2626;
+  --sd-danger-hover: #b91c1c;
   --sd-header-border: #e5e7eb;
   --sd-close-icon: #6b7280;
   --sd-close-icon-hover: #111827;
@@ -78,12 +84,14 @@ export const SHADER_DEV_CSS = `
 [data-shader-dev] input,
 [data-shader-dev] textarea,
 [data-shader-dev] .sd-prompt-pre,
-[data-shader-dev] .sd-paste-textarea {
+[data-shader-dev] .sd-paste-textarea,
+[data-shader-dev] .sd-text-input,
+[data-shader-dev] .sd-search-input {
   -webkit-user-select: text;
   user-select: text;
 }
 
-[data-shader-dev] button {
+[data-shader-dev] button:not([class]) {
   background: transparent;
   border: 0;
   padding: 0;
@@ -95,6 +103,16 @@ export const SHADER_DEV_CSS = `
   cursor: pointer;
 }
 
+/* All panel chrome buttons carry sd-* classes — zero host-app borders
+   (Tailwind preflight, browser defaults, etc.) before component styles apply. */
+[data-shader-dev] button[class*="sd-"] {
+  border: 0;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  box-shadow: none;
+}
+
 [data-shader-dev] input,
 [data-shader-dev] select,
 [data-shader-dev] textarea {
@@ -103,6 +121,11 @@ export const SHADER_DEV_CSS = `
   font-weight: inherit;
   line-height: inherit;
   color: inherit;
+  border: 0;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  box-shadow: none;
 }
 
 [data-shader-dev] input.sd-color-text {
@@ -209,6 +232,13 @@ export const SHADER_DEV_CSS = `
 }
 .sd-edge-sensor[data-sd-side="right"] { right: 0; }
 .sd-edge-sensor[data-sd-side="left"] { left: 0; }
+.sd-edge-sensor[data-sd-inline="true"] { display: none; }
+
+/* Inline panels (ToolShell) use absolute positioning within the overlay. */
+.sd-floating[data-sd-inline="true"] {
+  position: absolute;
+  z-index: 20;
+}
 
 /* Transparent click-catcher over the peeking panel — any click opens it fully
    instead of hitting a control in the scaled-down preview. */
@@ -241,6 +271,41 @@ export const SHADER_DEV_CSS = `
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.sd-panel-header-end {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+}
+.sd-theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 8px;
+  background: var(--sd-surface);
+}
+[data-shader-dev] .sd-theme-toggle-btn {
+  display: inline-flex;
+  width: 26px;
+  height: 26px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--sd-text-muted);
+  transition: background-color 150ms ease, color 150ms ease;
+}
+[data-shader-dev] .sd-theme-toggle-btn svg {
+  width: 14px;
+  height: 14px;
+}
+[data-shader-dev] .sd-theme-toggle-btn:hover {
+  color: var(--sd-action-text-hover);
+}
+[data-shader-dev] .sd-theme-toggle-btn[data-sd-active="true"] {
+  background: var(--sd-surface-active);
+  color: var(--sd-label-active);
 }
 .sd-switcher {
   appearance: none;
@@ -389,6 +454,15 @@ export const SHADER_DEV_CSS = `
   padding-top: 12px;
 }
 
+.sd-export-format-row {
+  display: flex;
+  gap: 6px;
+}
+.sd-export-format-row .sd-action-btn {
+  flex: 1;
+  min-width: 0;
+}
+
 /* Scoped under [data-shader-dev] to beat the global button reset on
    specificity — otherwise the always-on light gray fill loses. */
 [data-shader-dev] .sd-action-btn {
@@ -421,6 +495,31 @@ export const SHADER_DEV_CSS = `
   background: var(--sd-handle);
   filter: brightness(1.08);
   color: var(--sd-bg);
+}
+[data-shader-dev] .sd-action-btn-destructive {
+  background: color-mix(in srgb, var(--sd-danger) 10%, var(--sd-action-bg));
+  color: var(--sd-danger);
+}
+[data-shader-dev] .sd-action-btn-destructive:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--sd-danger) 16%, var(--sd-action-bg-hover));
+  color: var(--sd-danger-hover);
+}
+
+.sd-action-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.sd-action-group .sd-action-field {
+  min-width: 0;
+}
+.sd-action-group .sd-action-btn {
+  width: 100%;
+  padding-left: 8px;
+  padding-right: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .sd-action-field {
   display: flex;
@@ -523,17 +622,20 @@ export const SHADER_DEV_CSS = `
 .sd-collapse {
   display: grid;
   grid-template-rows: 0fr;
+  overflow: hidden;
   transition: grid-template-rows 280ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 .sd-collapse[data-sd-open="true"] {
   grid-template-rows: 1fr;
+  overflow: visible;
 }
 .sd-collapse-inner {
-  /* Vertical clipping via clip-path so the height animation still works,
-     but horizontal overshoot (e.g. the slider's overscroll scaleX spring)
-     can render outside the inner without being cropped. */
+  /* Vertical clipping only — height animation still collapses, but horizontal
+     overshoot (slider overscroll spring, toggle row full-bleed hover) is not
+     cropped. inset(-16px 0) regressed toggle hovers (white side gutters). */
   clip-path: inset(0 -9999px);
   min-height: 0;
+  min-width: 0;
   opacity: 0;
   transition: opacity 200ms ease;
 }
@@ -697,6 +799,12 @@ export const SHADER_DEV_CSS = `
   flex-direction: column;
   gap: 6px;
   padding-bottom: 10px;
+  overflow: visible;
+}
+
+.sd-field {
+  min-width: 0;
+  overflow: visible;
 }
 
 .sd-field-description {
@@ -707,13 +815,16 @@ export const SHADER_DEV_CSS = `
   letter-spacing: 0.01em;
 }
 
-.sd-slider {
+[data-shader-dev] .sd-slider {
   position: relative;
   height: 36px;
+  width: 100%;
+  margin: 0;
+  overflow: visible;
   transition: transform 220ms cubic-bezier(0.34, 1.16, 0.64, 1);
 }
-.sd-slider[data-sd-state="hover"] { transform: scale(1.01); }
-.sd-slider[data-sd-state="drag"] { transform: scale(1.018); }
+[data-shader-dev] .sd-slider[data-sd-state="hover"] { transform: scale(1.01); }
+[data-shader-dev] .sd-slider[data-sd-state="drag"] { transform: scale(1.018); }
 
 .sd-slider-overscroll {
   position: absolute;
@@ -1123,7 +1234,7 @@ export const SHADER_DEV_CSS = `
   background: transparent;
   transition: background-color 150ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-[data-shader-dev] .sd-toggle:hover { background: var(--sd-surface-active); }
+[data-shader-dev] .sd-toggle:hover { background: var(--sd-toggle-hover); }
 .sd-toggle-label {
   font-size: 13px;
   font-weight: 500;
@@ -1445,5 +1556,470 @@ export const SHADER_DEV_CSS = `
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px;
+}
+
+/* ── Preset selector ──────────────────────────────────────────────────────── */
+.sd-presets {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 12px 2px;
+}
+.sd-presets-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--sd-label);
+}
+[data-shader-dev] .sd-preset-select {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 36px;
+  border: 1px solid var(--sd-border);
+  border-radius: 8px;
+  padding: 0 28px 0 12px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--sd-label);
+  background:
+    linear-gradient(45deg, transparent 50%, var(--sd-muted-icon) 50%),
+    linear-gradient(135deg, var(--sd-muted-icon) 50%, transparent 50%),
+    var(--sd-surface);
+  background-position: calc(100% - 14px) 50%, calc(100% - 10px) 50%, 0 0;
+  background-size: 4px 4px, 4px 4px, auto;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+[data-shader-dev] .sd-preset-select:hover {
+  color: var(--sd-label-active);
+  background-color: var(--sd-surface-active);
+}
+[data-shader-dev] .sd-preset-select:focus-visible {
+  outline: 2px solid var(--sd-handle);
+  outline-offset: 1px;
+}
+
+/* ── ToolShell layout ───────────────────────────────────────────────────── */
+.sd-tool-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.sd-tool-viewport {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.sd-tool-overlay {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  transition: opacity 500ms ease;
+}
+.sd-tool-overlay[data-sd-ui-visible="false"] {
+  opacity: 0;
+}
+.sd-tool-topbar {
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  transition: padding 300ms ease;
+}
+.sd-tool-topbar > * {
+  pointer-events: auto;
+}
+.sd-tool-panels {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+}
+
+.sd-panel-toggle {
+  pointer-events: auto;
+  position: absolute;
+  bottom: 20px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--sd-border);
+  background: var(--sd-bg);
+  color: var(--sd-text-muted);
+  box-shadow: var(--sd-shadow);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: left 300ms ease, right 300ms ease, background 150ms ease, color 150ms ease;
+}
+.sd-panel-toggle:hover {
+  background: var(--sd-surface);
+  color: var(--sd-text);
+}
+.sd-panel-toggle-icon {
+  width: 16px;
+  height: 16px;
+  transition: transform 300ms ease;
+}
+
+.sd-eye-toggle {
+  pointer-events: auto;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid var(--sd-border);
+  background: var(--sd-bg);
+  color: var(--sd-text-muted);
+  box-shadow: var(--sd-shadow);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transform: translateX(-50%);
+  transition: background 150ms ease, color 500ms ease, opacity 500ms ease;
+}
+.sd-eye-toggle[data-sd-visible="false"] {
+  color: color-mix(in srgb, var(--sd-text-muted) 30%, transparent);
+}
+.sd-eye-toggle:hover {
+  background: var(--sd-surface);
+  color: var(--sd-text);
+}
+.sd-eye-toggle svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ── Disclosure rows (POI / caption editors) ─────────────────────────────── */
+.sd-disclosure {
+  display: flex;
+  flex-direction: column;
+}
+.sd-disclosure[data-sd-open="true"] {
+  margin-bottom: 10px;
+}
+.sd-disclosure[data-sd-dimmed="true"] {
+  opacity: 0.38;
+  pointer-events: none;
+}
+.sd-disclosure[data-sd-highlight="true"] .sd-disclosure-toggle {
+  box-shadow: inset 0 0 0 1px var(--sd-handle);
+  color: var(--sd-label-active);
+}
+[data-shader-dev] .sd-disclosure-toggle {
+  display: flex;
+  height: 36px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: var(--sd-surface);
+  color: var(--sd-label);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+[data-shader-dev] .sd-disclosure-toggle:hover,
+.sd-disclosure[data-sd-open="true"] .sd-disclosure-toggle {
+  color: var(--sd-label-active);
+  background: var(--sd-surface-active);
+}
+.sd-disclosure-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.sd-disclosure-caret {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  color: var(--sd-muted-icon);
+  transition: transform 200ms ease;
+}
+.sd-disclosure[data-sd-open="true"] .sd-disclosure-caret {
+  transform: rotate(180deg);
+}
+.sd-disclosure-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 0 14px;
+}
+/* Nested editors — damp hover scale so sliders don't spill past inset padding. */
+[data-shader-dev] .sd-disclosure-body .sd-slider,
+[data-shader-dev] .sd-vec2-row .sd-slider {
+  width: 100%;
+  margin: 0;
+}
+[data-shader-dev] .sd-disclosure-body .sd-slider[data-sd-state="hover"],
+[data-shader-dev] .sd-vec2-row .sd-slider[data-sd-state="hover"] {
+  transform: none;
+}
+[data-shader-dev] .sd-disclosure-body .sd-slider[data-sd-state="drag"],
+[data-shader-dev] .sd-vec2-row .sd-slider[data-sd-state="drag"] {
+  transform: scale(1.008);
+}
+[data-shader-dev] .sd-disclosure-body .sd-toggle {
+  width: 100%;
+  margin: 0;
+}
+
+/* ── Text input ──────────────────────────────────────────────────────────── */
+.sd-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sd-text[data-sd-layout="inline"] {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: var(--sd-surface);
+}
+.sd-text-label,
+.sd-search-label,
+.sd-textarea-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--sd-label);
+  padding: 0 12px;
+}
+.sd-text[data-sd-layout="inline"] .sd-text-label {
+  padding: 0;
+  flex-shrink: 0;
+}
+[data-shader-dev] .sd-text-input {
+  width: 100%;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: var(--sd-surface);
+  color: var(--sd-label);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+.sd-text[data-sd-layout="inline"] .sd-text-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  text-align: right;
+}
+[data-shader-dev] .sd-text-input[data-sd-mono="true"] {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+}
+[data-shader-dev] .sd-text-input:focus {
+  color: var(--sd-label-active);
+  background: var(--sd-surface-active);
+}
+[data-shader-dev] .sd-text-input::placeholder {
+  color: var(--sd-muted-icon);
+  text-transform: none;
+}
+
+/* ── Textarea ────────────────────────────────────────────────────────────── */
+.sd-textarea {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sd-search {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sd-search-row {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+}
+[data-shader-dev] .sd-search-input {
+  flex: 1;
+  min-width: 0;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: var(--sd-surface);
+  color: var(--sd-label);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+[data-shader-dev] .sd-search-input:focus {
+  color: var(--sd-label-active);
+  background: var(--sd-surface-active);
+}
+[data-shader-dev] .sd-search-input::placeholder {
+  color: var(--sd-muted-icon);
+}
+[data-shader-dev] .sd-search-btn {
+  flex-shrink: 0;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: var(--sd-action-bg);
+  color: var(--sd-action-text);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: background-color 150ms ease, color 150ms ease, transform 120ms ease;
+}
+[data-shader-dev] .sd-search-btn:hover:not(:disabled) {
+  background: var(--sd-action-bg-hover);
+  color: var(--sd-action-text-hover);
+}
+[data-shader-dev] .sd-search-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+[data-shader-dev] .sd-search-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.sd-search-error {
+  padding: 0 12px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: #ef4444;
+}
+
+/* ── Readout row ─────────────────────────────────────────────────────────── */
+.sd-readout {
+  display: flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--sd-surface);
+}
+.sd-readout-label {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--sd-label);
+}
+.sd-readout-value {
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--sd-text-muted);
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Option list (search results, pickers) ───────────────────────────────── */
+.sd-option-list-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sd-option-list-title {
+  padding: 0 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--sd-text-muted);
+}
+.sd-option-list {
+  display: flex;
+  max-height: 168px;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid var(--sd-border);
+  background: var(--sd-bg);
+  scrollbar-width: thin;
+}
+.sd-option-list::-webkit-scrollbar {
+  width: 6px;
+}
+.sd-option-list::-webkit-scrollbar-thumb {
+  background: var(--sd-surface-active);
+  border-radius: 999px;
+}
+[data-shader-dev] .sd-option-item {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--sd-label);
+  text-align: left;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+[data-shader-dev] .sd-option-item:hover:not(:disabled) {
+  background: var(--sd-surface);
+  color: var(--sd-label-active);
+}
+[data-shader-dev] .sd-option-item:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.sd-option-item-label {
+  width: 100%;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: inherit;
+}
+.sd-option-item-desc {
+  width: 100%;
+  font-size: 10.5px;
+  line-height: 1.35;
+  color: var(--sd-text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.sd-option-empty {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--sd-surface);
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--sd-text-muted);
+}
+
+/* ── Hint copy ───────────────────────────────────────────────────────────── */
+.sd-hint {
+  margin: 0;
+  padding: 0 12px 2px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--sd-text-muted);
 }
 `

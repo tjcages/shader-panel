@@ -30,7 +30,8 @@ export function mountShaderDevOverlay(
   if (root) return
   // Seed the open flag before the first render so a `defaultOpen` panel starts
   // open with no closed→open flash (the overlay is its own React root).
-  if (defaultOpen !== undefined) initShaderDevOpenFlag(defaultOpen)
+  if (defaultOpen !== undefined) initShaderDevOpenFlag(defaultOpen, "right")
+  initShaderDevOpenFlag(false, "left")
   mountedTheme = defaultTheme
   container = document.createElement("div")
   container.setAttribute("data-shader-dev-overlay", "")
