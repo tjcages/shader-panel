@@ -32,6 +32,8 @@ export type {
   PanelSelectOption,
   PanelSliderField,
   PanelToggleField,
+  PanelToggleGroupField,
+  PanelToggleGroupOption,
   PanelVec2Field,
   PanelWriteResult,
 } from "./types"
@@ -245,6 +247,7 @@ export const ControlImageInput = NULL_COMPONENT
 export const ControlPath = NULL_COMPONENT
 export type { ControlPathProps, PathPoint } from "./controls/path-input"
 export const ControlToggle = NULL_COMPONENT
+export const ControlToggleGroup = NULL_COMPONENT
 export const ControlSelect = NULL_COMPONENT
 export const ControlVec2 = NULL_COMPONENT
 export const ControlPresets = NULL_COMPONENT

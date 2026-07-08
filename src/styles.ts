@@ -280,34 +280,20 @@ export const PANEL_CSS = `
   align-items: center;
   gap: 4px;
 }
-.panel-theme-toggle {
-  display: flex;
-  align-items: center;
+/* Header variant of the toggle group — compact, icon-only, non-growing. */
+.panel-toggle-group.panel-theme-toggle {
+  width: auto;
+  padding: 0;
+}
+.panel-toggle-group.panel-theme-toggle .panel-toggle-group-track {
   gap: 2px;
   padding: 2px;
-  border-radius: 8px;
-  background: var(--panel-surface);
 }
-[data-panel] .panel-theme-toggle-btn {
-  display: inline-flex;
+[data-panel] .panel-toggle-group.panel-theme-toggle .panel-toggle-group-btn {
+  flex: 0 0 auto;
   width: 26px;
   height: 26px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  color: var(--panel-text-muted);
-  transition: background-color 150ms ease, color 150ms ease;
-}
-[data-panel] .panel-theme-toggle-btn svg {
-  width: 14px;
-  height: 14px;
-}
-[data-panel] .panel-theme-toggle-btn:hover {
-  color: var(--panel-action-text-hover);
-}
-[data-panel] .panel-theme-toggle-btn[data-panel-active="true"] {
-  background: var(--panel-surface-active);
-  color: var(--panel-label-active);
+  padding: 0;
 }
 .panel-switcher {
   appearance: none;
@@ -1317,21 +1303,103 @@ export const PANEL_CSS = `
   transform: translateX(12px);
 }
 
+/* Segmented single-select — optional label, then option buttons sharing a
+   surface track. Selected uses the panel surface tokens, not a heavy fill. */
+.panel-toggle-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  padding: 4px 0;
+}
+.panel-toggle-group-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--panel-label);
+  line-height: 1.35;
+  padding: 0 2px;
+}
+.panel-toggle-group-track {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 8px;
+  background: var(--panel-surface);
+}
+[data-panel] .panel-toggle-group-btn {
+  display: inline-flex;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 6px;
+  padding: 0 10px;
+  color: var(--panel-text-muted);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 150ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 150ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 150ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.panel-toggle-group-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+.panel-toggle-group-icon svg {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+.panel-toggle-group-text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+[data-panel] .panel-toggle-group-btn:hover {
+  color: var(--panel-action-text-hover);
+  background: var(--panel-toggle-hover);
+}
+[data-panel] .panel-toggle-group-btn:focus-visible {
+  outline: 2px solid var(--panel-handle);
+  outline-offset: -2px;
+}
+[data-panel] .panel-toggle-group-btn[data-panel-active="true"] {
+  background: var(--panel-surface-active);
+  color: var(--panel-label-active);
+}
+[data-panel] .panel-toggle-group-btn:active { transform: scale(0.98); }
+@media (prefers-reduced-motion: reduce) {
+  [data-panel] .panel-toggle-group-btn { transition: none; }
+  [data-panel] .panel-toggle-group-btn:active { transform: none; }
+}
+
 .panel-select {
   display: flex;
   min-height: 36px;
+  width: calc(100% + 16px);
+  margin: 0 -8px;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   border-radius: 8px;
-  padding: 0 4px 0 12px;
-  background: var(--panel-surface);
+  padding: 0 8px;
+  background: transparent;
+  transition: background-color 150ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+[data-panel] .panel-select[data-panel-layout="inline"]:hover {
+  background: var(--panel-toggle-hover);
 }
 .panel-select[data-panel-layout="stacked"] {
   flex-direction: column;
   align-items: stretch;
   gap: 6px;
-  padding: 8px 12px;
+  padding: 8px;
 }
 .panel-select-label {
   font-size: 13px;

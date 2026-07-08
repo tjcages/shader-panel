@@ -11,6 +11,7 @@ import { ControlReference } from "../controls/reference"
 import { ControlSelect } from "../controls/select"
 import { ControlSlider } from "../controls/slider"
 import { ControlToggle } from "../controls/toggle"
+import { ControlToggleGroup } from "../controls/toggle-group"
 import { ControlVec2 } from "../controls/vec2"
 import type {
   PanelCollectionField,
@@ -151,6 +152,20 @@ export function renderPanelField(
             value={values[field.key] as string | number}
             options={field.options}
             layout={field.layout}
+            onChange={(v) => setKey(field.key, v)}
+          />,
+        ),
+      }
+
+    case "toggle-group":
+      return {
+        reactKey: field.key,
+        node: withDescription(
+          field.description,
+          <ControlToggleGroup
+            label={field.label}
+            value={values[field.key] as string | number}
+            options={field.options}
             onChange={(v) => setKey(field.key, v)}
           />,
         ),

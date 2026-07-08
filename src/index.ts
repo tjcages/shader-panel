@@ -44,6 +44,8 @@ export type {
   PanelSelectOption,
   PanelSliderField,
   PanelToggleField,
+  PanelToggleGroupField,
+  PanelToggleGroupOption,
   PanelVec2Field,
   PanelWriteResult,
 } from "./types"
@@ -180,6 +182,11 @@ export {
   type PathPoint,
 } from "./controls/path-input"
 export { ControlToggle, type ControlToggleProps } from "./controls/toggle"
+export {
+  ControlToggleGroup,
+  type ControlToggleGroupOption,
+  type ControlToggleGroupProps,
+} from "./controls/toggle-group"
 export {
   ControlThemeToggle,
   type ControlThemeToggleProps,

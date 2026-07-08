@@ -48,6 +48,25 @@ export type PanelSelectField<T extends Record<string, unknown>> = {
   description?: string
 }
 
+export type PanelToggleGroupOption = {
+  value: string | number
+  /** Text label. Omit when using an icon-only option. */
+  label?: string
+}
+
+/**
+ * Segmented single-select control — N option buttons sharing one track, the
+ * selected value highlighted. Options render as text (via `label`); icon
+ * options are only available when constructing `ControlToggleGroup` directly.
+ */
+export type PanelToggleGroupField<T extends Record<string, unknown>> = {
+  type: "toggle-group"
+  key: keyof T & string
+  label: string
+  options: ReadonlyArray<PanelToggleGroupOption>
+  description?: string
+}
+
 /**
  * Pair of coupled sliders that read/write a `[x, y]` tuple at `key`.
  * Use for direction vectors, scroll offsets, anchor positions, etc.
@@ -217,6 +236,7 @@ export type PanelField<T extends Record<string, unknown>> =
   | PanelColorField<T>
   | PanelToggleField<T>
   | PanelSelectField<T>
+  | PanelToggleGroupField<T>
   | PanelVec2Field<T>
   | PanelImageField<T>
   | PanelPathField<T>
