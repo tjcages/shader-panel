@@ -86,7 +86,13 @@ export function subscribePanelRegistration(): () => void {
 }
 
 // Capture registry — no-op in prod (no export panel to drive it).
-export type { ShaderCaptureFn, ShaderGifExportFn, ShaderGifExportOptions } from "./hooks/capture-registry"
+export type {
+  ShaderCaptureFn,
+  ShaderGifExportFn,
+  ShaderGifExportOptions,
+  ShaderRecordFrameFn,
+  ShaderRecordingOptions,
+} from "./hooks/capture-registry"
 export function registerShaderCapture(): () => void {
   return NOOP
 }
@@ -108,6 +114,12 @@ export function registerShaderRecordPrepare(): () => void {
 export function getShaderRecordPrepare(): null {
   return null
 }
+export function registerShaderRecordFrame(): () => void {
+  return NOOP
+}
+export function getShaderRecordFrame(): null {
+  return null
+}
 export function registerShaderGifExport(): () => void {
   return NOOP
 }
@@ -117,6 +129,7 @@ export function getShaderGifExport(): null {
 export function subscribeShaderRecording(): () => void {
   return NOOP
 }
+export function setShaderRecording(): void {}
 
 // Animation clock — always runs on real time in prod (no panel to pause).
 export type { PanelAnimationSnapshot } from "./hooks/animation-clock"

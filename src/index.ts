@@ -72,16 +72,21 @@ export {
   getShaderCapture,
   getShaderGifExport,
   getShaderRecordCanvas,
+  getShaderRecordFrame,
   getShaderRecordPrepare,
   registerShaderCapture,
   registerShaderGifExport,
   registerShaderRecordCanvas,
+  registerShaderRecordFrame,
   registerShaderRecordPrepare,
   subscribeShaderCapture,
   subscribeShaderRecording,
+  setShaderRecording,
   type ShaderCaptureFn,
   type ShaderGifExportFn,
   type ShaderGifExportOptions,
+  type ShaderRecordFrameFn,
+  type ShaderRecordingOptions,
 } from "./hooks/capture-registry"
 
 export {

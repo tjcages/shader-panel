@@ -12,6 +12,7 @@ import {
   getShaderCapture,
   getShaderGifExport,
   getShaderRecordCanvas,
+  getShaderRecordFrame,
   getShaderRecordPrepare,
   setShaderRecording,
 } from "../hooks/capture-registry"
@@ -195,30 +196,15 @@ async function waitForCompositeReady(): Promise<HTMLCanvasElement | null> {
     const started = performance.now()
     const tick = () => {
       const canvas = getShaderRecordCanvas() ?? findShaderCanvas()
-      // Wait until the host has painted at least one composite frame
-      // (recording mode needs ~2 rAF for ThemeFog opaque clear).
-      if (canvas && canvas.width > 2 && canvas.height > 2) {
-        const ctx = canvas.getContext("2d", { willReadFrequently: true })
-        let hasPixels = false
-        if (ctx) {
-          try {
-            const sample = ctx.getImageData(
-              Math.floor(canvas.width / 2),
-              Math.floor(canvas.height / 2),
-              1,
-              1,
-            ).data
-            hasPixels = sample[3] > 0 || sample[0] + sample[1] + sample[2] > 0
-          } catch {
-            hasPixels = true
-          }
-        }
-        if (hasPixels || performance.now() - started > 200) {
-          requestAnimationFrame(() =>
-            requestAnimationFrame(() => resolve(canvas)),
-          )
-          return
-        }
+      // Prefer the host record canvas once it exists. Pixel content is painted
+      // on demand via registerShaderRecordFrame (WebCodecs) — don't require
+      // a continuous composite loop to have already filled it.
+      if (canvas && (getShaderRecordCanvas() || canvas.width > 2)) {
+        // Give ThemeFog ~2 frames to apply opaque clear after data-recording.
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => resolve(canvas)),
+        )
+        return
       }
       if (performance.now() - started > 5000) {
         resolve(canvas)
@@ -261,7 +247,7 @@ export function ControlExport({ name = "shader" }: { name?: string }) {
   }, [])
 
   const finishUi = useCallback(() => {
-    setShaderRecording(false)
+    setShaderRecording(false, { continuous: false })
     clearTimer()
     setRecording(false)
     setElapsed(0)
@@ -349,10 +335,12 @@ export function ControlExport({ name = "shader" }: { name?: string }) {
         typeof MediaRecorder === "undefined"
       ) {
         flash("Recording not supported here")
-        setShaderRecording(false)
+        setShaderRecording(false, { continuous: false })
         return
       }
 
+      // MediaRecorder needs a continuously updating canvas.
+      setShaderRecording(true, { continuous: true })
       const stream = canvas.captureStream(60)
       streamRef.current = stream
       const { mimeType, ext } = pickMediaRecorderFormat()
@@ -404,9 +392,9 @@ export function ControlExport({ name = "shader" }: { name?: string }) {
     const web = webCodecsRef.current
     if (web) {
       webCodecsRef.current = null
-      // Drop recording mode immediately so the host stops compositing /
-      // ThemeFog opaque-clear work while we finalize the MP4.
-      setShaderRecording(false)
+      // Drop recording mode immediately so ThemeFog opaque-clear work
+      // stops while we finalize the MP4 (host paints only on demand).
+      setShaderRecording(false, { continuous: false })
       clearTimer()
       setRecording(false)
       flash("Encoding MP4…", 60000)
@@ -444,12 +432,18 @@ export function ControlExport({ name = "shader" }: { name?: string }) {
       }
     }
 
-    setShaderRecording(true)
+    // WebCodecs paints via registerShaderRecordFrame (not continuous rAF).
+    // MediaRecorder flips continuous:true inside its start helper.
+    setShaderRecording(true, { continuous: false })
     const canvas = await waitForCompositeReady()
     if (!canvas || canvas.width <= 0 || canvas.height <= 0) {
-      setShaderRecording(false)
+      setShaderRecording(false, { continuous: false })
       return flash("No shader canvas found")
     }
+
+    // Paint one frame so waitForCompositeReady / first encode see real pixels.
+    const paint = getShaderRecordFrame()
+    if (paint) await paint()
 
     const useWebCodecs = await canRecordWebCodecsMp4(
       canvas.width,

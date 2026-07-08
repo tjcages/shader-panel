@@ -5,6 +5,7 @@ import {
   Output,
   canEncodeVideo,
 } from "mediabunny"
+import { getShaderRecordFrame } from "../hooks/capture-registry"
 
 export type WebCodecsMp4Recorder = {
   stop: () => Promise<Blob>
@@ -45,6 +46,10 @@ export async function canRecordWebCodecsMp4(
 /**
  * Live-record a canvas to H.264 MP4 via WebCodecs + Mediabunny.
  *
+ * Before each encode, asks the host (via `registerShaderRecordFrame`) to
+ * paint one composite frame — same sync model as GIF capture. That avoids
+ * racing a continuous host rAF against the encoder (washed / dropped frames).
+ *
  * Backpressured: each frame is encoded before the next is scheduled.
  * Wall-clock timestamps keep duration correct when frames are dropped.
  */
@@ -82,7 +87,16 @@ export async function startWebCodecsMp4Recording(
   let loopPromise: Promise<void> = Promise.resolve()
   const startedAt = performance.now()
 
+  const paintHostFrame = async () => {
+    const paint = getShaderRecordFrame()
+    if (!paint) return
+    await paint()
+  }
+
   const captureOne = async () => {
+    if (aborted || !capturing) return
+
+    await paintHostFrame()
     if (aborted || !capturing) return
 
     const timestamp = Math.max(
@@ -122,9 +136,11 @@ export async function startWebCodecsMp4Recording(
         (performance.now() - startedAt) / 1000,
       )
       if (frameCount === 0) {
+        await paintHostFrame()
         await videoSource.add(0, Math.max(FRAME_DURATION, endTimestamp))
       } else if (endTimestamp > lastTimestamp + FRAME_DURATION * 0.25) {
         try {
+          await paintHostFrame()
           await videoSource.add(
             endTimestamp,
             Math.max(FRAME_DURATION, endTimestamp - lastTimestamp),

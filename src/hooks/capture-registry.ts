@@ -25,14 +25,33 @@ export type ShaderGifExportFn = (
 
 type ShaderRecordCanvasGetter = () => HTMLCanvasElement | null
 type ShaderRecordPrepareFn = () => Promise<void>
+/**
+ * Host paints one composite frame into the record canvas. Called by the
+ * WebCodecs recorder immediately before each encode so capture stays in sync
+ * with the live scene (same idea as GIF frame capture).
+ */
+export type ShaderRecordFrameFn = () => void | Promise<void>
+
+export type ShaderRecordingOptions = {
+  /**
+   * When true, the host should continuously composite (MediaRecorder /
+   * captureStream). WebCodecs uses per-frame `registerShaderRecordFrame`
+   * instead and should leave this false.
+   */
+  continuous?: boolean
+}
 
 let current: ShaderCaptureFn | null = null
 let gifExport: ShaderGifExportFn | null = null
 let recordCanvasGetter: ShaderRecordCanvasGetter | null = null
 let recordPrepare: ShaderRecordPrepareFn | null = null
+let recordFrame: ShaderRecordFrameFn | null = null
 let recording = false
+let recordingContinuous = false
 const captureListeners = new Set<() => void>()
-const recordingListeners = new Set<(recording: boolean) => void>()
+const recordingListeners = new Set<
+  (recording: boolean, opts: { continuous: boolean }) => void
+>()
 
 function notifyCaptureListeners() {
   for (const listener of captureListeners) listener()
@@ -40,7 +59,9 @@ function notifyCaptureListeners() {
 
 function notifyRecordingListeners(next: boolean) {
   recording = next
-  for (const listener of recordingListeners) listener(next)
+  if (!next) recordingContinuous = false
+  const opts = { continuous: recordingContinuous }
+  for (const listener of recordingListeners) listener(next, opts)
 }
 
 export function registerShaderCapture(fn: ShaderCaptureFn | null): () => void {
@@ -102,15 +123,36 @@ export function getShaderGifExport(): ShaderGifExportFn | null {
   return gifExport
 }
 
+export function registerShaderRecordFrame(
+  fn: ShaderRecordFrameFn | null,
+): () => void {
+  recordFrame = fn
+  return () => {
+    if (recordFrame === fn) recordFrame = null
+  }
+}
+
+export function getShaderRecordFrame(): ShaderRecordFrameFn | null {
+  return recordFrame
+}
+
 export function subscribeShaderRecording(
-  listener: (recording: boolean) => void,
+  listener: (
+    recording: boolean,
+    opts: { continuous: boolean },
+  ) => void,
 ): () => void {
   recordingListeners.add(listener)
-  listener(recording)
+  listener(recording, { continuous: recordingContinuous })
   return () => recordingListeners.delete(listener)
 }
 
-export function setShaderRecording(active: boolean): void {
-  if (recording === active) return
+export function setShaderRecording(
+  active: boolean,
+  opts?: ShaderRecordingOptions,
+): void {
+  const nextContinuous = active ? !!opts?.continuous : false
+  if (recording === active && recordingContinuous === nextContinuous) return
+  recordingContinuous = nextContinuous
   notifyRecordingListeners(active)
 }
