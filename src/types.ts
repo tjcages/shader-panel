@@ -21,6 +21,8 @@ export type PanelColorField<T extends Record<string, unknown>> = {
   type: "color"
   key: keyof T & string
   label: string
+  /** Optional one-line hint rendered as small muted text above the color field. */
+  description?: string
 }
 
 export type PanelToggleField<T extends Record<string, unknown>> = {

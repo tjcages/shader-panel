@@ -130,7 +130,8 @@ export const PANEL_CSS = `
 }
 
 [data-panel] input.panel-color-text {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
   font-size: 13px;
   font-weight: 500;
   line-height: 1;
@@ -428,7 +429,7 @@ export const PANEL_CSS = `
   flex: 1;
   min-width: 0;
   padding: 0 6px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: inherit;
   font-size: 12px;
   font-variant-numeric: tabular-nums;
   color: var(--panel-text-muted);
@@ -442,7 +443,7 @@ export const PANEL_CSS = `
 .panel-shortcut-hint kbd {
   border-radius: 4px;
   padding: 0 4px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: inherit;
   background: var(--panel-kbd-bg);
 }
 
@@ -718,7 +719,7 @@ export const PANEL_CSS = `
   background: var(--panel-bg);
   color: var(--panel-text);
   border: 1px solid var(--panel-border);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: inherit;
   font-size: 10px;
   line-height: 1.5;
   outline: none;
@@ -966,7 +967,8 @@ export const PANEL_CSS = `
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
   font-size: 13px;
   font-weight: 500;
   color: var(--panel-label);
@@ -1002,7 +1004,8 @@ export const PANEL_CSS = `
   border: 0;
   outline: 0;
   text-align: right;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
   font-size: 13px;
   font-weight: 500;
   color: var(--panel-label);
@@ -1053,7 +1056,8 @@ export const PANEL_CSS = `
 .panel-path-count {
   font-size: 11px;
   color: var(--panel-muted-icon);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
 }
 [data-panel] .panel-path-clear {
   font-size: 11px;
@@ -1153,7 +1157,8 @@ export const PANEL_CSS = `
 .panel-path-point-num {
   fill: var(--panel-label);
   font-size: 3.4px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
   text-anchor: middle;
   pointer-events: none;
   user-select: none;
@@ -1168,7 +1173,8 @@ export const PANEL_CSS = `
   gap: 8px;
   font-size: 11px;
   color: var(--panel-text-muted);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
 }
 [data-panel] .panel-path-remove {
   font-size: 11px;
@@ -1353,7 +1359,8 @@ export const PANEL_CSS = `
   outline: 0;
   background: var(--panel-bg);
   color: var(--panel-label);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
   font-size: 11.5px;
   font-weight: 500;
   line-height: 1;
@@ -1451,7 +1458,8 @@ export const PANEL_CSS = `
   border: 0;
   background: transparent;
   color: var(--panel-label);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
   font-size: 11.5px;
   font-weight: 500;
   text-align: left;
@@ -1463,7 +1471,7 @@ export const PANEL_CSS = `
     color 120ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 [data-panel] .panel-select-option[data-panel-active="true"] {
-  background: var(--panel-surface-active);
+  background: var(--panel-surface);
   color: var(--panel-label-active);
 }
 [data-panel] .panel-select-option[aria-selected="true"] {
@@ -1538,7 +1546,7 @@ export const PANEL_CSS = `
   color: var(--panel-text);
   border: 1px solid var(--panel-border);
   border-radius: 8px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: inherit;
   font-size: 11px;
   line-height: 1.5;
   white-space: pre-wrap;
@@ -2098,7 +2106,8 @@ export const PANEL_CSS = `
   background: transparent;
 }
 [data-panel] .panel-text-input[data-panel-mono="true"] {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
   font-size: 12px;
 }
 [data-panel] .panel-text-input:focus {
@@ -2220,6 +2229,7 @@ export const PANEL_CSS = `
   min-width: 0;
   font-size: 12px;
   font-weight: 500;
+  font-variant-numeric: tabular-nums;
   color: var(--panel-text-muted);
   text-align: right;
   white-space: nowrap;

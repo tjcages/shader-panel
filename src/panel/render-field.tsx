@@ -257,12 +257,13 @@ export function renderPanelField(
     case "color":
       return {
         reactKey: field.key,
-        node: (
+        node: withDescription(
+          field.description,
           <ControlColorInput
             label={field.label}
             value={values[field.key] as string}
             onChange={(v) => setKey(field.key, v)}
-          />
+          />,
         ),
       }
   }
