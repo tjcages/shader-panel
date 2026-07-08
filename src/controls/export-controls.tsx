@@ -189,6 +189,13 @@ function fileBase(name: string): string {
   return `${slug}-${stamp}`
 }
 
+function extensionForVideoBlob(blob: Blob): string {
+  const type = blob.type.toLowerCase()
+  if (type.includes("quicktime") || type.includes("mov")) return "mov"
+  if (type.includes("webm")) return "webm"
+  return "mp4"
+}
+
 function presetExportLabel(preset: ResPreset): string {
   return preset.printHint ?? preset.label
 }
@@ -397,19 +404,20 @@ export function ControlExport({ name = "shader" }: { name?: string }) {
       hostVideoRef.current = null
       clearTimer()
       setRecording(false)
-      flash("Encoding MP4…", 60000)
+      flash("Encoding video…", 60000)
       try {
         const blob = await host.stop()
         finishUi()
         if (blob.size > 0) {
-          downloadBlob(blob, `${fileBase(name)}.mp4`)
-          flash("Video saved (.mp4)")
+          const ext = extensionForVideoBlob(blob)
+          downloadBlob(blob, `${fileBase(name)}.${ext}`)
+          flash(`Video saved (.${ext})`)
         } else {
           flash("Recording was empty")
         }
       } catch (e) {
         finishUi()
-        flash(e instanceof Error ? e.message : "MP4 encode failed")
+        flash(e instanceof Error ? e.message : "Video encode failed")
       }
       return
     }
