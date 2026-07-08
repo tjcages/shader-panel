@@ -3,16 +3,16 @@
 import { useCallback, useEffect, useSyncExternalStore } from "react"
 import { cn } from "../lib/cn"
 import {
-  getShaderDevAnimationRevision,
-  getShaderDevAnimationSnapshot,
-  initShaderDevAnimationClock,
-  pauseShaderDevAnimation,
-  playShaderDevAnimation,
-  resetShaderDevAnimation,
-  SHADER_DEV_ANIMATION_STEP,
-  stepShaderDevAnimationBackward,
-  stepShaderDevAnimationForward,
-  subscribeShaderDevAnimation,
+  getPanelAnimationRevision,
+  getPanelAnimationSnapshot,
+  initPanelAnimationClock,
+  pausePanelAnimation,
+  playPanelAnimation,
+  resetPanelAnimation,
+  PANEL_ANIMATION_STEP,
+  stepPanelAnimationBackward,
+  stepPanelAnimationForward,
+  subscribePanelAnimation,
 } from "../hooks/animation-clock"
 
 export interface ControlAnimationProps {
@@ -29,26 +29,26 @@ function formatTime(seconds: number): string {
 
 export function ControlAnimation({
   className,
-  step = SHADER_DEV_ANIMATION_STEP,
+  step = PANEL_ANIMATION_STEP,
 }: ControlAnimationProps) {
   useEffect(() => {
-    initShaderDevAnimationClock()
+    initPanelAnimationClock()
   }, [])
 
-  // Subscribe to the monotonic revision — same pattern as ShaderDevRoot's
+  // Subscribe to the monotonic revision — same pattern as PanelRoot's
   // registry store. Reading the snapshot object separately avoids returning a
   // fresh `{ playing, time, rate }` from getSnapshot (that causes an infinite
   // loop because Object.is sees a new reference every call).
   useSyncExternalStore(
-    subscribeShaderDevAnimation,
-    getShaderDevAnimationRevision,
+    subscribePanelAnimation,
+    getPanelAnimationRevision,
     () => 0,
   )
-  const snapshot = getShaderDevAnimationSnapshot()
+  const snapshot = getPanelAnimationSnapshot()
 
   const togglePlay = useCallback(() => {
-    if (snapshot.playing) pauseShaderDevAnimation()
-    else playShaderDevAnimation()
+    if (snapshot.playing) pausePanelAnimation()
+    else playPanelAnimation()
   }, [snapshot.playing])
 
   return (
@@ -58,7 +58,7 @@ export function ControlAnimation({
         <button
           type="button"
           className="panel-animation-btn"
-          onClick={() => stepShaderDevAnimationBackward(step)}
+          onClick={() => stepPanelAnimationBackward(step)}
           aria-label="Step backward one frame"
           title="Step back"
         >
@@ -76,7 +76,7 @@ export function ControlAnimation({
         <button
           type="button"
           className="panel-animation-btn"
-          onClick={() => stepShaderDevAnimationForward(step)}
+          onClick={() => stepPanelAnimationForward(step)}
           aria-label="Step forward one frame"
           title="Step forward"
         >
@@ -88,7 +88,7 @@ export function ControlAnimation({
         <button
           type="button"
           className="panel-animation-btn panel-animation-btn-reset"
-          onClick={resetShaderDevAnimation}
+          onClick={resetPanelAnimation}
           aria-label="Reset animation time"
           title="Reset to 0"
         >

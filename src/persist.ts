@@ -36,14 +36,14 @@ function readWithLegacy(s: Storage, key: string, legacyKey: string): string | nu
  *
  * ```tsx
  * const [config, setConfig] = useState(() =>
- *   loadPersistedShaderDevValues("my-shader", DEFAULTS),
+ *   loadPersistedPanelValues("my-shader", DEFAULTS),
  * )
  * ```
  *
  * Unknown keys in the persisted blob are dropped; missing keys fall back to
  * defaults. Always returns a fresh object (no shared reference with defaults).
  */
-export function loadPersistedShaderDevValues<T extends Record<string, unknown>>(
+export function loadPersistedPanelValues<T extends Record<string, unknown>>(
   id: string,
   defaults: T,
 ): T {
@@ -66,7 +66,7 @@ export function loadPersistedShaderDevValues<T extends Record<string, unknown>>(
   }
 }
 
-export function persistShaderDevValues<T extends Record<string, unknown>>(
+export function persistPanelValues<T extends Record<string, unknown>>(
   id: string,
   values: T,
 ): void {
@@ -79,7 +79,7 @@ export function persistShaderDevValues<T extends Record<string, unknown>>(
   }
 }
 
-export function clearPersistedShaderDevValues(id: string): void {
+export function clearPersistedPanelValues(id: string): void {
   const s = storage()
   if (!s) return
   try {
@@ -89,7 +89,7 @@ export function clearPersistedShaderDevValues(id: string): void {
   }
 }
 
-export function hasPersistedShaderDevValues(id: string): boolean {
+export function hasPersistedPanelValues(id: string): boolean {
   const s = storage()
   if (!s) return false
   try {
@@ -112,7 +112,7 @@ function legacySectionsStorageKey(id: string): string {
 /**
  * Load which panel sections are open. Missing keys default to open (`true`).
  */
-export function loadPersistedShaderDevSections(
+export function loadPersistedPanelSections(
   id: string,
 ): Record<string, boolean> {
   const s = storage()
@@ -138,7 +138,7 @@ export function loadPersistedShaderDevSections(
   }
 }
 
-export function persistShaderDevSections(
+export function persistPanelSections(
   id: string,
   sections: Record<string, boolean>,
 ): void {
@@ -155,7 +155,7 @@ export function persistShaderDevSections(
   }
 }
 
-export function clearPersistedShaderDevSections(id: string): void {
+export function clearPersistedPanelSections(id: string): void {
   const s = storage()
   if (!s) return
   try {
@@ -165,7 +165,7 @@ export function clearPersistedShaderDevSections(id: string): void {
   }
 }
 
-export function hasPersistedShaderDevSections(id: string): boolean {
+export function hasPersistedPanelSections(id: string): boolean {
   const s = storage()
   if (!s) return false
   try {

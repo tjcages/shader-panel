@@ -1,9 +1,9 @@
 import {
-  dispatchShaderDevToggle,
-  SHADER_DEV_TOGGLE_EVENT,
+  dispatchPanelToggle,
+  PANEL_TOGGLE_EVENT,
 } from "./use-shortcut"
 
-export { SHADER_DEV_TOGGLE_EVENT }
+export { PANEL_TOGGLE_EVENT }
 
 function isEditableTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false
@@ -18,7 +18,7 @@ function isEditableTarget(target: EventTarget | null): boolean {
 }
 
 /** True when this keydown should toggle shader dev tools (document listener). */
-export function matchShaderDevShortcut(e: KeyboardEvent): boolean {
+export function matchPanelShortcut(e: KeyboardEvent): boolean {
   if (isEditableTarget(e.target)) return false
 
   const mod = e.metaKey || e.ctrlKey
@@ -53,20 +53,20 @@ export function matchShaderDevShortcut(e: KeyboardEvent): boolean {
 let keyboardInstalled = false
 
 /** Idempotent — safe to call from layout root and inline boot script. */
-export function handleShaderDevShortcutKeydown(e: KeyboardEvent): void {
-  if (!matchShaderDevShortcut(e)) return
+export function handlePanelShortcutKeydown(e: KeyboardEvent): void {
+  if (!matchPanelShortcut(e)) return
   e.preventDefault()
   e.stopImmediatePropagation()
-  dispatchShaderDevToggle()
+  dispatchPanelToggle()
 }
 
 /** React backup when inline boot script is absent (e.g. some preview modes). */
-export function installShaderDevKeyboard(): () => void {
+export function installPanelKeyboard(): () => void {
   if (typeof document === "undefined") return () => {}
   if (keyboardInstalled) return () => {}
   keyboardInstalled = true
 
-  const onKeyDown = (e: KeyboardEvent) => handleShaderDevShortcutKeydown(e)
+  const onKeyDown = (e: KeyboardEvent) => handlePanelShortcutKeydown(e)
   document.addEventListener("keydown", onKeyDown, true)
   return () => {
     document.removeEventListener("keydown", onKeyDown, true)

@@ -2,9 +2,9 @@
 
 import { createContext, useContext, useEffect, useState } from "react"
 
-export type ShaderDevTheme = "light" | "dark"
+export type PanelTheme = "light" | "dark"
 
-export const SHADER_DEV_THEME_STORAGE_KEY = "shader-dev-theme"
+export const PANEL_THEME_STORAGE_KEY = "shader-dev-theme"
 
 declare global {
   interface Window {
@@ -13,9 +13,9 @@ declare global {
 }
 
 /** Apply light/dark to the document root and persist the user's choice. */
-export function applyShaderDevTheme(
-  mode: ShaderDevTheme,
-  storageKey: string = SHADER_DEV_THEME_STORAGE_KEY,
+export function applyPanelTheme(
+  mode: PanelTheme,
+  storageKey: string = PANEL_THEME_STORAGE_KEY,
 ): void {
   if (typeof document === "undefined") return
   window.__themeOverride = mode
@@ -27,7 +27,7 @@ export function applyShaderDevTheme(
   }
 }
 
-function detectSystemPreference(): ShaderDevTheme {
+function detectSystemPreference(): PanelTheme {
   if (typeof window === "undefined") return "dark"
   return window.matchMedia("(prefers-color-scheme: light)").matches
     ? "light"
@@ -40,11 +40,11 @@ function detectSystemPreference(): ShaderDevTheme {
  *   2. `defaultTheme` argument (per-mount opinion — pass this from the page)
  *   3. OS `prefers-color-scheme`
  */
-export function useShaderDevTheme(
-  defaultTheme?: ShaderDevTheme,
-): ShaderDevTheme {
+export function usePanelTheme(
+  defaultTheme?: PanelTheme,
+): PanelTheme {
   const [systemPreference, setSystemPreference] =
-    useState<ShaderDevTheme>(detectSystemPreference)
+    useState<PanelTheme>(detectSystemPreference)
   useEffect(() => {
     const mq = window.matchMedia("(prefers-color-scheme: light)")
     const onChange = (e: MediaQueryListEvent) => {
@@ -70,14 +70,14 @@ export function useShaderDevTheme(
 }
 
 /**
- * Theme context — provided by ShaderDevFloatingPanel, consumed by the inner
+ * Theme context — provided by FloatingPanel, consumed by the inner
  * Control primitives. Mostly informational now (CSS handles the visual swap
  * via the `[data-panel-theme]` attribute), but kept so custom controls can react.
  */
-const ShaderDevThemeContext = createContext<ShaderDevTheme>("dark")
+const PanelThemeContext = createContext<PanelTheme>("dark")
 
-export const ShaderDevThemeProvider = ShaderDevThemeContext.Provider
+export const PanelThemeProvider = PanelThemeContext.Provider
 
-export function useShaderDevThemeContext(): ShaderDevTheme {
-  return useContext(ShaderDevThemeContext)
+export function usePanelThemeContext(): PanelTheme {
+  return useContext(PanelThemeContext)
 }

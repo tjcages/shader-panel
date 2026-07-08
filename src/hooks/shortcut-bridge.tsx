@@ -2,19 +2,19 @@
 
 import { useCallback } from "react"
 import {
-  dispatchShaderDevToggle,
-  useShaderDevShortcut,
+  dispatchPanelToggle,
+  usePanelShortcut,
 } from "./use-shortcut"
 
 /**
  * Mount once in the site layout (dev only). Registers the keyboard shortcut even
  * before any AccentShader island has hydrated (client:visible).
  */
-export function ShaderDevShortcutBridge() {
+export function PanelShortcutBridge() {
   const onToggle = useCallback(() => {
-    dispatchShaderDevToggle()
+    dispatchPanelToggle()
   }, [])
 
-  useShaderDevShortcut(onToggle, true)
+  usePanelShortcut(onToggle, true)
   return null
 }

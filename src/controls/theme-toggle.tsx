@@ -2,9 +2,9 @@
 
 import { cn } from "../lib/cn"
 import {
-  applyShaderDevTheme,
-  useShaderDevTheme,
-  type ShaderDevTheme,
+  applyPanelTheme,
+  usePanelTheme,
+  type PanelTheme,
 } from "../hooks/use-theme"
 
 export interface ControlThemeToggleProps {
@@ -17,10 +17,10 @@ export function ControlThemeToggle({
   className,
   storageKey,
 }: ControlThemeToggleProps) {
-  const theme = useShaderDevTheme()
+  const theme = usePanelTheme()
 
-  const setTheme = (mode: ShaderDevTheme) => {
-    applyShaderDevTheme(mode, storageKey)
+  const setTheme = (mode: PanelTheme) => {
+    applyPanelTheme(mode, storageKey)
   }
 
   return (

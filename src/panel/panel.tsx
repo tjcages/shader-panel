@@ -22,25 +22,25 @@ import { ControlSlider } from "../controls/slider"
 import { ControlToggle } from "../controls/toggle"
 import { ControlVec2 } from "../controls/vec2"
 import {
-  DEFAULT_SHADER_DEV_PROMPTS,
-  type ShaderDevPrompt,
+  DEFAULT_PANEL_PROMPTS,
+  type PanelPrompt,
 } from "../prompts"
-import { ShaderDevFloatingPanel } from "./floating-panel"
+import { FloatingPanel } from "./floating-panel"
 import {
-  clearPersistedShaderDevValues,
-  clearPersistedShaderDevSections,
-  hasPersistedShaderDevValues,
-  loadPersistedShaderDevSections,
-  loadPersistedShaderDevValues,
-  persistShaderDevSections,
-  persistShaderDevValues,
+  clearPersistedPanelValues,
+  clearPersistedPanelSections,
+  hasPersistedPanelValues,
+  loadPersistedPanelSections,
+  loadPersistedPanelValues,
+  persistPanelSections,
+  persistPanelValues,
 } from "../persist"
-import type { ShaderDevTheme } from "../hooks/use-theme"
-import type { ShaderDevFieldDef, ShaderDevPanelSide } from "../types"
+import type { PanelTheme } from "../hooks/use-theme"
+import type { PanelField, PanelSide } from "../types"
 
-export type ShaderDevWriteResult = { ok: boolean; message: string }
+export type PanelWriteResult = { ok: boolean; message: string }
 
-export function ShaderDevPanel<T extends Record<string, unknown>>({
+export function Panel<T extends Record<string, unknown>>({
   id,
   title,
   titleSlot,
@@ -55,7 +55,7 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
   onWriteConfig,
   writeLabel = "Write config file",
   shortcutHint = false,
-  prompts = DEFAULT_SHADER_DEV_PROMPTS,
+  prompts = DEFAULT_PANEL_PROMPTS,
   persist = true,
   defaultTheme,
   themeStorageKey,
@@ -71,8 +71,8 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
   id?: string
   title: string
   /** Which side of the viewport the panel docks to. Default `"right"`. */
-  side?: ShaderDevPanelSide
-  /** Rendered next to the title — used by ShaderDevRoot for the multi-shader switcher. */
+  side?: PanelSide
+  /** Rendered next to the title — used by PanelRoot for the multi-shader switcher. */
   titleSlot?: React.ReactNode
   open: boolean
   onClose: () => void
@@ -80,16 +80,16 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
   onOpen?: () => void
   values: T
   defaults: T
-  fields: ShaderDevFieldDef<T>[]
+  fields: PanelField<T>[]
   onChange: (next: T) => void
-  onWriteConfig?: (values: T) => Promise<ShaderDevWriteResult>
+  onWriteConfig?: (values: T) => Promise<PanelWriteResult>
   writeLabel?: string
   shortcutHint?: boolean
   /** AI-prompt rail at the top of the panel. Pass `[]` to hide. */
-  prompts?: ReadonlyArray<ShaderDevPrompt>
+  prompts?: ReadonlyArray<PanelPrompt>
   /** Persist values to `localStorage["shader-dev:<id>"]`. Requires `id`. Default true. */
   persist?: boolean
-  defaultTheme?: ShaderDevTheme
+  defaultTheme?: PanelTheme
   /** sessionStorage key for the header theme toggle. */
   themeStorageKey?: string
   /** Show the light/dark toggle in the panel header. Default true. */
@@ -168,7 +168,7 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
 
   // Auto-hydrate from localStorage on first mount for this id — push saved
   // values back through onChange. This makes persistence "just work" without
-  // the consumer wiring `loadPersistedShaderDevValues` into its useState
+  // the consumer wiring `loadPersistedPanelValues` into its useState
   // initializer (that path still works and avoids the one-frame flash).
   const liveRef = useRef({ onChange, defaults, values, valuesJson, stripImages })
   liveRef.current = { onChange, defaults, values, valuesJson, stripImages }
@@ -177,9 +177,9 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
     if (!persistKey) return
     if (hydratedIdRef.current === persistKey) return
     hydratedIdRef.current = persistKey
-    if (!hasPersistedShaderDevValues(persistKey)) return
+    if (!hasPersistedPanelValues(persistKey)) return
     const live = liveRef.current
-    const saved = loadPersistedShaderDevValues(persistKey, live.defaults)
+    const saved = loadPersistedPanelValues(persistKey, live.defaults)
     // Image keys are never persisted — keep whatever the app currently holds
     // (a consumer may have set an object URL before hydration ran).
     for (const k of imageKeys) {
@@ -202,9 +202,9 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
       return
     }
     if (isModified) {
-      persistShaderDevValues(persistKey, JSON.parse(valuesJson) as T)
+      persistPanelValues(persistKey, JSON.parse(valuesJson) as T)
     } else {
-      clearPersistedShaderDevValues(persistKey)
+      clearPersistedPanelValues(persistKey)
     }
   }, [persistKey, valuesJson, isModified])
 
@@ -214,7 +214,7 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
     if (!sectionsKey) return
     if (sectionHydratedIdRef.current === sectionsKey) return
     sectionHydratedIdRef.current = sectionsKey
-    setSectionOpen(loadPersistedShaderDevSections(sectionsKey))
+    setSectionOpen(loadPersistedPanelSections(sectionsKey))
   }, [sectionsKey])
 
   const setSectionOpenState = useCallback((title: string, open: boolean) => {
@@ -228,7 +228,7 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
       skipNextSectionPersistRef.current = false
       return
     }
-    persistShaderDevSections(sectionsKey, sectionOpen)
+    persistPanelSections(sectionsKey, sectionOpen)
   }, [sectionsKey, sectionOpen])
 
   const setKey = useCallback(
@@ -240,8 +240,8 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
 
   const resetAll = useCallback(() => {
     onChange({ ...defaults })
-    if (persistKey) clearPersistedShaderDevValues(persistKey)
-    if (sectionsKey) clearPersistedShaderDevSections(sectionsKey)
+    if (persistKey) clearPersistedPanelValues(persistKey)
+    if (sectionsKey) clearPersistedPanelSections(sectionsKey)
     setSectionOpen({})
     setStatus(null)
   }, [defaults, onChange, persistKey, sectionsKey])
@@ -527,7 +527,7 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
   const resolvedPeek = peek ?? !inline
 
   return (
-    <ShaderDevFloatingPanel
+    <FloatingPanel
       side={side}
       collapsed={!open}
       onToggle={onClose}
@@ -650,6 +650,6 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
           {status ? <div className="panel-status">{status}</div> : null}
         </div>
       </div>
-    </ShaderDevFloatingPanel>
+    </FloatingPanel>
   )
 }

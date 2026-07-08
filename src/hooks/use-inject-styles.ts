@@ -9,7 +9,7 @@ let injected = false
  * Inject the shader-dev stylesheet into `<head>` exactly once.
  * Idempotent across mounts, HMR, and multiple panel instances.
  */
-export function useInjectShaderDevStyles(): void {
+export function useInjectPanelStyles(): void {
   useEffect(() => {
     if (injected) return
     if (typeof document === "undefined") return

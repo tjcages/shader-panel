@@ -9,13 +9,13 @@ import {
 } from "react"
 import { createPortal } from "react-dom"
 import { cn } from "../lib/cn"
-import { useShaderDevThemeContext } from "../hooks/use-theme"
-import type { ShaderDevSelectOption } from "../types"
+import { usePanelThemeContext } from "../hooks/use-theme"
+import type { PanelSelectOption } from "../types"
 
 export interface ControlSelectProps {
   label: string
   value: string | number
-  options: ReadonlyArray<ShaderDevSelectOption>
+  options: ReadonlyArray<PanelSelectOption>
   onChange: (v: string | number) => void
   /** Label above control (default) or on the same row. */
   layout?: "inline" | "stacked"
@@ -38,7 +38,7 @@ export function ControlSelect({
   layout = "stacked",
   className,
 }: ControlSelectProps) {
-  const theme = useShaderDevThemeContext()
+  const theme = usePanelThemeContext()
   const btnRef = useRef<HTMLButtonElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const [open, setOpen] = useState(false)

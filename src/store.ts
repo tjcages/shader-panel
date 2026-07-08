@@ -1,24 +1,24 @@
-import type { ShaderDevPrompt } from "./prompts"
-import type { ShaderDevFieldDef, ShaderDevPanelSide, ShaderDevWriteResult } from "./types"
+import type { PanelPrompt } from "./prompts"
+import type { PanelField, PanelSide, PanelWriteResult } from "./types"
 
-export type ShaderDevValues = Record<string, unknown>
+export type PanelState = Record<string, unknown>
 
-export type ShaderDevRegistration<T extends ShaderDevValues = ShaderDevValues> = {
+export type PanelRegistration<T extends PanelState = PanelState> = {
   id: string
   title: string
   /** Which side of the viewport the panel docks to. Default `"right"`. */
-  side?: ShaderDevPanelSide
+  side?: PanelSide
   values: T
   defaults: T
-  fields: ShaderDevFieldDef<T>[]
+  fields: PanelField<T>[]
   onChange: (next: T) => void
-  onWriteConfig?: (values: T) => Promise<ShaderDevWriteResult>
+  onWriteConfig?: (values: T) => Promise<PanelWriteResult>
   writeLabel?: string
   /**
    * Override the default AI-prompt rail at the top of the panel. Pass `[]`
-   * to hide it entirely. Omit to use the built-in `DEFAULT_SHADER_DEV_PROMPTS`.
+   * to hide it entirely. Omit to use the built-in `DEFAULT_PANEL_PROMPTS`.
    */
-  prompts?: ReadonlyArray<ShaderDevPrompt>
+  prompts?: ReadonlyArray<PanelPrompt>
   /**
    * Persist uniform values to `localStorage["shader-dev:<id>"]`. Defaults to
    * `true`. Section expand/collapse is always persisted when `id` is set,
@@ -29,14 +29,14 @@ export type ShaderDevRegistration<T extends ShaderDevValues = ShaderDevValues> =
   actionHandlers?: Record<string, () => void>
 }
 
-const registrations = new Map<string, ShaderDevRegistration>()
+const registrations = new Map<string, PanelRegistration>()
 let activeLeftId: string | null = null
 let activeRightId: string | null = null
 let lastRegisteredId: string | null = null
 const listeners = new Set<() => void>()
 let snapshotRevision = 0
 
-function registrationSide(reg: ShaderDevRegistration): ShaderDevPanelSide {
+function registrationSide(reg: PanelRegistration): PanelSide {
   return reg.side ?? "right"
 }
 
@@ -45,7 +45,7 @@ function notify(): void {
   for (const listener of listeners) listener()
 }
 
-function promoteActiveForSide(side: ShaderDevPanelSide): void {
+function promoteActiveForSide(side: PanelSide): void {
   const remaining = Array.from(registrations.values()).filter(
     (reg) => registrationSide(reg) === side,
   )
@@ -59,24 +59,24 @@ function promoteActiveForSide(side: ShaderDevPanelSide): void {
  *
  * Returns an unregister function — store it as the effect cleanup:
  * ```tsx
- * useEffect(() => registerShaderDev({...}), [config])
+ * useEffect(() => registerPanel({...}), [config])
  * ```
  *
  * Passing `null` is a legacy no-arg cleanup: it removes the most recently
  * registered shader. Prefer returning the cleanup function or calling
- * `unregisterShaderDev(id)` explicitly.
+ * `unregisterPanel(id)` explicitly.
  */
-export function registerShaderDev<T extends ShaderDevValues>(
-  next: ShaderDevRegistration<T> | null,
+export function registerPanel<T extends PanelState>(
+  next: PanelRegistration<T> | null,
 ): () => void {
   if (next === null) {
     if (lastRegisteredId !== null) {
-      unregisterShaderDev(lastRegisteredId)
+      unregisterPanel(lastRegisteredId)
     }
     return () => {}
   }
 
-  const reg = next as ShaderDevRegistration
+  const reg = next as PanelRegistration
   const side = registrationSide(reg)
   registrations.set(reg.id, reg)
   lastRegisteredId = reg.id
@@ -90,11 +90,11 @@ export function registerShaderDev<T extends ShaderDevValues>(
   }
 
   notify()
-  return () => unregisterShaderDev(reg.id)
+  return () => unregisterPanel(reg.id)
 }
 
 /** Remove a registration by id. No-op if id isn't registered. */
-export function unregisterShaderDev(id: string): void {
+export function unregisterPanel(id: string): void {
   const reg = registrations.get(id)
   const had = registrations.delete(id)
   if (!had || !reg) return
@@ -106,7 +106,7 @@ export function unregisterShaderDev(id: string): void {
 }
 
 /** Switch which registered shader the panel shows on the given side. */
-export function setActiveShaderDev(id: string): void {
+export function setActivePanel(id: string): void {
   const reg = registrations.get(id)
   if (!reg) return
   const side = registrationSide(reg)
@@ -120,40 +120,40 @@ export function setActiveShaderDev(id: string): void {
   notify()
 }
 
-export function getActiveShaderDevId(): string | null {
+export function getActivePanelId(): string | null {
   return activeRightId ?? activeLeftId
 }
 
-export function getActiveShaderDevIdForSide(
-  side: ShaderDevPanelSide,
+export function getActivePanelIdForSide(
+  side: PanelSide,
 ): string | null {
   return side === "left" ? activeLeftId : activeRightId
 }
 
-export function getActiveShaderDev(): ShaderDevRegistration | null {
+export function getActivePanel(): PanelRegistration | null {
   if (activeRightId) return registrations.get(activeRightId) ?? null
   if (activeLeftId) return registrations.get(activeLeftId) ?? null
   return null
 }
 
-export function getActiveShaderDevForSide(
-  side: ShaderDevPanelSide,
-): ShaderDevRegistration | null {
-  const id = getActiveShaderDevIdForSide(side)
+export function getActivePanelForSide(
+  side: PanelSide,
+): PanelRegistration | null {
+  const id = getActivePanelIdForSide(side)
   return id ? (registrations.get(id) ?? null) : null
 }
 
 /** Snapshot of the registration map. */
-export function getShaderDevRegistrations(): ReadonlyMap<
+export function getPanelRegistrations(): ReadonlyMap<
   string,
-  ShaderDevRegistration
+  PanelRegistration
 > {
   return registrations
 }
 
-export function getShaderDevRegistrationsForSide(
-  side: ShaderDevPanelSide,
-): ShaderDevRegistration[] {
+export function getPanelRegistrationsForSide(
+  side: PanelSide,
+): PanelRegistration[] {
   return Array.from(registrations.values()).filter(
     (reg) => registrationSide(reg) === side,
   )
@@ -164,16 +164,16 @@ export function getShaderDevRegistrationsForSide(
  * snapshot when you want to subscribe to "anything changed", not a specific
  * registration.
  */
-export function getShaderDevRevision(): number {
+export function getPanelRevision(): number {
   return snapshotRevision
 }
 
-/** @deprecated Use `getActiveShaderDev` */
-export function getShaderDevRegistration(): ShaderDevRegistration | null {
-  return getActiveShaderDev()
+/** @deprecated Use `getActivePanel` */
+export function getPanelRegistration(): PanelRegistration | null {
+  return getActivePanel()
 }
 
-export function subscribeShaderDevRegistration(
+export function subscribePanelRegistration(
   listener: () => void,
 ): () => void {
   listeners.add(listener)

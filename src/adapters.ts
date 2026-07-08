@@ -1,4 +1,4 @@
-import type { ShaderDevFieldDef } from "./types"
+import type { PanelField } from "./types"
 
 /** Parse `#rgb` / `#rrggbb` to a normalized `[r, g, b]` tuple in `[0, 1]`. */
 export function hexToRgb01(hex: string): [number, number, number] {
@@ -31,7 +31,7 @@ function uniformNameFor<T>(
 
 export type CreateWebGLAdapterOptions<T extends Record<string, unknown>> = {
   /** Field definitions — the adapter walks these to build the uniform record. */
-  fields: ShaderDevFieldDef<T>[]
+  fields: PanelField<T>[]
   /**
    * Per-key uniform name overrides. Keys not listed fall back to
    * `prefix + key` (e.g. `speed` → `u_speed`).
@@ -93,7 +93,7 @@ export function createWebGLAdapter<T extends Record<string, unknown>>({
 export type CreateR3FAdapterOptions<T extends Record<string, unknown>> = {
   /** Live Three.js uniforms record. The adapter mutates `[name].value` in place. */
   uniforms: Record<string, { value: unknown }>
-  fields: ShaderDevFieldDef<T>[]
+  fields: PanelField<T>[]
   mapping?: Mapping<T>
   prefix?: string
 }

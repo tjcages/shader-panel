@@ -1,11 +1,11 @@
 "use client"
 
-import { ShaderDevFloatingPanel } from "./floating-panel"
-import type { ShaderDevTheme } from "../hooks/use-theme"
-import type { ShaderDevPanelSide } from "../types"
+import { FloatingPanel } from "./floating-panel"
+import type { PanelTheme } from "../hooks/use-theme"
+import type { PanelSide } from "../types"
 
 export type ToolPanelProps = {
-  side: ShaderDevPanelSide
+  side: PanelSide
   title: string
   open: boolean
   onClose: () => void
@@ -14,7 +14,7 @@ export type ToolPanelProps = {
   titleSlot?: React.ReactNode
   children: React.ReactNode
   className?: string
-  defaultTheme?: ShaderDevTheme
+  defaultTheme?: PanelTheme
   themeStorageKey?: string
   showThemeToggle?: boolean
   /** Portal target. Ignored when `inline` is true (default in ToolShell). */
@@ -45,7 +45,7 @@ export function ToolPanel({
   peek,
 }: ToolPanelProps) {
   return (
-    <ShaderDevFloatingPanel
+    <FloatingPanel
       side={side}
       collapsed={!open}
       onToggle={onClose}
@@ -61,9 +61,9 @@ export function ToolPanel({
       peek={peek}
     >
       {children}
-    </ShaderDevFloatingPanel>
+    </FloatingPanel>
   )
 }
 
 /** Alias for ToolPanel — same component, shader-panel naming convention. */
-export const ShaderDevToolPanel = ToolPanel
+export const PanelToolPanel = ToolPanel

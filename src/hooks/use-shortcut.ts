@@ -1,17 +1,17 @@
 "use client"
 
 import { useEffect } from "react"
-import type { ShaderDevPanelSide } from "../types"
+import type { PanelSide } from "../types"
 
-export const SHADER_DEV_TOGGLE_EVENT = "cf-shader-dev-toggle"
-const SHADER_DEV_OPEN_KEY = "cf-accent-shader-dev-open"
-const SHADER_DEV_OPEN_LEFT_KEY = "cf-accent-shader-dev-open-left"
+export const PANEL_TOGGLE_EVENT = "cf-shader-dev-toggle"
+const PANEL_OPEN_KEY = "cf-accent-shader-dev-open"
+const PANEL_OPEN_LEFT_KEY = "cf-accent-shader-dev-open-left"
 
-function openKeyForSide(side: ShaderDevPanelSide): string {
-  return side === "left" ? SHADER_DEV_OPEN_LEFT_KEY : SHADER_DEV_OPEN_KEY
+function openKeyForSide(side: PanelSide): string {
+  return side === "left" ? PANEL_OPEN_LEFT_KEY : PANEL_OPEN_KEY
 }
 
-export function readShaderDevOpenFlag(side: ShaderDevPanelSide = "right"): boolean {
+export function readPanelOpenFlag(side: PanelSide = "right"): boolean {
   try {
     return sessionStorage.getItem(openKeyForSide(side)) === "true"
   } catch {
@@ -19,9 +19,9 @@ export function readShaderDevOpenFlag(side: ShaderDevPanelSide = "right"): boole
   }
 }
 
-export function writeShaderDevOpenFlag(
+export function writePanelOpenFlag(
   open: boolean,
-  side: ShaderDevPanelSide = "right",
+  side: PanelSide = "right",
 ): void {
   try {
     sessionStorage.setItem(openKeyForSide(side), open ? "true" : "false")
@@ -36,9 +36,9 @@ export function writeShaderDevOpenFlag(
  * choice wins. Returns the effective open state. Call synchronously before the
  * panel's first render to avoid an open/close flash.
  */
-export function initShaderDevOpenFlag(
+export function initPanelOpenFlag(
   defaultOpen: boolean,
-  side: ShaderDevPanelSide = "right",
+  side: PanelSide = "right",
 ): boolean {
   try {
     const key = openKeyForSide(side)
@@ -74,7 +74,7 @@ function isKeyD(e: KeyboardEvent): boolean {
  * - ⌘⌥D / Ctrl+Alt+D (primary)
  * - ⌘⇧D / Ctrl+Shift+D (Chrome on Mac may steal this for "Bookmark all tabs")
  */
-export function useShaderDevShortcut(onToggle: () => void, enabled = true) {
+export function usePanelShortcut(onToggle: () => void, enabled = true) {
   useEffect(() => {
     if (!enabled) return
 
@@ -99,7 +99,7 @@ export function useShaderDevShortcut(onToggle: () => void, enabled = true) {
 }
 
 /** Dispatch from layout bridge; persists open state for late-hydrating shader islands. */
-export function dispatchShaderDevToggle(side: ShaderDevPanelSide = "right"): void {
-  writeShaderDevOpenFlag(!readShaderDevOpenFlag(side), side)
-  window.dispatchEvent(new CustomEvent(SHADER_DEV_TOGGLE_EVENT, { detail: { side } }))
+export function dispatchPanelToggle(side: PanelSide = "right"): void {
+  writePanelOpenFlag(!readPanelOpenFlag(side), side)
+  window.dispatchEvent(new CustomEvent(PANEL_TOGGLE_EVENT, { detail: { side } }))
 }

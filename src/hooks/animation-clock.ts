@@ -1,7 +1,7 @@
 /** Default step size for frame-step buttons (≈ one 30 fps frame). */
-export const SHADER_DEV_ANIMATION_STEP = 1 / 30
+export const PANEL_ANIMATION_STEP = 1 / 30
 
-export type ShaderDevAnimationSnapshot = {
+export type PanelAnimationSnapshot = {
   playing: boolean
   /** Elapsed animation time in seconds. */
   time: number
@@ -18,7 +18,7 @@ let lastRafAt = 0
 
 /** Cached snapshot — getSnapshot must return a stable reference between updates. */
 let cachedRevision = -1
-let cachedSnapshot: ShaderDevAnimationSnapshot = {
+let cachedSnapshot: PanelAnimationSnapshot = {
   playing: true,
   time: 0,
   rate: 1,
@@ -54,7 +54,7 @@ function stopLoop(): void {
   rafId = 0
 }
 
-export function playShaderDevAnimation(): void {
+export function playPanelAnimation(): void {
   if (playing) return
   playing = true
   lastRafAt = performance.now()
@@ -62,48 +62,48 @@ export function playShaderDevAnimation(): void {
   ensureLoop()
 }
 
-export function pauseShaderDevAnimation(): void {
+export function pausePanelAnimation(): void {
   if (!playing) return
   playing = false
   stopLoop()
   notify()
 }
 
-export function toggleShaderDevAnimation(): void {
-  if (playing) pauseShaderDevAnimation()
-  else playShaderDevAnimation()
+export function togglePanelAnimation(): void {
+  if (playing) pausePanelAnimation()
+  else playPanelAnimation()
 }
 
-export function stepShaderDevAnimationForward(
-  step = SHADER_DEV_ANIMATION_STEP,
+export function stepPanelAnimationForward(
+  step = PANEL_ANIMATION_STEP,
 ): void {
   time += step
   notify()
 }
 
-export function stepShaderDevAnimationBackward(
-  step = SHADER_DEV_ANIMATION_STEP,
+export function stepPanelAnimationBackward(
+  step = PANEL_ANIMATION_STEP,
 ): void {
   time = Math.max(0, time - step)
   notify()
 }
 
-export function resetShaderDevAnimation(): void {
+export function resetPanelAnimation(): void {
   time = 0
   notify()
 }
 
-export function setShaderDevAnimationTime(next: number): void {
+export function setPanelAnimationTime(next: number): void {
   time = Math.max(0, next)
   notify()
 }
 
-export function setShaderDevAnimationRate(next: number): void {
+export function setPanelAnimationRate(next: number): void {
   rate = Math.max(0.01, Math.min(8, next))
   notify()
 }
 
-export function getShaderDevAnimationSnapshot(): ShaderDevAnimationSnapshot {
+export function getPanelAnimationSnapshot(): PanelAnimationSnapshot {
   if (revision !== cachedRevision) {
     cachedRevision = revision
     cachedSnapshot = { playing, time, rate }
@@ -111,15 +111,15 @@ export function getShaderDevAnimationSnapshot(): ShaderDevAnimationSnapshot {
   return cachedSnapshot
 }
 
-export function getShaderDevAnimationTime(): number {
+export function getPanelAnimationTime(): number {
   return time
 }
 
-export function getShaderDevAnimationRevision(): number {
+export function getPanelAnimationRevision(): number {
   return revision
 }
 
-export function subscribeShaderDevAnimation(listener: () => void): () => void {
+export function subscribePanelAnimation(listener: () => void): () => void {
   listeners.add(listener)
   if (playing) ensureLoop()
   return () => {
@@ -133,11 +133,11 @@ export function subscribeShaderDevAnimation(listener: () => void): () => void {
  * r3f `useFrame` (or any per-frame tick). Respects play/pause and manual
  * step/seek from the dev panel.
  */
-export function advanceShaderDevAnimationDelta(previousTime: number): {
+export function advancePanelAnimationDelta(previousTime: number): {
   time: number
   delta: number
 } {
-  const nextTime = getShaderDevAnimationTime()
+  const nextTime = getPanelAnimationTime()
   // Allow negative deltas so panel step-backward rewinds shaders; still cap
   // magnitude so a tab-background jump or seek doesn't explode uTime.
   const delta = Math.max(-0.1, Math.min(nextTime - previousTime, 0.1))
@@ -145,6 +145,6 @@ export function advanceShaderDevAnimationDelta(previousTime: number): {
 }
 
 /** Start the animation clock — called when the panel mounts. */
-export function initShaderDevAnimationClock(): void {
+export function initPanelAnimationClock(): void {
   if (playing) ensureLoop()
 }

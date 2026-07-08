@@ -2,12 +2,12 @@
 
 import { useCallback, useMemo, useState } from "react"
 import { cn } from "../lib/cn"
-import { fillShaderDevPrompt, type ShaderDevPrompt } from "../prompts"
+import { fillPanelPrompt, type PanelPrompt } from "../prompts"
 import { ControlSection } from "./section"
 
 export interface ControlQuickActionsProps {
   title?: string
-  prompts: ReadonlyArray<ShaderDevPrompt>
+  prompts: ReadonlyArray<PanelPrompt>
   /** Active shader name — substituted for the `{{shader}}` token in prompts. */
   shaderName?: string
   className?: string
@@ -31,12 +31,12 @@ export function ControlQuickActions({
     () =>
       prompts.map((p) => ({
         ...p,
-        prompt: fillShaderDevPrompt(p.prompt, shaderName),
+        prompt: fillPanelPrompt(p.prompt, shaderName),
       })),
     [prompts, shaderName],
   )
 
-  const copy = useCallback((p: ShaderDevPrompt) => {
+  const copy = useCallback((p: PanelPrompt) => {
     void navigator.clipboard.writeText(p.prompt)
     setCopiedId(p.id)
     window.setTimeout(() => {
@@ -77,7 +77,7 @@ function PromptRow({
   onToggle,
   onCopy,
 }: {
-  prompt: ShaderDevPrompt
+  prompt: PanelPrompt
   isOpen: boolean
   isCopied: boolean
   onToggle: () => void

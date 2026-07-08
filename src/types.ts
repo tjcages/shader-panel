@@ -1,11 +1,11 @@
-export type ShaderDevPanelSide = "left" | "right"
+export type PanelSide = "left" | "right"
 
-export type ShaderDevSectionField = {
+export type PanelSectionField = {
   type: "section"
   title: string
 }
 
-export type ShaderDevSliderField<T extends Record<string, unknown>> = {
+export type PanelSliderField<T extends Record<string, unknown>> = {
   type: "slider"
   key: keyof T & string
   label: string
@@ -17,13 +17,13 @@ export type ShaderDevSliderField<T extends Record<string, unknown>> = {
   description?: string
 }
 
-export type ShaderDevColorField<T extends Record<string, unknown>> = {
+export type PanelColorField<T extends Record<string, unknown>> = {
   type: "color"
   key: keyof T & string
   label: string
 }
 
-export type ShaderDevToggleField<T extends Record<string, unknown>> = {
+export type PanelToggleField<T extends Record<string, unknown>> = {
   type: "toggle"
   key: keyof T & string
   label: string
@@ -31,16 +31,16 @@ export type ShaderDevToggleField<T extends Record<string, unknown>> = {
   description?: string
 }
 
-export type ShaderDevSelectOption = {
+export type PanelSelectOption = {
   value: string | number
   label: string
 }
 
-export type ShaderDevSelectField<T extends Record<string, unknown>> = {
+export type PanelSelectField<T extends Record<string, unknown>> = {
   type: "select"
   key: keyof T & string
   label: string
-  options: ReadonlyArray<ShaderDevSelectOption>
+  options: ReadonlyArray<PanelSelectOption>
   /** Label above control (default) or on the same row. */
   layout?: "inline" | "stacked"
   description?: string
@@ -50,7 +50,7 @@ export type ShaderDevSelectField<T extends Record<string, unknown>> = {
  * Pair of coupled sliders that read/write a `[x, y]` tuple at `key`.
  * Use for direction vectors, scroll offsets, anchor positions, etc.
  */
-export type ShaderDevVec2Field<T extends Record<string, unknown>> = {
+export type PanelVec2Field<T extends Record<string, unknown>> = {
   type: "vec2"
   key: keyof T & string
   label: string
@@ -71,7 +71,7 @@ export type ShaderDevVec2Field<T extends Record<string, unknown>> = {
  * Image values are NEVER persisted to localStorage — object URLs don't survive
  * a reload, so on refresh the field falls back to its default.
  */
-export type ShaderDevImageField<T extends Record<string, unknown>> = {
+export type PanelImageField<T extends Record<string, unknown>> = {
   type: "image"
   key: keyof T & string
   label: string
@@ -93,7 +93,7 @@ export type ShaderDevImageField<T extends Record<string, unknown>> = {
  * position, drawn as the start of the path (waypoints chain off it). When set,
  * the home point is draggable on the path pad and writes back to that key.
  */
-export type ShaderDevPathField<T extends Record<string, unknown>> = {
+export type PanelPathField<T extends Record<string, unknown>> = {
   type: "path"
   key: keyof T & string
   label: string
@@ -105,9 +105,9 @@ export type ShaderDevPathField<T extends Record<string, unknown>> = {
 
 /**
  * One-off action button — does not read or write config. Wire handlers via
- * `actionHandlers` on `useShaderDev` / `ShaderDevPanel`.
+ * `actionHandlers` on `usePanel` / `Panel`.
  */
-export type ShaderDevActionField = {
+export type PanelActionField = {
   type: "action"
   /** Key into the `actionHandlers` map passed to the panel. */
   actionId: string
@@ -122,7 +122,7 @@ export type ShaderDevActionField = {
  * One-click preset that merges partial values or replaces the full config.
  * Use a function for presets that need the current state (e.g. reset-all).
  */
-export type ShaderDevPresetOption<T extends Record<string, unknown>> = {
+export type PanelPresetOption<T extends Record<string, unknown>> = {
   label: string
   /** Merge partial values or replace via function. Omit when using `actionId`. */
   values?: Partial<T> | ((current: T) => T)
@@ -130,29 +130,29 @@ export type ShaderDevPresetOption<T extends Record<string, unknown>> = {
   actionId?: string
 }
 
-export type ShaderDevPresetsField<T extends Record<string, unknown>> = {
+export type PanelPresetsField<T extends Record<string, unknown>> = {
   type: "presets"
   /** Optional heading above the preset buttons. */
   label?: string
-  presets: ReadonlyArray<ShaderDevPresetOption<T>>
+  presets: ReadonlyArray<PanelPresetOption<T>>
 }
 
-export type ShaderDevFieldDef<T extends Record<string, unknown>> =
-  | ShaderDevSectionField
-  | ShaderDevSliderField<T>
-  | ShaderDevColorField<T>
-  | ShaderDevToggleField<T>
-  | ShaderDevSelectField<T>
-  | ShaderDevVec2Field<T>
-  | ShaderDevImageField<T>
-  | ShaderDevPathField<T>
-  | ShaderDevActionField
-  | ShaderDevPresetsField<T>
+export type PanelField<T extends Record<string, unknown>> =
+  | PanelSectionField
+  | PanelSliderField<T>
+  | PanelColorField<T>
+  | PanelToggleField<T>
+  | PanelSelectField<T>
+  | PanelVec2Field<T>
+  | PanelImageField<T>
+  | PanelPathField<T>
+  | PanelActionField
+  | PanelPresetsField<T>
 
-export type ShaderDevWriteResult = { ok: boolean; message: string }
+export type PanelWriteResult = { ok: boolean; message: string }
 
-export function isShaderDevSection(
-  field: ShaderDevFieldDef<Record<string, unknown>>,
-): field is ShaderDevSectionField {
+export function isPanelSection(
+  field: PanelField<Record<string, unknown>>,
+): field is PanelSectionField {
   return field.type === "section"
 }

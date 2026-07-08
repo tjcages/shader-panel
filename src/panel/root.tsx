@@ -1,40 +1,40 @@
 "use client"
 
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react"
-import type { ShaderDevPanelSide } from "../types"
-import { ShaderDevPanel } from "./panel"
+import type { PanelSide } from "../types"
+import { Panel } from "./panel"
 import {
-  getActiveShaderDevForSide,
-  getActiveShaderDevIdForSide,
-  getShaderDevRegistrationsForSide,
-  getShaderDevRevision,
-  setActiveShaderDev,
-  subscribeShaderDevRegistration,
+  getActivePanelForSide,
+  getActivePanelIdForSide,
+  getPanelRegistrationsForSide,
+  getPanelRevision,
+  setActivePanel,
+  subscribePanelRegistration,
 } from "../store"
-import { installShaderDevKeyboard } from "../hooks/keyboard"
-import { useInjectShaderDevStyles } from "../hooks/use-inject-styles"
+import { installPanelKeyboard } from "../hooks/keyboard"
+import { useInjectPanelStyles } from "../hooks/use-inject-styles"
 import {
-  initShaderDevOpenFlag,
-  readShaderDevOpenFlag,
-  SHADER_DEV_TOGGLE_EVENT,
-  writeShaderDevOpenFlag,
+  initPanelOpenFlag,
+  readPanelOpenFlag,
+  PANEL_TOGGLE_EVENT,
+  writePanelOpenFlag,
 } from "../hooks/use-shortcut"
 import {
-  useShaderDevTheme,
-  type ShaderDevTheme,
+  usePanelTheme,
+  type PanelTheme,
 } from "../hooks/use-theme"
 
-function subscribeSideOpen(side: ShaderDevPanelSide, listener: () => void): () => void {
+function subscribeSideOpen(side: PanelSide, listener: () => void): () => void {
   const onToggle = () => listener()
-  window.addEventListener(SHADER_DEV_TOGGLE_EVENT, onToggle)
-  return () => window.removeEventListener(SHADER_DEV_TOGGLE_EVENT, onToggle)
+  window.addEventListener(PANEL_TOGGLE_EVENT, onToggle)
+  return () => window.removeEventListener(PANEL_TOGGLE_EVENT, onToggle)
 }
 
-function getSideOpenSnapshot(side: ShaderDevPanelSide): boolean {
-  return readShaderDevOpenFlag(side)
+function getSideOpenSnapshot(side: PanelSide): boolean {
+  return readPanelOpenFlag(side)
 }
 
-function useSideOpen(side: ShaderDevPanelSide): boolean {
+function useSideOpen(side: PanelSide): boolean {
   const subscribe = useCallback(
     (listener: () => void) => subscribeSideOpen(side, listener),
     [side],
@@ -47,70 +47,73 @@ function useSideOpen(side: ShaderDevPanelSide): boolean {
 }
 
 // Only one root renders the panel — whether mounted explicitly via
-// <ShaderDevRoot/> or auto-injected by useShaderDev. The first to claim wins;
+// <PanelRoot/> or auto-injected by usePanel. The first to claim wins;
 // extras render null so you never get two panels.
 let primaryClaimed = false
 
 /**
  * Mounts once in the app layout. Owns the keyboard shortcut + renders whichever
  * shader is currently active on each side. Shaders register themselves on
- * hydrate via `registerShaderDev({ id, title, side, values, defaults, fields, onChange })`.
+ * hydrate via `registerPanel({ id, title, side, values, defaults, fields, onChange })`.
  *
  * When 2+ shaders are registered on the same side, a switcher appears in that
  * panel's header.
  */
-export function ShaderDevRoot({
+export function PanelRoot({
   emptyMessage = "No shader registered on this page.",
   defaultTheme,
   themeStorageKey,
   defaultLeftOpen = false,
   defaultRightOpen,
+  showThemeToggle = true,
 }: {
   emptyMessage?: string
   /** Initial theme when no user override + no `html.dark` are set. Falls back to OS preference if omitted. */
-  defaultTheme?: ShaderDevTheme
+  defaultTheme?: PanelTheme
   /** sessionStorage key for the header theme toggle. */
   themeStorageKey?: string
   /** Initial open state for the left panel this session. Default false. */
   defaultLeftOpen?: boolean
-  /** Initial open state for the right panel. Defaults to closed unless seeded by `useShaderDev({ defaultOpen: true })`. */
+  /** Initial open state for the right panel. Defaults to closed unless seeded by `usePanel({ defaultOpen: true })`. */
   defaultRightOpen?: boolean
+  /** Show the sun/moon theme toggle in the left panel header. Default true. */
+  showThemeToggle?: boolean
 } = {}) {
   const [isPrimary, setIsPrimary] = useState(false)
   useEffect(() => {
     if (primaryClaimed) return
     primaryClaimed = true
     setIsPrimary(true)
-    initShaderDevOpenFlag(defaultLeftOpen, "left")
+    initPanelOpenFlag(defaultLeftOpen, "left")
     if (defaultRightOpen !== undefined) {
-      initShaderDevOpenFlag(defaultRightOpen, "right")
+      initPanelOpenFlag(defaultRightOpen, "right")
     }
     return () => {
       primaryClaimed = false
     }
   }, [defaultLeftOpen, defaultRightOpen])
 
-  useInjectShaderDevStyles()
-  const theme = useShaderDevTheme(defaultTheme)
+  useInjectPanelStyles()
+  const theme = usePanelTheme(defaultTheme)
   const leftOpen = useSideOpen("left")
   const rightOpen = useSideOpen("right")
 
   useSyncExternalStore(
-    subscribeShaderDevRegistration,
-    getShaderDevRevision,
+    subscribePanelRegistration,
+    getPanelRevision,
     () => 0,
   )
 
-  const leftRegistration = getActiveShaderDevForSide("left")
-  const rightRegistration = getActiveShaderDevForSide("right")
-  const leftRegistrations = getShaderDevRegistrationsForSide("left")
-  const rightRegistrations = getShaderDevRegistrationsForSide("right")
+  const leftRegistration = getActivePanelForSide("left")
+  const rightRegistration = getActivePanelForSide("right")
+  const leftRegistrations = getPanelRegistrationsForSide("left")
+  const rightRegistrations = getPanelRegistrationsForSide("right")
 
-  useEffect(() => installShaderDevKeyboard(), [])
+  useEffect(() => installPanelKeyboard(), [])
 
-  const setSideOpen = useCallback((side: ShaderDevPanelSide, next: boolean) => {
-    writeShaderDevOpenFlag(next, side)
-    window.dispatchEvent(new CustomEvent(SHADER_DEV_TOGGLE_EVENT, { detail: { side } }))
+  const setSideOpen = useCallback((side: PanelSide, next: boolean) => {
+    writePanelOpenFlag(next, side)
+    window.dispatchEvent(new CustomEvent(PANEL_TOGGLE_EVENT, { detail: { side } }))
   }, [])
 
   if (!isPrimary) return null
@@ -142,21 +145,21 @@ export function ShaderDevRoot({
         <RegisteredSidePanel
           side="left"
           registration={leftRegistration}
-          activeId={getActiveShaderDevIdForSide("left")}
+          activeId={getActivePanelIdForSide("left")}
           allRegistrations={leftRegistrations}
           open={leftOpen}
           onClose={() => setSideOpen("left", false)}
           onOpen={() => setSideOpen("left", true)}
           defaultTheme={defaultTheme}
           themeStorageKey={themeStorageKey}
-          showThemeToggle
+          showThemeToggle={showThemeToggle}
         />
       ) : null}
       {rightRegistration ? (
         <RegisteredSidePanel
           side="right"
           registration={rightRegistration}
-          activeId={getActiveShaderDevIdForSide("right")}
+          activeId={getActivePanelIdForSide("right")}
           allRegistrations={rightRegistrations}
           open={rightOpen}
           onClose={() => setSideOpen("right", false)}
@@ -182,14 +185,14 @@ function RegisteredSidePanel({
   themeStorageKey,
   showThemeToggle,
 }: {
-  side: ShaderDevPanelSide
-  registration: NonNullable<ReturnType<typeof getActiveShaderDevForSide>>
+  side: PanelSide
+  registration: NonNullable<ReturnType<typeof getActivePanelForSide>>
   activeId: string | null
-  allRegistrations: ReturnType<typeof getShaderDevRegistrationsForSide>
+  allRegistrations: ReturnType<typeof getPanelRegistrationsForSide>
   open: boolean
   onClose: () => void
   onOpen: () => void
-  defaultTheme?: ShaderDevTheme
+  defaultTheme?: PanelTheme
   themeStorageKey?: string
   showThemeToggle?: boolean
 }) {
@@ -198,12 +201,12 @@ function RegisteredSidePanel({
       <ShaderSwitcher
         activeId={activeId}
         registrations={allRegistrations}
-        onSelect={setActiveShaderDev}
+        onSelect={setActivePanel}
       />
     ) : null
 
   return (
-    <ShaderDevPanel
+    <Panel
       id={registration.id}
       side={side}
       title={registration.title}

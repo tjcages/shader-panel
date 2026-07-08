@@ -4,14 +4,14 @@ import { useEffect, useState } from "react"
 import { createPortal } from "react-dom"
 import { cn } from "../lib/cn"
 import { ControlThemeToggle } from "../controls/theme-toggle"
-import { useInjectShaderDevStyles } from "../hooks/use-inject-styles"
+import { useInjectPanelStyles } from "../hooks/use-inject-styles"
 import {
-  ShaderDevThemeProvider,
-  useShaderDevTheme,
-  type ShaderDevTheme,
+  PanelThemeProvider,
+  usePanelTheme,
+  type PanelTheme,
 } from "../hooks/use-theme"
 
-export function ShaderDevFloatingPanel({
+export function FloatingPanel({
   side,
   collapsed,
   onToggle,
@@ -34,11 +34,11 @@ export function ShaderDevFloatingPanel({
   /** Open — used by the edge sensor / peek preview. Defaults to `onToggle`. */
   onOpen?: () => void
   title: string
-  /** Rendered next to the title — used by ShaderDevRoot for the multi-shader switcher. */
+  /** Rendered next to the title — used by PanelRoot for the multi-shader switcher. */
   titleSlot?: React.ReactNode
   children: React.ReactNode
   className?: string
-  defaultTheme?: ShaderDevTheme
+  defaultTheme?: PanelTheme
   /** sessionStorage key for the header theme toggle. */
   themeStorageKey?: string
   /** Show the light/dark toggle in the panel header. Default true. */
@@ -51,8 +51,8 @@ export function ShaderDevFloatingPanel({
   peek?: boolean
 }) {
   const open = onOpen ?? onToggle
-  useInjectShaderDevStyles()
-  const theme = useShaderDevTheme(defaultTheme)
+  useInjectPanelStyles()
+  const theme = usePanelTheme(defaultTheme)
   const [mounted, setMounted] = useState(false)
 
   const showPeek = peek && !inline
@@ -74,7 +74,7 @@ export function ShaderDevFloatingPanel({
   if (!mounted) return null
 
   const panel = (
-    <ShaderDevThemeProvider value={theme}>
+    <PanelThemeProvider value={theme}>
       {showPeek && collapsed ? (
         <div
           className="panel-edge-sensor"
@@ -129,7 +129,7 @@ export function ShaderDevFloatingPanel({
           />
         ) : null}
       </div>
-    </ShaderDevThemeProvider>
+    </PanelThemeProvider>
   )
 
   if (inline) return panel

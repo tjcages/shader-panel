@@ -2,16 +2,16 @@
 
 import { useCallback, type ReactNode } from "react"
 import { TOOL_PANEL_FULL, TOOL_PANEL_INSET } from "../constants"
-import { useInjectShaderDevStyles } from "../hooks/use-inject-styles"
+import { useInjectPanelStyles } from "../hooks/use-inject-styles"
 import { cn } from "../lib/cn"
-import type { ShaderDevPanelSide } from "../types"
+import type { PanelSide } from "../types"
 
 export type ToolShellProps = {
   /** Full-bleed viewport content (canvas, scene, etc.). */
   children: ReactNode
   /** Optional top bar — receives dynamic padding when panels open. */
   topBar?: ReactNode
-  /** Left panel slot — typically `<ToolPanel side="left">` or `<ShaderDevPanel side="left">`. */
+  /** Left panel slot — typically `<ToolPanel side="left">` or `<Panel side="left">`. */
   leftPanel?: ReactNode
   /** Right panel slot. */
   rightPanel?: ReactNode
@@ -48,7 +48,7 @@ export function ToolShell({
   showEyeToggle = true,
   className,
 }: ToolShellProps) {
-  useInjectShaderDevStyles()
+  useInjectPanelStyles()
 
   const toggleLeft = useCallback(() => {
     onLeftOpenChange?.(!leftOpen)
@@ -109,7 +109,7 @@ export function ToolShell({
 }
 
 export type PanelToggleButtonProps = {
-  side: ShaderDevPanelSide
+  side: PanelSide
   open: boolean
   onToggle: () => void
 }

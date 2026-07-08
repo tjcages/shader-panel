@@ -1,27 +1,27 @@
 "use client"
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react"
-import { mountShaderDevOverlay, unmountShaderDevOverlay } from "../panel/auto-overlay"
-import { loadPersistedShaderDevValues } from "../persist"
+import { mountPanelOverlay, unmountPanelOverlay } from "../panel/auto-overlay"
+import { loadPersistedPanelValues } from "../persist"
 import {
-  registerShaderDev,
-  unregisterShaderDev,
-  type ShaderDevRegistration,
-  type ShaderDevValues,
+  registerPanel,
+  unregisterPanel,
+  type PanelRegistration,
+  type PanelState,
 } from "../store"
-import type { ShaderDevTheme } from "./use-theme"
+import type { PanelTheme } from "./use-theme"
 
-export type UseShaderDevOptions<T extends ShaderDevValues> = Omit<
-  ShaderDevRegistration<T>,
+export type UsePanelOptions<T extends PanelState> = Omit<
+  PanelRegistration<T>,
   "values" | "onChange"
 > & {
   /**
-   * Auto-inject the panel into <body> so you don't render <ShaderDevRoot/>
+   * Auto-inject the panel into <body> so you don't render <PanelRoot/>
    * yourself. Default `true`. Set `false` if you mount the root manually.
    */
   autoMount?: boolean
   /** Initial theme passed to the auto-mounted panel. */
-  defaultTheme?: ShaderDevTheme
+  defaultTheme?: PanelTheme
   /**
    * Open the panel by default the first time it mounts this session. Once the
    * user toggles it, their choice sticks (persisted in sessionStorage). Only
@@ -32,11 +32,11 @@ export type UseShaderDevOptions<T extends ShaderDevValues> = Omit<
 
 /**
  * One-call shader dev panel. Owns the config state, registers with the panel,
- * and (by default) injects the panel UI for you — no `<ShaderDevRoot/>`, no
+ * and (by default) injects the panel UI for you — no `<PanelRoot/>`, no
  * separate files.
  *
  * ```tsx
- * const [config] = useShaderDev({
+ * const [config] = usePanel({
  *   id: "my-shader",
  *   title: "My shader",
  *   defaults: DEFAULTS,
@@ -49,8 +49,8 @@ export type UseShaderDevOptions<T extends ShaderDevValues> = Omit<
  * from props). Edits persist to localStorage and rehydrate on reload unless
  * `persist: false`.
  */
-export function useShaderDev<T extends ShaderDevValues>(
-  options: UseShaderDevOptions<T>,
+export function usePanel<T extends PanelState>(
+  options: UsePanelOptions<T>,
 ): [T, (next: T) => void] {
   const {
     id,
@@ -64,7 +64,7 @@ export function useShaderDev<T extends ShaderDevValues>(
   const [values, setValues] = useState<T>(() =>
     persist === false
       ? ({ ...defaults } as T)
-      : loadPersistedShaderDevValues(id, defaults),
+      : loadPersistedPanelValues(id, defaults),
   )
 
   // Latest options for the registration without re-subscribing every render.
@@ -75,7 +75,7 @@ export function useShaderDev<T extends ShaderDevValues>(
   // Re-registering with the same id just replaces the entry — no flicker.
   useLayoutEffect(() => {
     const o = optionsRef.current
-    registerShaderDev<T>({
+    registerPanel<T>({
       ...o,
       values,
       onChange: setValues,
@@ -84,10 +84,10 @@ export function useShaderDev<T extends ShaderDevValues>(
 
   // Unregister once on unmount, and own the auto-mounted overlay lifecycle.
   useEffect(() => {
-    if (autoMount) mountShaderDevOverlay(defaultTheme, defaultOpen)
+    if (autoMount) mountPanelOverlay(defaultTheme, defaultOpen)
     return () => {
-      unregisterShaderDev(optionsRef.current.id)
-      if (autoMount) unmountShaderDevOverlay()
+      unregisterPanel(optionsRef.current.id)
+      if (autoMount) unmountPanelOverlay()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

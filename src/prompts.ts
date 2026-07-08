@@ -1,4 +1,4 @@
-export type ShaderDevPrompt = {
+export type PanelPrompt = {
   id: string
   title: string
   /** Short one-liner shown beneath the title in the preview. */
@@ -16,7 +16,7 @@ export type ShaderDevPrompt = {
  * Replace `{{shader}}` (and whitespace variants) with the active shader's
  * name. Falls back to a generic "shader" when no name is available.
  */
-export function fillShaderDevPrompt(
+export function fillPanelPrompt(
   prompt: string,
   shaderName?: string,
 ): string {
@@ -31,9 +31,9 @@ export function fillShaderDevPrompt(
  * files by project context (no paths to fill in) and name the active shader
  * automatically via the `{{shader}}` token.
  *
- * Override per-shader by passing `prompts` to `registerShaderDev`.
+ * Override per-shader by passing `prompts` to `registerPanel`.
  */
-export const DEFAULT_SHADER_DEV_PROMPTS: ReadonlyArray<ShaderDevPrompt> = [
+export const DEFAULT_PANEL_PROMPTS: ReadonlyArray<PanelPrompt> = [
   {
     id: "improve-quality",
     title: "Improve visual quality",
