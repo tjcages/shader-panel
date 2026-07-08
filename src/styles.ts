@@ -871,7 +871,11 @@ export const PANEL_CSS = `
   transform-origin: var(--panel-os-origin, 50% 50%);
 }
 .panel-slider-overscroll[data-panel-release="true"] {
-  transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 320ms cubic-bezier(0.34, 1.16, 0.64, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .panel-slider-overscroll[data-panel-release="true"] { transition: none; }
+  [data-panel] .panel-slider { transition: none; }
 }
 
 .panel-slider-track {
@@ -1862,8 +1866,16 @@ export const PANEL_CSS = `
 .panel-text[data-panel-layout="inline"] .panel-text-input {
   flex: 1;
   min-width: 0;
+  padding: 0;
+  height: 100%;
   background: transparent;
   text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.panel-text[data-panel-layout="inline"] .panel-text-input:focus {
+  background: transparent;
 }
 [data-panel] .panel-text-input[data-panel-mono="true"] {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
