@@ -92,6 +92,8 @@ export type {
   ShaderGifExportOptions,
   ShaderRecordFrameFn,
   ShaderRecordingOptions,
+  ShaderVideoExportFn,
+  ShaderVideoSession,
 } from "./hooks/capture-registry"
 export function registerShaderCapture(): () => void {
   return NOOP
@@ -124,6 +126,12 @@ export function registerShaderGifExport(): () => void {
   return NOOP
 }
 export function getShaderGifExport(): null {
+  return null
+}
+export function registerShaderVideoExport(): () => void {
+  return NOOP
+}
+export function getShaderVideoExport(): null {
   return null
 }
 export function subscribeShaderRecording(): () => void {

@@ -14,7 +14,9 @@ import {
   getShaderRecordCanvas,
   getShaderRecordFrame,
   getShaderRecordPrepare,
+  getShaderVideoExport,
   setShaderRecording,
+  type ShaderVideoSession,
 } from "../hooks/capture-registry"
 
 const EXPORT_DPI = 300
@@ -229,6 +231,7 @@ export function ControlExport({ name = "shader" }: { name?: string }) {
   const [gifFps, setGifFps] = useState<number>(GIF_DEFAULT_FPS)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const webCodecsRef = useRef<WebCodecsMp4Recorder | null>(null)
+  const hostVideoRef = useRef<ShaderVideoSession | null>(null)
   const chunksRef = useRef<Blob[]>([])
   const streamRef = useRef<MediaStream | null>(null)
   const timerRef = useRef<number | null>(null)
@@ -389,6 +392,28 @@ export function ControlExport({ name = "shader" }: { name?: string }) {
     if (stoppingRef.current) return
     stoppingRef.current = true
 
+    const host = hostVideoRef.current
+    if (host) {
+      hostVideoRef.current = null
+      clearTimer()
+      setRecording(false)
+      flash("Encoding MP4…", 60000)
+      try {
+        const blob = await host.stop()
+        finishUi()
+        if (blob.size > 0) {
+          downloadBlob(blob, `${fileBase(name)}.mp4`)
+          flash("Video saved (.mp4)")
+        } else {
+          flash("Recording was empty")
+        }
+      } catch (e) {
+        finishUi()
+        flash(e instanceof Error ? e.message : "MP4 encode failed")
+      }
+      return
+    }
+
     const web = webCodecsRef.current
     if (web) {
       webCodecsRef.current = null
@@ -423,6 +448,27 @@ export function ControlExport({ name = "shader" }: { name?: string }) {
   }, [clearTimer, finishUi, flash, name])
 
   const startRecording = useCallback(async () => {
+    // Prefer host-owned video (same capture path as GIF/PNG). Panel is
+    // just the start/stop button in that case.
+    const hostVideo = getShaderVideoExport()
+    if (hostVideo) {
+      try {
+        hostVideoRef.current = await hostVideo()
+        setRecording(true)
+        const startedAt = performance.now()
+        setElapsed(0)
+        timerRef.current = window.setInterval(() => {
+          setElapsed((performance.now() - startedAt) / 1000)
+        }, 100)
+        return
+      } catch (e) {
+        hostVideoRef.current = null
+        return flash(
+          e instanceof Error ? e.message : "Video recording failed to start",
+        )
+      }
+    }
+
     const prepare = getShaderRecordPrepare()
     if (prepare) {
       try {
@@ -432,8 +478,7 @@ export function ControlExport({ name = "shader" }: { name?: string }) {
       }
     }
 
-    // WebCodecs paints via registerShaderRecordFrame (not continuous rAF).
-    // MediaRecorder flips continuous:true inside its start helper.
+    // Legacy path: panel-owned WebCodecs / MediaRecorder against a host canvas.
     setShaderRecording(true, { continuous: false })
     const canvas = await waitForCompositeReady()
     if (!canvas || canvas.width <= 0 || canvas.height <= 0) {
@@ -441,7 +486,6 @@ export function ControlExport({ name = "shader" }: { name?: string }) {
       return flash("No shader canvas found")
     }
 
-    // Paint one frame so waitForCompositeReady / first encode see real pixels.
     const paint = getShaderRecordFrame()
     if (paint) await paint()
 
@@ -506,6 +550,11 @@ export function ControlExport({ name = "shader" }: { name?: string }) {
   // Tear down an in-flight recording if the panel unmounts.
   useEffect(() => {
     return () => {
+      const host = hostVideoRef.current
+      if (host) {
+        hostVideoRef.current = null
+        void host.stop().catch(() => {})
+      }
       const web = webCodecsRef.current
       if (web) {
         webCodecsRef.current = null

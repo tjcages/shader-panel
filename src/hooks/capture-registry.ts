@@ -23,6 +23,16 @@ export type ShaderGifExportFn = (
   opts: ShaderGifExportOptions,
 ) => Promise<Blob>
 
+/**
+ * Host-owned video recording. The panel only starts/stops — capture + encode
+ * live entirely in the host (same model as GIF export).
+ */
+export type ShaderVideoSession = {
+  stop: () => Promise<Blob>
+}
+
+export type ShaderVideoExportFn = () => Promise<ShaderVideoSession>
+
 type ShaderRecordCanvasGetter = () => HTMLCanvasElement | null
 type ShaderRecordPrepareFn = () => Promise<void>
 /**
@@ -43,6 +53,7 @@ export type ShaderRecordingOptions = {
 
 let current: ShaderCaptureFn | null = null
 let gifExport: ShaderGifExportFn | null = null
+let videoExport: ShaderVideoExportFn | null = null
 let recordCanvasGetter: ShaderRecordCanvasGetter | null = null
 let recordPrepare: ShaderRecordPrepareFn | null = null
 let recordFrame: ShaderRecordFrameFn | null = null
@@ -121,6 +132,19 @@ export function registerShaderGifExport(
 
 export function getShaderGifExport(): ShaderGifExportFn | null {
   return gifExport
+}
+
+export function registerShaderVideoExport(
+  fn: ShaderVideoExportFn | null,
+): () => void {
+  videoExport = fn
+  return () => {
+    if (videoExport === fn) videoExport = null
+  }
+}
+
+export function getShaderVideoExport(): ShaderVideoExportFn | null {
+  return videoExport
 }
 
 export function registerShaderRecordFrame(
