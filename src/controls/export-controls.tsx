@@ -195,11 +195,30 @@ async function waitForCompositeReady(): Promise<HTMLCanvasElement | null> {
     const started = performance.now()
     const tick = () => {
       const canvas = getShaderRecordCanvas() ?? findShaderCanvas()
-      if (canvas && canvas.width > 0 && canvas.height > 0) {
-        requestAnimationFrame(() =>
-          requestAnimationFrame(() => resolve(canvas)),
-        )
-        return
+      // Wait until the host has painted at least one composite frame
+      // (recording mode needs ~2 rAF for ThemeFog opaque clear).
+      if (canvas && canvas.width > 2 && canvas.height > 2) {
+        const ctx = canvas.getContext("2d", { willReadFrequently: true })
+        let hasPixels = false
+        if (ctx) {
+          try {
+            const sample = ctx.getImageData(
+              Math.floor(canvas.width / 2),
+              Math.floor(canvas.height / 2),
+              1,
+              1,
+            ).data
+            hasPixels = sample[3] > 0 || sample[0] + sample[1] + sample[2] > 0
+          } catch {
+            hasPixels = true
+          }
+        }
+        if (hasPixels || performance.now() - started > 200) {
+          requestAnimationFrame(() =>
+            requestAnimationFrame(() => resolve(canvas)),
+          )
+          return
+        }
       }
       if (performance.now() - started > 5000) {
         resolve(canvas)
@@ -385,6 +404,11 @@ export function ControlExport({ name = "shader" }: { name?: string }) {
     const web = webCodecsRef.current
     if (web) {
       webCodecsRef.current = null
+      // Drop recording mode immediately so the host stops compositing /
+      // ThemeFog opaque-clear work while we finalize the MP4.
+      setShaderRecording(false)
+      clearTimer()
+      setRecording(false)
       flash("Encoding MP4…", 60000)
       try {
         const blob = await web.stop()
@@ -408,7 +432,7 @@ export function ControlExport({ name = "shader" }: { name?: string }) {
       return
     }
     finishUi()
-  }, [finishUi, flash, name])
+  }, [clearTimer, finishUi, flash, name])
 
   const startRecording = useCallback(async () => {
     const prepare = getShaderRecordPrepare()
