@@ -14,16 +14,6 @@
  * `.d.ts` declarations (still served via the `types` export condition).
  */
 
-// Functional utilities — kept in prod.
-export {
-  createR3FAdapter,
-  createWebGLAdapter,
-  hexToRgb01,
-  type CreateR3FAdapterOptions,
-  type CreateWebGLAdapterOptions,
-} from "./adapters"
-export { patchShaderConfigDefaults } from "./patch-config"
-
 // Re-export types (zero runtime cost — type-only imports are erased).
 export type {
   PanelColorField,
@@ -55,24 +45,9 @@ export type { PanelTheme } from "./hooks/use-theme"
 const NOOP = (): void => {}
 const NULL_COMPONENT = (): null => null
 
-// Pure string util — inlined (not imported) so the prompt-text array stays
-// out of the prod bundle entirely.
-export function fillPanelPrompt(
-  prompt: string,
-  shaderName?: string,
-): string {
-  const name = shaderName?.trim() || "shader"
-  return prompt.replace(/\{\{\s*shader\s*\}\}/g, name)
-}
-
 // Constants
-export const DEFAULT_PANEL_PROMPTS: ReadonlyArray<unknown> = []
 export const PANEL_CSS = ""
 export const PANEL_STYLE_ID = "shader-dev-styles"
-/** @deprecated use PANEL_CSS */
-export const SHADER_DEV_CSS = PANEL_CSS
-/** @deprecated use PANEL_STYLE_ID */
-export const SHADER_DEV_STYLE_ID = PANEL_STYLE_ID
 export const PANEL_TOGGLE_EVENT = "cf-shader-dev-toggle"
 
 // Registry
@@ -254,157 +229,3 @@ export const ControlAnimation = NULL_COMPONENT
 export const TOOL_PANEL_WIDTH = 280
 export const TOOL_PANEL_INSET = 16
 export const TOOL_PANEL_FULL = 296
-
-// ---------------------------------------------------------------------------
-// @deprecated back-compat aliases — every pre-rename `ShaderDev*` / `useShaderDev`
-// name, mapped to its canonical `Panel*` replacement. Keeps existing
-// `shader-panel` consumers compiling unchanged against the prod entry too.
-// ---------------------------------------------------------------------------
-
-/** @deprecated Renamed to `DEFAULT_PANEL_PROMPTS`. */
-export const DEFAULT_SHADER_DEV_PROMPTS = DEFAULT_PANEL_PROMPTS
-/** @deprecated Renamed to `PANEL_TOGGLE_EVENT`. */
-export const SHADER_DEV_TOGGLE_EVENT = PANEL_TOGGLE_EVENT
-/** @deprecated Renamed to `PANEL_ANIMATION_STEP`. */
-export const SHADER_DEV_ANIMATION_STEP = PANEL_ANIMATION_STEP
-
-/** @deprecated Renamed to `fillPanelPrompt`. */
-export const fillShaderDevPrompt = fillPanelPrompt
-
-/** @deprecated Renamed to `isPanelSection`. */
-export { isPanelSection as isShaderDevSection } from "./types"
-
-/** @deprecated Renamed `ShaderDev*Field` / related types to `Panel*`. */
-export type {
-  PanelColorField as ShaderDevColorField,
-  PanelField as ShaderDevFieldDef,
-  PanelImageField as ShaderDevImageField,
-  PanelSide as ShaderDevPanelSide,
-  PanelPathField as ShaderDevPathField,
-  PanelPresetOption as ShaderDevPresetOption,
-  PanelPresetsField as ShaderDevPresetsField,
-  PanelSectionField as ShaderDevSectionField,
-  PanelSelectField as ShaderDevSelectField,
-  PanelSelectOption as ShaderDevSelectOption,
-  PanelSliderField as ShaderDevSliderField,
-  PanelToggleField as ShaderDevToggleField,
-  PanelVec2Field as ShaderDevVec2Field,
-  PanelWriteResult as ShaderDevWriteResult,
-} from "./types"
-/** @deprecated Renamed to `PanelPrompt`. */
-export type { PanelPrompt as ShaderDevPrompt } from "./prompts"
-/** @deprecated Renamed to `PanelRegistration` / `PanelState`. */
-export type {
-  PanelRegistration as ShaderDevRegistration,
-  PanelState as ShaderDevValues,
-} from "./store"
-/** @deprecated Renamed to `PanelTheme`. */
-export type { PanelTheme as ShaderDevTheme } from "./hooks/use-theme"
-/** @deprecated Renamed to `PanelAnimationSnapshot`. */
-export type { PanelAnimationSnapshot as ShaderDevAnimationSnapshot } from "./hooks/animation-clock"
-/** @deprecated Renamed to `UsePanelOptions`. */
-export type { UsePanelOptions as UseShaderDevOptions } from "./hooks/use-panel"
-
-/** @deprecated Renamed registry members to `Panel*`. */
-export const registerShaderDev = registerPanel
-/** @deprecated Renamed registry members to `Panel*`. */
-export const unregisterShaderDev = unregisterPanel
-/** @deprecated Renamed registry members to `Panel*`. */
-export const setActiveShaderDev = setActivePanel
-/** @deprecated Renamed registry members to `Panel*`. */
-export const getActiveShaderDev = getActivePanel
-/** @deprecated Renamed registry members to `Panel*`. */
-export const getActiveShaderDevId = getActivePanelId
-/** @deprecated Renamed registry members to `Panel*`. */
-export const getActiveShaderDevIdForSide = getActivePanelIdForSide
-/** @deprecated Renamed registry members to `Panel*`. */
-export const getActiveShaderDevForSide = getActivePanelForSide
-/** @deprecated Renamed registry members to `Panel*`. */
-export const getShaderDevRegistration = getPanelRegistration
-/** @deprecated Renamed registry members to `Panel*`. */
-export const getShaderDevRegistrations = getPanelRegistrations
-/** @deprecated Renamed registry members to `Panel*`. */
-export const getShaderDevRegistrationsForSide = getPanelRegistrationsForSide
-/** @deprecated Renamed registry members to `Panel*`. */
-export const getShaderDevRevision = getPanelRevision
-/** @deprecated Renamed registry members to `Panel*`. */
-export const subscribeShaderDevRegistration = subscribePanelRegistration
-
-/** @deprecated Renamed animation-clock members to `Panel*`. */
-export const advanceShaderDevAnimationDelta = advancePanelAnimationDelta
-/** @deprecated Renamed animation-clock members to `Panel*`. */
-export const getShaderDevAnimationRevision = getPanelAnimationRevision
-/** @deprecated Renamed animation-clock members to `Panel*`. */
-export const getShaderDevAnimationSnapshot = getPanelAnimationSnapshot
-/** @deprecated Renamed animation-clock members to `Panel*`. */
-export const getShaderDevAnimationTime = getPanelAnimationTime
-/** @deprecated Renamed animation-clock members to `Panel*`. */
-export const initShaderDevAnimationClock = initPanelAnimationClock
-/** @deprecated Renamed animation-clock members to `Panel*`. */
-export const pauseShaderDevAnimation = pausePanelAnimation
-/** @deprecated Renamed animation-clock members to `Panel*`. */
-export const playShaderDevAnimation = playPanelAnimation
-/** @deprecated Renamed animation-clock members to `Panel*`. */
-export const resetShaderDevAnimation = resetPanelAnimation
-/** @deprecated Renamed animation-clock members to `Panel*`. */
-export const setShaderDevAnimationRate = setPanelAnimationRate
-/** @deprecated Renamed animation-clock members to `Panel*`. */
-export const setShaderDevAnimationTime = setPanelAnimationTime
-/** @deprecated Renamed animation-clock members to `Panel*`. */
-export const stepShaderDevAnimationBackward = stepPanelAnimationBackward
-/** @deprecated Renamed animation-clock members to `Panel*`. */
-export const stepShaderDevAnimationForward = stepPanelAnimationForward
-/** @deprecated Renamed animation-clock members to `Panel*`. */
-export const subscribeShaderDevAnimation = subscribePanelAnimation
-/** @deprecated Renamed animation-clock members to `Panel*`. */
-export const toggleShaderDevAnimation = togglePanelAnimation
-
-/** @deprecated Renamed persistence members to `Panel*`. */
-export const loadPersistedShaderDevValues = loadPersistedPanelValues
-/** @deprecated Renamed persistence members to `Panel*`. */
-export const persistShaderDevValues = persistPanelValues
-/** @deprecated Renamed persistence members to `Panel*`. */
-export const clearPersistedShaderDevValues = clearPersistedPanelValues
-/** @deprecated Renamed persistence members to `Panel*`. */
-export const hasPersistedShaderDevValues = hasPersistedPanelValues
-/** @deprecated Renamed persistence members to `Panel*`. */
-export const loadPersistedShaderDevSections = loadPersistedPanelSections
-/** @deprecated Renamed persistence members to `Panel*`. */
-export const persistShaderDevSections = persistPanelSections
-
-/** @deprecated Renamed shortcut members to `Panel*`. */
-export const dispatchShaderDevToggle = dispatchPanelToggle
-/** @deprecated Renamed shortcut members to `Panel*`. */
-export const readShaderDevOpenFlag = readPanelOpenFlag
-/** @deprecated Renamed shortcut members to `Panel*`. */
-export const writeShaderDevOpenFlag = writePanelOpenFlag
-/** @deprecated Renamed shortcut members to `Panel*`. */
-export const useShaderDevShortcut = usePanelShortcut
-
-/** @deprecated Renamed keyboard members to `Panel*`. */
-export const handleShaderDevShortcutKeydown = handlePanelShortcutKeydown
-/** @deprecated Renamed keyboard members to `Panel*`. */
-export const installShaderDevKeyboard = installPanelKeyboard
-/** @deprecated Renamed keyboard members to `Panel*`. */
-export const matchShaderDevShortcut = matchPanelShortcut
-
-/** @deprecated Renamed theme members to `Panel*`. */
-export const ShaderDevThemeProvider = PanelThemeProvider
-/** @deprecated Renamed theme members to `Panel*`. */
-export const useShaderDevTheme = usePanelTheme
-/** @deprecated Renamed theme members to `Panel*`. */
-export const useShaderDevThemeContext = usePanelThemeContext
-
-/** @deprecated Renamed to `usePanel`. */
-export const useShaderDev = usePanel
-
-/** @deprecated Renamed to `PanelRoot`. */
-export const ShaderDevRoot = PanelRoot
-/** @deprecated Renamed to `Panel`. */
-export const ShaderDevPanel = Panel
-/** @deprecated Renamed to `FloatingPanel`. */
-export const ShaderDevFloatingPanel = FloatingPanel
-/** @deprecated Renamed to `PanelToolPanel`. */
-export const ShaderDevToolPanel = PanelToolPanel
-/** @deprecated Renamed to `PanelShortcutBridge`. */
-export const ShaderDevShortcutBridge = PanelShortcutBridge

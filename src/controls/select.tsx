@@ -189,7 +189,6 @@ export function ControlSelect({
       {open && pos
         ? createPortal(
             <div
-              data-shader-dev=""
               data-panel=""
               data-panel-theme={theme}
               className="panel-select-layer"

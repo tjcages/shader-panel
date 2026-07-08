@@ -87,7 +87,6 @@ export function FloatingPanel({
         />
       ) : null}
       <div
-        data-shader-dev=""
         data-panel=""
         data-panel-theme={theme}
         data-panel-side={side}

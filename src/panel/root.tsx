@@ -123,7 +123,7 @@ export function PanelRoot({
 
   if (!hasAnyRegistration) {
     return anyOpen ? (
-      <div data-shader-dev="" data-panel="" data-panel-theme={theme} className="panel-empty">
+      <div data-panel="" data-panel-theme={theme} className="panel-empty">
         {emptyMessage}
         <button
           type="button"

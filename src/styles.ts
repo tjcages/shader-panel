@@ -12,60 +12,60 @@ export const PANEL_STYLE_ID = "shader-dev-styles"
 
 export const PANEL_CSS = `
 [data-panel] {
-  --panel-bg: var(--sd-bg, rgba(13, 13, 16, 0.95));
-  --panel-border: var(--sd-border, rgba(255, 255, 255, 0.16));
-  --panel-text: var(--sd-text, #ffffff);
-  --panel-text-muted: var(--sd-text-muted, rgba(255, 255, 255, 0.72));
-  --panel-surface: var(--sd-surface, rgba(255, 255, 255, 0.05));
-  --panel-surface-active: var(--sd-surface-active, rgba(255, 255, 255, 0.15));
-  --panel-toggle-hover: var(--sd-toggle-hover, var(--panel-surface-active));
-  --panel-surface-idle-fill: var(--sd-surface-idle-fill, rgba(255, 255, 255, 0.11));
-  --panel-hash: var(--sd-hash, rgba(255, 255, 255, 0.15));
-  --panel-handle: var(--sd-handle, #ffffff);
-  --panel-label: var(--sd-label, rgba(255, 255, 255, 0.7));
-  --panel-label-active: var(--sd-label-active, #ffffff);
-  --panel-divider: var(--sd-divider, rgba(255, 255, 255, 0.06));
-  --panel-muted-icon: var(--sd-muted-icon, rgba(255, 255, 255, 0.4));
-  --panel-swatch-border: var(--sd-swatch-border, rgba(255, 255, 255, 0.2));
-  --panel-kbd-bg: var(--sd-kbd-bg, rgba(255, 255, 255, 0.1));
-  --panel-action-bg: var(--sd-action-bg, rgba(255, 255, 255, 0.05));
-  --panel-action-bg-hover: var(--sd-action-bg-hover, rgba(255, 255, 255, 0.1));
-  --panel-action-text: var(--sd-action-text, rgba(255, 255, 255, 0.72));
-  --panel-action-text-hover: var(--sd-action-text-hover, #ffffff);
-  --panel-danger: var(--sd-danger, #f87171);
-  --panel-danger-hover: var(--sd-danger-hover, #fca5a5);
-  --panel-header-border: var(--sd-header-border, rgba(255, 255, 255, 0.096));
-  --panel-close-icon: var(--sd-close-icon, rgba(255, 255, 255, 0.72));
-  --panel-close-icon-hover: var(--sd-close-icon-hover, #ffffff);
-  --panel-shadow: var(--sd-shadow, 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1));
+  --panel-bg: rgba(13, 13, 16, 0.95);
+  --panel-border: rgba(255, 255, 255, 0.16);
+  --panel-text: #ffffff;
+  --panel-text-muted: rgba(255, 255, 255, 0.72);
+  --panel-surface: rgba(255, 255, 255, 0.05);
+  --panel-surface-active: rgba(255, 255, 255, 0.15);
+  --panel-toggle-hover: var(--panel-surface-active);
+  --panel-surface-idle-fill: rgba(255, 255, 255, 0.11);
+  --panel-hash: rgba(255, 255, 255, 0.15);
+  --panel-handle: #ffffff;
+  --panel-label: rgba(255, 255, 255, 0.7);
+  --panel-label-active: #ffffff;
+  --panel-divider: rgba(255, 255, 255, 0.06);
+  --panel-muted-icon: rgba(255, 255, 255, 0.4);
+  --panel-swatch-border: rgba(255, 255, 255, 0.2);
+  --panel-kbd-bg: rgba(255, 255, 255, 0.1);
+  --panel-action-bg: rgba(255, 255, 255, 0.05);
+  --panel-action-bg-hover: rgba(255, 255, 255, 0.1);
+  --panel-action-text: rgba(255, 255, 255, 0.72);
+  --panel-action-text-hover: #ffffff;
+  --panel-danger: #f87171;
+  --panel-danger-hover: #fca5a5;
+  --panel-header-border: rgba(255, 255, 255, 0.096);
+  --panel-close-icon: rgba(255, 255, 255, 0.72);
+  --panel-close-icon-hover: #ffffff;
+  --panel-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
 }
 
 [data-panel][data-panel-theme="light"] {
-  --panel-bg: var(--sd-bg, rgba(255, 255, 255, 0.95));
-  --panel-border: var(--sd-border, #d1d5db);
-  --panel-text: var(--sd-text, #111827);
-  --panel-text-muted: var(--sd-text-muted, #4b5563);
-  --panel-surface: var(--sd-surface, #f3f4f6);
-  --panel-surface-active: var(--sd-surface-active, #d1d5db);
-  --panel-toggle-hover: var(--sd-toggle-hover, rgba(17, 24, 39, 0.04));
-  --panel-surface-idle-fill: var(--sd-surface-idle-fill, #e5e7eb);
-  --panel-hash: var(--sd-hash, #d1d5db);
-  --panel-handle: var(--sd-handle, #111827);
-  --panel-label: var(--sd-label, #374151);
-  --panel-label-active: var(--sd-label-active, #111827);
-  --panel-divider: var(--sd-divider, #e5e7eb);
-  --panel-muted-icon: var(--sd-muted-icon, #9ca3af);
-  --panel-swatch-border: var(--sd-swatch-border, #d1d5db);
-  --panel-kbd-bg: var(--sd-kbd-bg, #e5e7eb);
-  --panel-action-bg: var(--sd-action-bg, #f3f4f6);
-  --panel-action-bg-hover: var(--sd-action-bg-hover, #e5e7eb);
-  --panel-action-text: var(--sd-action-text, #374151);
-  --panel-action-text-hover: var(--sd-action-text-hover, #111827);
-  --panel-danger: var(--sd-danger, #dc2626);
-  --panel-danger-hover: var(--sd-danger-hover, #b91c1c);
-  --panel-header-border: var(--sd-header-border, #e5e7eb);
-  --panel-close-icon: var(--sd-close-icon, #6b7280);
-  --panel-close-icon-hover: var(--sd-close-icon-hover, #111827);
+  --panel-bg: rgba(255, 255, 255, 0.95);
+  --panel-border: #d1d5db;
+  --panel-text: #111827;
+  --panel-text-muted: #4b5563;
+  --panel-surface: #f3f4f6;
+  --panel-surface-active: #d1d5db;
+  --panel-toggle-hover: rgba(17, 24, 39, 0.04);
+  --panel-surface-idle-fill: #e5e7eb;
+  --panel-hash: #d1d5db;
+  --panel-handle: #111827;
+  --panel-label: #374151;
+  --panel-label-active: #111827;
+  --panel-divider: #e5e7eb;
+  --panel-muted-icon: #9ca3af;
+  --panel-swatch-border: #d1d5db;
+  --panel-kbd-bg: #e5e7eb;
+  --panel-action-bg: #f3f4f6;
+  --panel-action-bg-hover: #e5e7eb;
+  --panel-action-text: #374151;
+  --panel-action-text-hover: #111827;
+  --panel-danger: #dc2626;
+  --panel-danger-hover: #b91c1c;
+  --panel-header-border: #e5e7eb;
+  --panel-close-icon: #6b7280;
+  --panel-close-icon-hover: #111827;
 }
 
 [data-panel],
@@ -2084,8 +2084,3 @@ export const PANEL_CSS = `
   color: var(--panel-text-muted);
 }
 `
-
-/** @deprecated use PANEL_CSS */
-export const SHADER_DEV_CSS = PANEL_CSS
-/** @deprecated use PANEL_STYLE_ID */
-export const SHADER_DEV_STYLE_ID = PANEL_STYLE_ID
