@@ -14,16 +14,19 @@ export default defineConfig([
   // `development` condition. Emits the shared .d.ts.
   {
     ...shared,
-    entry: ["src/index.ts"],
+    entry: ["src/index.ts", "src/shader/index.ts"],
     dts: true,
     clean: true,
   },
-  // Production no-op stub — bundlers resolve to this under `production`.
-  // No types: TypeScript always reads dist/index.d.ts via the `types`
-  // condition, so the stub's shape doesn't need to be re-emitted.
+  // Production no-op stubs — bundlers resolve to these under `production`.
+  // No types: TypeScript always reads the .d.ts via the `types` condition,
+  // so the stubs' shapes don't need to be re-emitted.
   {
     ...shared,
-    entry: { "index.prod": "src/index.prod.ts" },
+    entry: {
+      "index.prod": "src/index.prod.ts",
+      "shader/index.prod": "src/shader/index.prod.ts",
+    },
     dts: false,
     clean: false,
   },

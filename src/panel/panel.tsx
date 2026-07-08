@@ -21,10 +21,7 @@ import { ControlSelect } from "../controls/select"
 import { ControlSlider } from "../controls/slider"
 import { ControlToggle } from "../controls/toggle"
 import { ControlVec2 } from "../controls/vec2"
-import {
-  DEFAULT_PANEL_PROMPTS,
-  type PanelPrompt,
-} from "../prompts"
+import type { PanelPrompt } from "../prompts"
 import { FloatingPanel } from "./floating-panel"
 import {
   clearPersistedPanelValues,
@@ -37,6 +34,9 @@ import {
 } from "../persist"
 import type { PanelTheme } from "../hooks/use-theme"
 import type { PanelField, PanelSide } from "../types"
+
+/** Empty default — the AI-prompt rail is opt-in (shaders use `useShaderPanel`). */
+const EMPTY_PROMPTS: readonly PanelPrompt[] = []
 
 export type PanelWriteResult = { ok: boolean; message: string }
 
@@ -55,7 +55,7 @@ export function Panel<T extends Record<string, unknown>>({
   onWriteConfig,
   writeLabel = "Write config file",
   shortcutHint = false,
-  prompts = DEFAULT_PANEL_PROMPTS,
+  prompts = EMPTY_PROMPTS,
   persist = true,
   defaultTheme,
   themeStorageKey,

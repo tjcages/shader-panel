@@ -1,7 +1,7 @@
 {
-  "name": "shader-panel",
-  "version": "1.2.0",
-  "description": "Drop-in dev panel for tweaking shader uniforms live — sliders, color pickers, keyboard shortcut, copy/write JSON. Zero CSS framework, zero animation library.",
+  "name": "@tjcages/panels",
+  "version": "0.1.0",
+  "description": "Drop-in dev panel that wraps any React tool — shaders, canvases, 3D scenes, dashboards — with live controls, item collections, and image/video export. Compiles out of production.",
   "type": "module",
   "sideEffects": false,
   "main": "./dist/index.js",
@@ -14,6 +14,13 @@
       "development": "./dist/index.js",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
+    },
+    "./shader": {
+      "types": "./dist/shader/index.d.ts",
+      "production": "./dist/shader/index.prod.js",
+      "development": "./dist/shader/index.js",
+      "import": "./dist/shader/index.js",
+      "default": "./dist/shader/index.js"
     },
     "./dev": {
       "types": "./dist/index.d.ts",
@@ -43,6 +50,9 @@
     "access": "public"
   },
   "keywords": [
+    "panels",
+    "dev-panel",
+    "control-panel",
     "shader",
     "webgl",
     "webgl2",
