@@ -111,7 +111,7 @@ export function ControlSelect({
   useLayoutEffect(() => {
     if (!open) return
     menuRef.current
-      ?.querySelector<HTMLElement>(`[data-sd-index="${active}"]`)
+      ?.querySelector<HTMLElement>(`[data-panel-index="${active}"]`)
       ?.scrollIntoView({ block: "nearest" })
   }, [open, active])
 
@@ -157,23 +157,23 @@ export function ControlSelect({
 
   return (
     <div
-      className={cn("sd-select", className)}
-      data-sd-layout={layout}
+      className={cn("panel-select", className)}
+      data-panel-layout={layout}
     >
-      <span className="sd-select-label">{label}</span>
+      <span className="panel-select-label">{label}</span>
       <button
         ref={btnRef}
         type="button"
-        className="sd-select-btn"
+        className="panel-select-btn"
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={label}
         onClick={() => (open ? setOpen(false) : openMenu())}
         onKeyDown={onKeyDown}
       >
-        <span className="sd-select-value">{selected?.label ?? "—"}</span>
+        <span className="panel-select-value">{selected?.label ?? "—"}</span>
         <svg
-          className="sd-select-chevron"
+          className="panel-select-chevron"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -190,15 +190,16 @@ export function ControlSelect({
         ? createPortal(
             <div
               data-shader-dev=""
-              data-sd-theme={theme}
-              className="sd-select-layer"
+              data-panel=""
+              data-panel-theme={theme}
+              className="panel-select-layer"
             >
               <div
                 ref={menuRef}
                 role="listbox"
                 aria-label={label}
-                className="sd-select-menu"
-                data-sd-up={pos.up ? "true" : "false"}
+                className="panel-select-menu"
+                data-panel-up={pos.up ? "true" : "false"}
                 style={{
                   position: "fixed",
                   left: pos.left,
@@ -216,16 +217,16 @@ export function ControlSelect({
                       type="button"
                       role="option"
                       aria-selected={isSelected}
-                      data-sd-index={i}
-                      data-sd-active={i === active ? "true" : "false"}
-                      className="sd-select-option"
+                      data-panel-index={i}
+                      data-panel-active={i === active ? "true" : "false"}
+                      className="panel-select-option"
                       onMouseEnter={() => setActive(i)}
                       onClick={() => commit(i)}
                     >
                       <span>{o.label}</span>
                       {isSelected ? (
                         <svg
-                          className="sd-select-check"
+                          className="panel-select-check"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"

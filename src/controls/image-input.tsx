@@ -45,13 +45,13 @@ export function ControlImageInput({
   }
 
   return (
-    <div className={cn("sd-image", className)}>
-      <div className="sd-image-head">
-        <span className="sd-image-label">{label}</span>
+    <div className={cn("panel-image", className)}>
+      <div className="panel-image-head">
+        <span className="panel-image-label">{label}</span>
         {interactive ? (
           <button
             type="button"
-            className="sd-image-upload"
+            className="panel-image-upload"
             onClick={() => inputRef.current?.click()}
           >
             Upload
@@ -59,7 +59,7 @@ export function ControlImageInput({
         ) : null}
       </div>
       <div
-        className="sd-image-frame"
+        className="panel-image-frame"
         style={
           value && aspect
             ? // Frame at the image's natural aspect; the img inside renders at
@@ -67,8 +67,8 @@ export function ControlImageInput({
               { aspectRatio: `${aspect}` }
             : undefined
         }
-        data-sd-interactive={interactive ? "true" : "false"}
-        data-sd-drag={dragOver ? "true" : "false"}
+        data-panel-interactive={interactive ? "true" : "false"}
+        data-panel-drag={dragOver ? "true" : "false"}
         role={interactive ? "button" : undefined}
         tabIndex={interactive ? 0 : undefined}
         aria-label={interactive ? `Upload image for ${label}` : label}
@@ -106,7 +106,7 @@ export function ControlImageInput({
           <img
             src={value}
             alt={label}
-            className="sd-image-preview"
+            className="panel-image-preview"
             draggable={false}
             onLoad={(e) => {
               const img = e.currentTarget
@@ -116,7 +116,7 @@ export function ControlImageInput({
             }}
           />
         ) : (
-          <span className="sd-image-empty">
+          <span className="panel-image-empty">
             {emptyLabel ?? (readonly ? "—" : "Click or drop an image")}
           </span>
         )}
@@ -126,7 +126,7 @@ export function ControlImageInput({
           ref={inputRef}
           type="file"
           accept={accept}
-          className="sd-image-native"
+          className="panel-image-native"
           tabIndex={-1}
           aria-hidden="true"
           onChange={(e) => {

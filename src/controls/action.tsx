@@ -24,16 +24,16 @@ export function ControlAction({
   className,
 }: ControlActionProps) {
   return (
-    <div className={cn("sd-action-field", className)}>
+    <div className={cn("panel-action-field", className)}>
       {description ? (
-        <div className="sd-field-description">{description}</div>
+        <div className="panel-field-description">{description}</div>
       ) : null}
       <button
         type="button"
         className={cn(
-          "sd-action-btn",
-          variant === "primary" && "sd-action-btn-primary",
-          variant === "destructive" && "sd-action-btn-destructive",
+          "panel-action-btn",
+          variant === "primary" && "panel-action-btn-primary",
+          variant === "destructive" && "panel-action-btn-destructive",
         )}
         disabled={disabled}
         onClick={onClick}

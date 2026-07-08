@@ -25,14 +25,14 @@ export function ControlThemeToggle({
 
   return (
     <div
-      className={cn("sd-theme-toggle", className)}
+      className={cn("panel-theme-toggle", className)}
       role="group"
       aria-label="Color theme"
     >
       <button
         type="button"
-        className="sd-theme-toggle-btn"
-        data-sd-active={theme === "light" ? "true" : "false"}
+        className="panel-theme-toggle-btn"
+        data-panel-active={theme === "light" ? "true" : "false"}
         aria-pressed={theme === "light"}
         aria-label="Light theme"
         title="Light"
@@ -42,8 +42,8 @@ export function ControlThemeToggle({
       </button>
       <button
         type="button"
-        className="sd-theme-toggle-btn"
-        data-sd-active={theme === "dark" ? "true" : "false"}
+        className="panel-theme-toggle-btn"
+        data-panel-active={theme === "dark" ? "true" : "false"}
         aria-pressed={theme === "dark"}
         aria-label="Dark theme"
         title="Dark"

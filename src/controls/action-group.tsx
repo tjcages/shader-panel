@@ -12,5 +12,5 @@ export function ControlActionGroup({
   children,
   className,
 }: ControlActionGroupProps) {
-  return <div className={cn("sd-action-group", className)}>{children}</div>
+  return <div className={cn("panel-action-group", className)}>{children}</div>
 }

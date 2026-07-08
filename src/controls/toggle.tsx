@@ -22,12 +22,12 @@ export function ControlToggle({
       aria-checked={value}
       aria-label={label}
       onClick={() => onChange(!value)}
-      className={cn("sd-toggle", className)}
-      data-sd-on={value ? "true" : "false"}
+      className={cn("panel-toggle", className)}
+      data-panel-on={value ? "true" : "false"}
     >
-      <span className="sd-toggle-label">{label}</span>
-      <span className="sd-toggle-track">
-        <span className="sd-toggle-thumb" />
+      <span className="panel-toggle-label">{label}</span>
+      <span className="panel-toggle-track">
+        <span className="panel-toggle-thumb" />
       </span>
     </button>
   )

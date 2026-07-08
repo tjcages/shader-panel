@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
-import { SHADER_DEV_CSS, SHADER_DEV_STYLE_ID } from "../styles"
+import { PANEL_CSS, PANEL_STYLE_ID } from "../styles"
 
 let injected = false
 
@@ -13,13 +13,13 @@ export function useInjectShaderDevStyles(): void {
   useEffect(() => {
     if (injected) return
     if (typeof document === "undefined") return
-    if (document.getElementById(SHADER_DEV_STYLE_ID)) {
+    if (document.getElementById(PANEL_STYLE_ID)) {
       injected = true
       return
     }
     const style = document.createElement("style")
-    style.id = SHADER_DEV_STYLE_ID
-    style.textContent = SHADER_DEV_CSS
+    style.id = PANEL_STYLE_ID
+    style.textContent = PANEL_CSS
     document.head.appendChild(style)
     injected = true
   }, [])

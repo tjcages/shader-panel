@@ -41,13 +41,13 @@ export function ControlSlider({
   const displayValue = value.toFixed(decimals)
 
   // Reflect prop changes into CSS variables. CSS handles whether to animate
-  // (data-sd-state="drag" disables the width transition, everything else gets
+  // (data-panel-state="drag" disables the width transition, everything else gets
   // a 220ms ease-out).
   useEffect(() => {
     const fill = fillRef.current
     const handle = handleRef.current
-    if (fill) fill.style.setProperty("--sd-fill-pct", `${percentage}%`)
-    if (handle) handle.style.setProperty("--sd-handle-left", `${percentage}%`)
+    if (fill) fill.style.setProperty("--panel-fill-pct", `${percentage}%`)
+    if (handle) handle.style.setProperty("--panel-handle-left", `${percentage}%`)
   }, [percentage])
 
   const positionToValue = useCallback(
@@ -74,8 +74,8 @@ export function ControlSlider({
   const setOverscroll = useCallback((scale: number, origin: string) => {
     const el = overscrollRef.current
     if (!el) return
-    el.style.setProperty("--sd-os-scale", String(scale))
-    el.style.setProperty("--sd-os-origin", origin)
+    el.style.setProperty("--panel-os-scale", String(scale))
+    el.style.setProperty("--panel-os-origin", origin)
   }, [])
 
   const handlePointerDown = useCallback(
@@ -139,13 +139,13 @@ export function ControlSlider({
         ? (((i + 1) * step) / (max - min)) * 100
         : (i + 1) * 10
     return (
-      <div key={`h${pct}`} className="sd-slider-hash" style={{ left: `${pct}%` }} />
+      <div key={`h${pct}`} className="panel-slider-hash" style={{ left: `${pct}%` }} />
     )
   })
 
   return (
-    <div data-sd-state={state} className={cn("sd-slider", className)}>
-      <div ref={overscrollRef} className="sd-slider-overscroll">
+    <div data-panel-state={state} className={cn("panel-slider", className)}>
+      <div ref={overscrollRef} className="panel-slider-overscroll">
         <div
           ref={trackRef}
           role="slider"
@@ -154,28 +154,28 @@ export function ControlSlider({
           aria-valuemin={min}
           aria-valuemax={max}
           aria-label={label}
-          className="sd-slider-track"
+          className="panel-slider-track"
           onPointerDown={handlePointerDown}
           onPointerEnter={() => setState((s) => (s === "drag" ? s : "hover"))}
           onPointerLeave={() => setState((s) => (s === "drag" ? s : "idle"))}
         >
-          <div className="sd-slider-hash-row">{hashMarks}</div>
+          <div className="panel-slider-hash-row">{hashMarks}</div>
           <div
             ref={fillRef}
-            className="sd-slider-fill"
+            className="panel-slider-fill"
             style={
-              { "--sd-fill-pct": `${percentage}%` } as React.CSSProperties
+              { "--panel-fill-pct": `${percentage}%` } as React.CSSProperties
             }
           />
           <div
             ref={handleRef}
-            className="sd-slider-handle"
+            className="panel-slider-handle"
             style={
-              { "--sd-handle-left": `${percentage}%` } as React.CSSProperties
+              { "--panel-handle-left": `${percentage}%` } as React.CSSProperties
             }
           />
-          <span className="sd-slider-label">{label}</span>
-          <span className="sd-slider-value">{displayValue}</span>
+          <span className="panel-slider-label">{label}</span>
+          <span className="panel-slider-value">{displayValue}</span>
         </div>
       </div>
     </div>

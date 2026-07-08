@@ -48,10 +48,10 @@ export function ControlPresets<T extends Record<string, unknown>>({
   }
 
   return (
-    <div className={cn("sd-presets", className)}>
-      <label className="sd-presets-label">{label}</label>
+    <div className={cn("panel-presets", className)}>
+      <label className="panel-presets-label">{label}</label>
       <select
-        className="sd-preset-select"
+        className="panel-preset-select"
         defaultValue=""
         onChange={handleChange}
         aria-label={label}

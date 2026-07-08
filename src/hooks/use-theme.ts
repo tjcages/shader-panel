@@ -72,7 +72,7 @@ export function useShaderDevTheme(
 /**
  * Theme context — provided by ShaderDevFloatingPanel, consumed by the inner
  * Control primitives. Mostly informational now (CSS handles the visual swap
- * via the `[data-sd-theme]` attribute), but kept so custom controls can react.
+ * via the `[data-panel-theme]` attribute), but kept so custom controls can react.
  */
 const ShaderDevThemeContext = createContext<ShaderDevTheme>("dark")
 

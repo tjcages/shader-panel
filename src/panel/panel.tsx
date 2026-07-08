@@ -330,7 +330,7 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
         current = { title: "Parameters", children: [], keys: [] }
         out.push(current)
       }
-      current.children.push(<div key={key} className="sd-field">{node}</div>)
+      current.children.push(<div key={key} className="panel-field">{node}</div>)
       current.keys.push(key)
     }
 
@@ -339,7 +339,7 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
         current = { title: "Parameters", children: [], keys: [] }
         out.push(current)
       }
-      current.children.push(<div key={reactKey} className="sd-field">{node}</div>)
+      current.children.push(<div key={reactKey} className="panel-field">{node}</div>)
     }
 
     for (const field of fields) {
@@ -385,7 +385,7 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
         pushField(
           <>
             {field.description && (
-              <div className="sd-field-description">{field.description}</div>
+              <div className="panel-field-description">{field.description}</div>
             )}
             <ControlSlider
               label={field.label}
@@ -405,7 +405,7 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
         pushField(
           <>
             {field.description && (
-              <div className="sd-field-description">{field.description}</div>
+              <div className="panel-field-description">{field.description}</div>
             )}
             <ControlToggle
               label={field.label}
@@ -422,7 +422,7 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
         pushField(
           <>
             {field.description && (
-              <div className="sd-field-description">{field.description}</div>
+              <div className="panel-field-description">{field.description}</div>
             )}
             <ControlSelect
               label={field.label}
@@ -458,7 +458,7 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
         pushField(
           <>
             {field.description && (
-              <div className="sd-field-description">{field.description}</div>
+              <div className="panel-field-description">{field.description}</div>
             )}
             <ControlImageInput
               label={field.label}
@@ -485,7 +485,7 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
         pushField(
           <>
             {field.description && (
-              <div className="sd-field-description">{field.description}</div>
+              <div className="panel-field-description">{field.description}</div>
             )}
             <ControlPath
               label={field.label}
@@ -541,7 +541,7 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
       inline={inline}
       peek={resolvedPeek}
     >
-      <div className="sd-fields">
+      <div className="panel-fields">
         {showAnimation ? <ControlAnimation /> : null}
 
         {prompts.length > 0 ? (
@@ -549,7 +549,7 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
         ) : null}
 
         {shortcutHint ? (
-          <div className="sd-shortcut-hint">
+          <div className="panel-shortcut-hint">
             <kbd>⌘⌥D</kbd> to toggle · <kbd>⌘⇧`</kbd> / <kbd>⌘⇧D</kbd> also work
           </div>
         ) : null}
@@ -570,13 +570,13 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
           </ControlSection>
         ))}
 
-        <div className="sd-actions">
+        <div className="panel-actions">
           {showExport ? <ControlExport name={title} /> : null}
 
-          <button type="button" onClick={resetAll} className="sd-action-btn">
+          <button type="button" onClick={resetAll} className="panel-action-btn">
             Reset to defaults
           </button>
-          <button type="button" onClick={handleCopy} className="sd-action-btn">
+          <button type="button" onClick={handleCopy} className="panel-action-btn">
             Copy JSON
           </button>
           <button
@@ -585,34 +585,34 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
               setPasteOpen((v) => !v)
               setPasteError(null)
             }}
-            className="sd-action-btn"
+            className="panel-action-btn"
             aria-expanded={pasteOpen}
           >
             {pasteOpen ? "Cancel paste" : "Paste JSON"}
           </button>
 
           <div
-            className="sd-collapse"
-            data-sd-open={persistKey && isModified ? "true" : "false"}
+            className="panel-collapse"
+            data-panel-open={persistKey && isModified ? "true" : "false"}
             aria-hidden={!(persistKey && isModified)}
           >
-            <div className="sd-collapse-inner">
-              <div className="sd-saved-indicator" aria-live="polite">
-                <span className="sd-saved-dot" /> Edits saved locally
+            <div className="panel-collapse-inner">
+              <div className="panel-saved-indicator" aria-live="polite">
+                <span className="panel-saved-dot" /> Edits saved locally
               </div>
             </div>
           </div>
 
           <div
-            className="sd-collapse"
-            data-sd-open={pasteOpen ? "true" : "false"}
+            className="panel-collapse"
+            data-panel-open={pasteOpen ? "true" : "false"}
             aria-hidden={!pasteOpen}
           >
-            <div className="sd-collapse-inner">
-              <div className="sd-paste">
+            <div className="panel-collapse-inner">
+              <div className="panel-paste">
                 <textarea
                   ref={pasteTextareaRef}
-                  className="sd-paste-textarea"
+                  className="panel-paste-textarea"
                   value={pasteText}
                   onChange={(e) => {
                     setPasteText(e.target.value)
@@ -623,13 +623,13 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
                   rows={5}
                 />
                 {pasteError ? (
-                  <div className="sd-paste-error">{pasteError}</div>
+                  <div className="panel-paste-error">{pasteError}</div>
                 ) : null}
                 <button
                   type="button"
                   onClick={handleApplyPaste}
                   disabled={pasteText.trim().length === 0}
-                  className="sd-action-btn"
+                  className="panel-action-btn"
                 >
                   Apply
                 </button>
@@ -642,12 +642,12 @@ export function ShaderDevPanel<T extends Record<string, unknown>>({
               type="button"
               disabled={writing}
               onClick={() => void handleWrite()}
-              className="sd-action-btn"
+              className="panel-action-btn"
             >
               {writing ? "Writing…" : writeLabel}
             </button>
           ) : null}
-          {status ? <div className="sd-status">{status}</div> : null}
+          {status ? <div className="panel-status">{status}</div> : null}
         </div>
       </div>
     </ShaderDevFloatingPanel>

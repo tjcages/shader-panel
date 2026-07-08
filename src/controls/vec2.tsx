@@ -37,9 +37,9 @@ export function ControlVec2({
   )
 
   return (
-    <div className={cn("sd-vec2", className)}>
-      <span className="sd-vec2-label">{label}</span>
-      <div className="sd-vec2-row">
+    <div className={cn("panel-vec2", className)}>
+      <span className="panel-vec2-label">{label}</span>
+      <div className="panel-vec2-row">
         <ControlSlider
           label={xLabel}
           value={value[0]}

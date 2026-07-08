@@ -16,9 +16,9 @@ export function ControlReadout({
   className,
 }: ControlReadoutProps) {
   return (
-    <div className={cn("sd-readout", className)}>
-      <span className="sd-readout-label">{label}</span>
-      <span className="sd-readout-value">{value?.trim() || emptyValue}</span>
+    <div className={cn("panel-readout", className)}>
+      <span className="panel-readout-label">{label}</span>
+      <span className="panel-readout-value">{value?.trim() || emptyValue}</span>
     </div>
   )
 }

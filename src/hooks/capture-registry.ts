@@ -12,16 +12,44 @@
  */
 export type ShaderCaptureFn = (opts: { maxEdge: number }) => Promise<Blob>
 
+export type ShaderGifExportOptions = {
+  durationSec: number
+  fps: number
+  maxEdge: number
+  onProgress?: (progress: number) => void
+}
+
+export type ShaderGifExportFn = (
+  opts: ShaderGifExportOptions,
+) => Promise<Blob>
+
+type ShaderRecordCanvasGetter = () => HTMLCanvasElement | null
+type ShaderRecordPrepareFn = () => Promise<void>
+
 let current: ShaderCaptureFn | null = null
-const listeners = new Set<() => void>()
+let gifExport: ShaderGifExportFn | null = null
+let recordCanvasGetter: ShaderRecordCanvasGetter | null = null
+let recordPrepare: ShaderRecordPrepareFn | null = null
+let recording = false
+const captureListeners = new Set<() => void>()
+const recordingListeners = new Set<(recording: boolean) => void>()
+
+function notifyCaptureListeners() {
+  for (const listener of captureListeners) listener()
+}
+
+function notifyRecordingListeners(next: boolean) {
+  recording = next
+  for (const listener of recordingListeners) listener(next)
+}
 
 export function registerShaderCapture(fn: ShaderCaptureFn | null): () => void {
   current = fn
-  for (const l of listeners) l()
+  notifyCaptureListeners()
   return () => {
     if (current === fn) {
       current = null
-      for (const l of listeners) l()
+      notifyCaptureListeners()
     }
   }
 }
@@ -31,6 +59,58 @@ export function getShaderCapture(): ShaderCaptureFn | null {
 }
 
 export function subscribeShaderCapture(listener: () => void): () => void {
-  listeners.add(listener)
-  return () => listeners.delete(listener)
+  captureListeners.add(listener)
+  return () => captureListeners.delete(listener)
+}
+
+export function registerShaderRecordCanvas(
+  getter: ShaderRecordCanvasGetter | null,
+): () => void {
+  recordCanvasGetter = getter
+  return () => {
+    if (recordCanvasGetter === getter) recordCanvasGetter = null
+  }
+}
+
+export function getShaderRecordCanvas(): HTMLCanvasElement | null {
+  return recordCanvasGetter?.() ?? null
+}
+
+export function registerShaderRecordPrepare(
+  fn: ShaderRecordPrepareFn | null,
+): () => void {
+  recordPrepare = fn
+  return () => {
+    if (recordPrepare === fn) recordPrepare = null
+  }
+}
+
+export function getShaderRecordPrepare(): ShaderRecordPrepareFn | null {
+  return recordPrepare
+}
+
+export function registerShaderGifExport(
+  fn: ShaderGifExportFn | null,
+): () => void {
+  gifExport = fn
+  return () => {
+    if (gifExport === fn) gifExport = null
+  }
+}
+
+export function getShaderGifExport(): ShaderGifExportFn | null {
+  return gifExport
+}
+
+export function subscribeShaderRecording(
+  listener: (recording: boolean) => void,
+): () => void {
+  recordingListeners.add(listener)
+  listener(recording)
+  return () => recordingListeners.delete(listener)
+}
+
+export function setShaderRecording(active: boolean): void {
+  if (recording === active) return
+  notifyRecordingListeners(active)
 }

@@ -1,98 +1,98 @@
 /**
  * Self-contained CSS for the shader-dev panel.
  *
- * Themes via CSS custom properties on `[data-shader-dev]`. Consumers override
+ * Themes via CSS custom properties on `[data-panel]`. Consumers override
  * any variable in their own stylesheet to recolor without re-implementing.
  *
- * Class names are all `.sd-*` prefixed so they cannot collide with host app
+ * Class names are all `.panel-*` prefixed so they cannot collide with host app
  * styles even when the panel portals into `document.body`.
  */
 
-export const SHADER_DEV_STYLE_ID = "shader-dev-styles"
+export const PANEL_STYLE_ID = "shader-dev-styles"
 
-export const SHADER_DEV_CSS = `
-[data-shader-dev] {
-  --sd-bg: rgba(13, 13, 16, 0.95);
-  --sd-border: rgba(255, 255, 255, 0.16);
-  --sd-text: #ffffff;
-  --sd-text-muted: rgba(255, 255, 255, 0.72);
-  --sd-surface: rgba(255, 255, 255, 0.05);
-  --sd-surface-active: rgba(255, 255, 255, 0.15);
-  --sd-toggle-hover: var(--sd-surface-active);
-  --sd-surface-idle-fill: rgba(255, 255, 255, 0.11);
-  --sd-hash: rgba(255, 255, 255, 0.15);
-  --sd-handle: #ffffff;
-  --sd-label: rgba(255, 255, 255, 0.7);
-  --sd-label-active: #ffffff;
-  --sd-divider: rgba(255, 255, 255, 0.06);
-  --sd-muted-icon: rgba(255, 255, 255, 0.4);
-  --sd-swatch-border: rgba(255, 255, 255, 0.2);
-  --sd-kbd-bg: rgba(255, 255, 255, 0.1);
-  --sd-action-bg: rgba(255, 255, 255, 0.05);
-  --sd-action-bg-hover: rgba(255, 255, 255, 0.1);
-  --sd-action-text: rgba(255, 255, 255, 0.72);
-  --sd-action-text-hover: #ffffff;
-  --sd-danger: #f87171;
-  --sd-danger-hover: #fca5a5;
-  --sd-header-border: rgba(255, 255, 255, 0.096);
-  --sd-close-icon: rgba(255, 255, 255, 0.72);
-  --sd-close-icon-hover: #ffffff;
-  --sd-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+export const PANEL_CSS = `
+[data-panel] {
+  --panel-bg: var(--sd-bg, rgba(13, 13, 16, 0.95));
+  --panel-border: var(--sd-border, rgba(255, 255, 255, 0.16));
+  --panel-text: var(--sd-text, #ffffff);
+  --panel-text-muted: var(--sd-text-muted, rgba(255, 255, 255, 0.72));
+  --panel-surface: var(--sd-surface, rgba(255, 255, 255, 0.05));
+  --panel-surface-active: var(--sd-surface-active, rgba(255, 255, 255, 0.15));
+  --panel-toggle-hover: var(--sd-toggle-hover, var(--panel-surface-active));
+  --panel-surface-idle-fill: var(--sd-surface-idle-fill, rgba(255, 255, 255, 0.11));
+  --panel-hash: var(--sd-hash, rgba(255, 255, 255, 0.15));
+  --panel-handle: var(--sd-handle, #ffffff);
+  --panel-label: var(--sd-label, rgba(255, 255, 255, 0.7));
+  --panel-label-active: var(--sd-label-active, #ffffff);
+  --panel-divider: var(--sd-divider, rgba(255, 255, 255, 0.06));
+  --panel-muted-icon: var(--sd-muted-icon, rgba(255, 255, 255, 0.4));
+  --panel-swatch-border: var(--sd-swatch-border, rgba(255, 255, 255, 0.2));
+  --panel-kbd-bg: var(--sd-kbd-bg, rgba(255, 255, 255, 0.1));
+  --panel-action-bg: var(--sd-action-bg, rgba(255, 255, 255, 0.05));
+  --panel-action-bg-hover: var(--sd-action-bg-hover, rgba(255, 255, 255, 0.1));
+  --panel-action-text: var(--sd-action-text, rgba(255, 255, 255, 0.72));
+  --panel-action-text-hover: var(--sd-action-text-hover, #ffffff);
+  --panel-danger: var(--sd-danger, #f87171);
+  --panel-danger-hover: var(--sd-danger-hover, #fca5a5);
+  --panel-header-border: var(--sd-header-border, rgba(255, 255, 255, 0.096));
+  --panel-close-icon: var(--sd-close-icon, rgba(255, 255, 255, 0.72));
+  --panel-close-icon-hover: var(--sd-close-icon-hover, #ffffff);
+  --panel-shadow: var(--sd-shadow, 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1));
 }
 
-[data-shader-dev][data-sd-theme="light"] {
-  --sd-bg: rgba(255, 255, 255, 0.95);
-  --sd-border: #d1d5db;
-  --sd-text: #111827;
-  --sd-text-muted: #4b5563;
-  --sd-surface: #f3f4f6;
-  --sd-surface-active: #d1d5db;
-  --sd-toggle-hover: rgba(17, 24, 39, 0.04);
-  --sd-surface-idle-fill: #e5e7eb;
-  --sd-hash: #d1d5db;
-  --sd-handle: #111827;
-  --sd-label: #374151;
-  --sd-label-active: #111827;
-  --sd-divider: #e5e7eb;
-  --sd-muted-icon: #9ca3af;
-  --sd-swatch-border: #d1d5db;
-  --sd-kbd-bg: #e5e7eb;
-  --sd-action-bg: #f3f4f6;
-  --sd-action-bg-hover: #e5e7eb;
-  --sd-action-text: #374151;
-  --sd-action-text-hover: #111827;
-  --sd-danger: #dc2626;
-  --sd-danger-hover: #b91c1c;
-  --sd-header-border: #e5e7eb;
-  --sd-close-icon: #6b7280;
-  --sd-close-icon-hover: #111827;
+[data-panel][data-panel-theme="light"] {
+  --panel-bg: var(--sd-bg, rgba(255, 255, 255, 0.95));
+  --panel-border: var(--sd-border, #d1d5db);
+  --panel-text: var(--sd-text, #111827);
+  --panel-text-muted: var(--sd-text-muted, #4b5563);
+  --panel-surface: var(--sd-surface, #f3f4f6);
+  --panel-surface-active: var(--sd-surface-active, #d1d5db);
+  --panel-toggle-hover: var(--sd-toggle-hover, rgba(17, 24, 39, 0.04));
+  --panel-surface-idle-fill: var(--sd-surface-idle-fill, #e5e7eb);
+  --panel-hash: var(--sd-hash, #d1d5db);
+  --panel-handle: var(--sd-handle, #111827);
+  --panel-label: var(--sd-label, #374151);
+  --panel-label-active: var(--sd-label-active, #111827);
+  --panel-divider: var(--sd-divider, #e5e7eb);
+  --panel-muted-icon: var(--sd-muted-icon, #9ca3af);
+  --panel-swatch-border: var(--sd-swatch-border, #d1d5db);
+  --panel-kbd-bg: var(--sd-kbd-bg, #e5e7eb);
+  --panel-action-bg: var(--sd-action-bg, #f3f4f6);
+  --panel-action-bg-hover: var(--sd-action-bg-hover, #e5e7eb);
+  --panel-action-text: var(--sd-action-text, #374151);
+  --panel-action-text-hover: var(--sd-action-text-hover, #111827);
+  --panel-danger: var(--sd-danger, #dc2626);
+  --panel-danger-hover: var(--sd-danger-hover, #b91c1c);
+  --panel-header-border: var(--sd-header-border, #e5e7eb);
+  --panel-close-icon: var(--sd-close-icon, #6b7280);
+  --panel-close-icon-hover: var(--sd-close-icon-hover, #111827);
 }
 
-[data-shader-dev],
-[data-shader-dev] *,
-[data-shader-dev] *::before,
-[data-shader-dev] *::after {
+[data-panel],
+[data-panel] *,
+[data-panel] *::before,
+[data-panel] *::after {
   box-sizing: border-box;
 }
 
 /* Chrome elements shouldn't be selectable — labels, titles, buttons. Only
    inputs and the prompt code block opt back in via the override below. */
-[data-shader-dev] {
+[data-panel] {
   -webkit-user-select: none;
   user-select: none;
 }
-[data-shader-dev] input,
-[data-shader-dev] textarea,
-[data-shader-dev] .sd-prompt-pre,
-[data-shader-dev] .sd-paste-textarea,
-[data-shader-dev] .sd-text-input,
-[data-shader-dev] .sd-textarea-input,
-[data-shader-dev] .sd-search-input {
+[data-panel] input,
+[data-panel] textarea,
+[data-panel] .panel-prompt-pre,
+[data-panel] .panel-paste-textarea,
+[data-panel] .panel-text-input,
+[data-panel] .panel-textarea-input,
+[data-panel] .panel-search-input {
   -webkit-user-select: text;
   user-select: text;
 }
 
-[data-shader-dev] button:not([class]) {
+[data-panel] button:not([class]) {
   background: transparent;
   border: 0;
   padding: 0;
@@ -104,9 +104,9 @@ export const SHADER_DEV_CSS = `
   cursor: pointer;
 }
 
-/* All panel chrome buttons carry sd-* classes — zero host-app borders
+/* All panel chrome buttons carry panel-* classes — zero host-app borders
    (Tailwind preflight, browser defaults, etc.) before component styles apply. */
-[data-shader-dev] button[class*="sd-"] {
+[data-panel] button[class*="panel-"] {
   border: 0;
   outline: none;
   appearance: none;
@@ -114,9 +114,9 @@ export const SHADER_DEV_CSS = `
   box-shadow: none;
 }
 
-[data-shader-dev] input,
-[data-shader-dev] select,
-[data-shader-dev] textarea {
+[data-panel] input,
+[data-panel] select,
+[data-panel] textarea {
   font-family: inherit;
   font-size: inherit;
   font-weight: inherit;
@@ -129,15 +129,15 @@ export const SHADER_DEV_CSS = `
   box-shadow: none;
 }
 
-[data-shader-dev] input.sd-color-text {
+[data-panel] input.panel-color-text {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 13px;
   font-weight: 500;
   line-height: 1;
-  color: var(--sd-label);
+  color: var(--panel-label);
 }
 
-.sd-floating {
+.panel-floating {
   pointer-events: auto;
   position: fixed;
   top: 16px;
@@ -156,11 +156,11 @@ export const SHADER_DEV_CSS = `
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
-.sd-floating[data-sd-side="left"] { left: 16px; }
-.sd-floating[data-sd-side="right"] { right: 16px; }
-.sd-floating[data-sd-collapsed="true"][data-sd-side="left"] { transform: translateX(calc(-100% - 16px)); }
-.sd-floating[data-sd-collapsed="true"][data-sd-side="right"] { transform: translateX(calc(100% + 16px)); }
-.sd-floating[data-sd-collapsed="true"]:not([data-sd-peek="true"]) {
+.panel-floating[data-panel-side="left"] { left: 16px; }
+.panel-floating[data-panel-side="right"] { right: 16px; }
+.panel-floating[data-panel-collapsed="true"][data-panel-side="left"] { transform: translateX(calc(-100% - 16px)); }
+.panel-floating[data-panel-collapsed="true"][data-panel-side="right"] { transform: translateX(calc(100% + 16px)); }
+.panel-floating[data-panel-collapsed="true"]:not([data-panel-peek="true"]) {
   opacity: 0;
   filter: blur(4px);
   pointer-events: none;
@@ -168,15 +168,15 @@ export const SHADER_DEV_CSS = `
 
 /* Peek preview — a scaled-down sliver slides in when the viewport edge is
    hovered while collapsed. Overrides the fully-hidden collapsed transform. */
-.sd-floating[data-sd-collapsed="true"][data-sd-peek="true"] { cursor: pointer; }
-.sd-floating[data-sd-collapsed="true"][data-sd-peek="true"][data-sd-side="right"] {
+.panel-floating[data-panel-collapsed="true"][data-panel-peek="true"] { cursor: pointer; }
+.panel-floating[data-panel-collapsed="true"][data-panel-peek="true"][data-panel-side="right"] {
   transform: translateX(calc(100% - 56px)) scale(0.9);
   transform-origin: right center;
   opacity: 1;
   filter: blur(0);
   pointer-events: auto;
 }
-.sd-floating[data-sd-collapsed="true"][data-sd-peek="true"][data-sd-side="left"] {
+.panel-floating[data-panel-collapsed="true"][data-panel-peek="true"][data-panel-side="left"] {
   transform: translateX(calc(-100% + 56px)) scale(0.9);
   transform-origin: left center;
   opacity: 1;
@@ -184,37 +184,37 @@ export const SHADER_DEV_CSS = `
   pointer-events: auto;
 }
 @media (prefers-reduced-motion: reduce) {
-  .sd-floating { transition: none; }
-  .sd-floating[data-sd-collapsed="true"]:not([data-sd-peek="true"]) {
+  .panel-floating { transition: none; }
+  .panel-floating[data-panel-collapsed="true"]:not([data-panel-peek="true"]) {
     opacity: 0;
     filter: none;
   }
-  .sd-panel,
-  .sd-floating[data-sd-collapsed="true"]:not([data-sd-peek="true"]) .sd-panel {
+  .panel-panel,
+  .panel-floating[data-panel-collapsed="true"]:not([data-panel-peek="true"]) .panel-panel {
     transition: none;
     opacity: 1;
     transform: none;
   }
 }
 
-.sd-panel {
+.panel-panel {
   display: flex;
   min-height: 0;
   flex: 1;
   flex-direction: column;
   overflow: hidden;
   border-radius: 14px;
-  border: 1px solid var(--sd-border);
-  background: var(--sd-bg);
-  color: var(--sd-text);
-  box-shadow: var(--sd-shadow);
+  border: 1px solid var(--panel-border);
+  background: var(--panel-bg);
+  color: var(--panel-text);
+  box-shadow: var(--panel-shadow);
   opacity: 1;
   transform: translateY(0) scale(1);
   transition-property: opacity, transform;
   transition-duration: 220ms;
   transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
-.sd-floating[data-sd-collapsed="true"]:not([data-sd-peek="true"]) .sd-panel {
+.panel-floating[data-panel-collapsed="true"]:not([data-panel-peek="true"]) .panel-panel {
   opacity: 0;
   transform: translateY(-8px) scale(0.98);
   transition-timing-function: ease-in;
@@ -223,7 +223,7 @@ export const SHADER_DEV_CSS = `
 
 /* Invisible hover/click strip pinned to the viewport edge — reveals the peek
    (and reopens on click) while the panel is collapsed. */
-.sd-edge-sensor {
+.panel-edge-sensor {
   position: fixed;
   top: 0;
   bottom: 0;
@@ -231,19 +231,19 @@ export const SHADER_DEV_CSS = `
   z-index: 9998;
   cursor: pointer;
 }
-.sd-edge-sensor[data-sd-side="right"] { right: 0; }
-.sd-edge-sensor[data-sd-side="left"] { left: 0; }
-.sd-edge-sensor[data-sd-inline="true"] { display: none; }
+.panel-edge-sensor[data-panel-side="right"] { right: 0; }
+.panel-edge-sensor[data-panel-side="left"] { left: 0; }
+.panel-edge-sensor[data-panel-inline="true"] { display: none; }
 
 /* Inline panels (ToolShell) use absolute positioning within the overlay. */
-.sd-floating[data-sd-inline="true"] {
+.panel-floating[data-panel-inline="true"] {
   position: absolute;
   z-index: 20;
 }
 
 /* Transparent click-catcher over the peeking panel — any click opens it fully
    instead of hitting a control in the scaled-down preview. */
-.sd-peek-catch {
+.panel-peek-catch {
   position: absolute;
   inset: 0;
   z-index: 3;
@@ -252,68 +252,68 @@ export const SHADER_DEV_CSS = `
   cursor: pointer;
 }
 
-.sd-panel-header {
+.panel-panel-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--sd-header-border);
+  border-bottom: 1px solid var(--panel-header-border);
   padding: 10px 12px 6px 12px;
 }
-.sd-panel-title-row {
+.panel-panel-title-row {
   display: flex;
   align-items: center;
   gap: 8px;
   min-width: 0;
   flex: 1;
 }
-.sd-panel-title {
+.panel-panel-title {
   font-size: 15px;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.sd-panel-header-end {
+.panel-panel-header-end {
   display: flex;
   flex-shrink: 0;
   align-items: center;
   gap: 4px;
 }
-.sd-theme-toggle {
+.panel-theme-toggle {
   display: flex;
   align-items: center;
   gap: 2px;
   padding: 2px;
   border-radius: 8px;
-  background: var(--sd-surface);
+  background: var(--panel-surface);
 }
-[data-shader-dev] .sd-theme-toggle-btn {
+[data-panel] .panel-theme-toggle-btn {
   display: inline-flex;
   width: 26px;
   height: 26px;
   align-items: center;
   justify-content: center;
   border-radius: 6px;
-  color: var(--sd-text-muted);
+  color: var(--panel-text-muted);
   transition: background-color 150ms ease, color 150ms ease;
 }
-[data-shader-dev] .sd-theme-toggle-btn svg {
+[data-panel] .panel-theme-toggle-btn svg {
   width: 14px;
   height: 14px;
 }
-[data-shader-dev] .sd-theme-toggle-btn:hover {
-  color: var(--sd-action-text-hover);
+[data-panel] .panel-theme-toggle-btn:hover {
+  color: var(--panel-action-text-hover);
 }
-[data-shader-dev] .sd-theme-toggle-btn[data-sd-active="true"] {
-  background: var(--sd-surface-active);
-  color: var(--sd-label-active);
+[data-panel] .panel-theme-toggle-btn[data-panel-active="true"] {
+  background: var(--panel-surface-active);
+  color: var(--panel-label-active);
 }
-.sd-switcher {
+.panel-switcher {
   appearance: none;
   -webkit-appearance: none;
-  border: 1px solid var(--sd-border);
-  background: var(--sd-surface);
-  color: var(--sd-text);
+  border: 1px solid var(--panel-border);
+  background: var(--panel-surface);
+  color: var(--panel-text);
   border-radius: 6px;
   padding: 2px 22px 2px 8px;
   font-size: 12px;
@@ -328,9 +328,9 @@ export const SHADER_DEV_CSS = `
   text-overflow: ellipsis;
   overflow: hidden;
 }
-.sd-switcher:focus { outline: 2px solid var(--sd-handle); outline-offset: 1px; }
+.panel-switcher:focus { outline: 2px solid var(--panel-handle); outline-offset: 1px; }
 
-.sd-close-btn {
+.panel-close-btn {
   position: relative;
   display: flex;
   align-items: center;
@@ -338,32 +338,32 @@ export const SHADER_DEV_CSS = `
   width: 20px;
   height: 20px;
   border-radius: 4px;
-  color: var(--sd-close-icon);
+  color: var(--panel-close-icon);
   transition-property: color, scale;
   transition-duration: 150ms;
   transition-timing-function: ease-out;
 }
-.sd-close-btn::before {
+.panel-close-btn::before {
   content: "";
   position: absolute;
   inset: -10px;
 }
-.sd-close-btn:active {
+.panel-close-btn:active {
   scale: 0.96;
 }
-.sd-close-btn:hover { color: var(--sd-close-icon-hover); }
-.sd-close-btn svg { width: 16px; height: 16px; }
+.panel-close-btn:hover { color: var(--panel-close-icon-hover); }
+.panel-close-btn svg { width: 16px; height: 16px; }
 
-.sd-panel-body {
+.panel-panel-body {
   flex: 1;
   overflow-y: auto;
   padding: 10px 12px;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
-.sd-panel-body::-webkit-scrollbar { display: none; }
+.panel-panel-body::-webkit-scrollbar { display: none; }
 
-.sd-fields {
+.panel-fields {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -371,28 +371,28 @@ export const SHADER_DEV_CSS = `
 }
 
 /* Animation transport — pinned at the top of the panel body. */
-.sd-animation {
+.panel-animation {
   display: flex;
   flex-direction: column;
   gap: 6px;
   padding-bottom: 10px;
   margin-bottom: 2px;
-  border-bottom: 1px solid var(--sd-divider);
+  border-bottom: 1px solid var(--panel-divider);
 }
-.sd-animation-label {
+.panel-animation-label {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--sd-text-muted);
+  color: var(--panel-text-muted);
   padding: 0 2px;
 }
-.sd-animation-row {
+.panel-animation-row {
   display: flex;
   align-items: center;
   gap: 4px;
 }
-[data-shader-dev] .sd-animation-btn {
+[data-panel] .panel-animation-btn {
   flex: 0 0 auto;
   width: 32px;
   height: 32px;
@@ -400,121 +400,121 @@ export const SHADER_DEV_CSS = `
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--sd-action-text);
-  background: var(--sd-action-bg);
+  color: var(--panel-action-text);
+  background: var(--panel-action-bg);
   transition: background-color 150ms ease, color 150ms ease;
 }
-[data-shader-dev] .sd-animation-btn svg {
+[data-panel] .panel-animation-btn svg {
   width: 14px;
   height: 14px;
 }
-[data-shader-dev] .sd-animation-btn:hover {
-  background: var(--sd-action-bg-hover);
-  color: var(--sd-action-text-hover);
+[data-panel] .panel-animation-btn:hover {
+  background: var(--panel-action-bg-hover);
+  color: var(--panel-action-text-hover);
 }
-[data-shader-dev] .sd-animation-btn-primary {
+[data-panel] .panel-animation-btn-primary {
   width: 36px;
-  background: var(--sd-surface-active);
-  color: var(--sd-label-active);
+  background: var(--panel-surface-active);
+  color: var(--panel-label-active);
 }
-[data-shader-dev] .sd-animation-btn-primary:hover {
-  background: var(--sd-handle);
+[data-panel] .panel-animation-btn-primary:hover {
+  background: var(--panel-handle);
   color: #ffffff;
 }
-[data-shader-dev] .sd-animation-btn-reset {
+[data-panel] .panel-animation-btn-reset {
   margin-left: auto;
 }
-.sd-animation-time {
+.panel-animation-time {
   flex: 1;
   min-width: 0;
   padding: 0 6px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 12px;
   font-variant-numeric: tabular-nums;
-  color: var(--sd-text-muted);
+  color: var(--panel-text-muted);
   text-align: center;
 }
 
-.sd-shortcut-hint {
+.panel-shortcut-hint {
   font-size: 12px;
-  color: var(--sd-text-muted);
+  color: var(--panel-text-muted);
 }
-.sd-shortcut-hint kbd {
+.panel-shortcut-hint kbd {
   border-radius: 4px;
   padding: 0 4px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  background: var(--sd-kbd-bg);
+  background: var(--panel-kbd-bg);
 }
 
-.sd-actions {
+.panel-actions {
   margin-top: 8px;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  border-top: 1px solid var(--sd-divider);
+  border-top: 1px solid var(--panel-divider);
   padding-top: 12px;
 }
 
-.sd-export-format-row {
+.panel-export-format-row {
   display: flex;
   gap: 6px;
 }
-.sd-export-format-row .sd-action-btn {
+.panel-export-format-row .panel-action-btn {
   flex: 1;
   min-width: 0;
 }
 
-/* Scoped under [data-shader-dev] to beat the global button reset on
+/* Scoped under [data-panel] to beat the global button reset on
    specificity — otherwise the always-on light gray fill loses. */
-[data-shader-dev] .sd-action-btn {
+[data-panel] .panel-action-btn {
   width: 100%;
   height: 36px;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 500;
   line-height: 1;
-  background: var(--sd-action-bg);
-  color: var(--sd-action-text);
+  background: var(--panel-action-bg);
+  color: var(--panel-action-text);
   transition-property: background-color, color, scale;
   transition-duration: 150ms;
   transition-timing-function: ease-out;
 }
-[data-shader-dev] .sd-action-btn:active:not(:disabled) {
+[data-panel] .panel-action-btn:active:not(:disabled) {
   scale: 0.96;
 }
-[data-shader-dev] .sd-action-btn:hover:not(.sd-action-btn-primary):not(:disabled) {
-  background: var(--sd-action-bg-hover);
-  color: var(--sd-action-text-hover);
+[data-panel] .panel-action-btn:hover:not(.panel-action-btn-primary):not(:disabled) {
+  background: var(--panel-action-bg-hover);
+  color: var(--panel-action-text-hover);
 }
-[data-shader-dev] .sd-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-[data-shader-dev] .sd-action-btn-primary {
-  background: var(--sd-handle);
-  color: var(--sd-bg);
+[data-panel] .panel-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+[data-panel] .panel-action-btn-primary {
+  background: var(--panel-handle);
+  color: var(--panel-bg);
   border-color: transparent;
 }
-[data-shader-dev] .sd-action-btn-primary:hover:not(:disabled) {
-  background: var(--sd-handle);
+[data-panel] .panel-action-btn-primary:hover:not(:disabled) {
+  background: var(--panel-handle);
   filter: brightness(1.08);
-  color: var(--sd-bg);
+  color: var(--panel-bg);
 }
-[data-shader-dev] .sd-action-btn-destructive {
-  background: color-mix(in srgb, var(--sd-danger) 10%, var(--sd-action-bg));
-  color: var(--sd-danger);
+[data-panel] .panel-action-btn-destructive {
+  background: color-mix(in srgb, var(--panel-danger) 10%, var(--panel-action-bg));
+  color: var(--panel-danger);
 }
-[data-shader-dev] .sd-action-btn-destructive:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--sd-danger) 16%, var(--sd-action-bg-hover));
-  color: var(--sd-danger-hover);
+[data-panel] .panel-action-btn-destructive:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--panel-danger) 16%, var(--panel-action-bg-hover));
+  color: var(--panel-danger-hover);
 }
 
-.sd-action-group {
+.panel-action-group {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px;
 }
-.sd-action-group .sd-action-field {
+.panel-action-group .panel-action-field {
   min-width: 0;
 }
-.sd-action-group .sd-action-btn {
+.panel-action-group .panel-action-btn {
   width: 100%;
   padding-left: 8px;
   padding-right: 8px;
@@ -522,80 +522,117 @@ export const SHADER_DEV_CSS = `
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.sd-action-field {
+.panel-action-field {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.sd-status {
+.panel-status {
   padding: 0 4px;
   font-size: 12px;
-  color: var(--sd-text-muted);
+  color: var(--panel-text-muted);
 }
 
 /* Export group — pinned at the top of the actions block, separated from the
    JSON/reset buttons by a hairline divider. */
-.sd-export {
+.panel-export {
   display: flex;
   flex-direction: column;
   gap: 6px;
   padding-bottom: 12px;
   margin-bottom: 4px;
-  border-bottom: 1px solid var(--sd-divider);
+  border-bottom: 1px solid var(--panel-divider);
 }
-.sd-export-label {
+.panel-export-label {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--sd-text-muted);
+  color: var(--panel-text-muted);
   padding: 0 2px;
 }
-.sd-export-row {
+.panel-export-row {
   display: flex;
   gap: 6px;
 }
-.sd-export-row .sd-action-btn {
+.panel-export-row .panel-action-btn {
   flex: 1;
 }
-.sd-export-hint {
+.panel-export-hint {
   font-size: 11px;
   line-height: 1.35;
-  color: var(--sd-text-muted);
+  color: var(--panel-text-muted);
   padding: 0 2px;
 }
-
-/* Segmented resolution selector for the hi-res PNG. */
-.sd-export-res {
+.panel-export-gif {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--panel-divider);
+}
+.panel-export-gif-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--panel-text-muted);
+  padding: 0 2px;
+}
+.panel-export-gif-row {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
   padding: 3px;
   border-radius: 8px;
-  background: var(--sd-surface);
+  background: var(--panel-surface);
 }
-[data-shader-dev] .sd-export-res-btn {
-  flex: 1 1 calc(25% - 4px);
+[data-panel] .panel-export-gif-row .panel-export-res-btn {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* Segmented resolution selector for the hi-res PNG. */
+.panel-export-res-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.panel-export-res {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 8px;
+  background: var(--panel-surface);
+}
+[data-panel] .panel-export-res-screen .panel-export-res-btn,
+[data-panel] .panel-export-res-print .panel-export-res-btn {
+  flex: 1 1 0;
+  min-width: 0;
+}
+[data-panel] .panel-export-res-btn {
   min-width: 2.75rem;
   height: 26px;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 500;
   line-height: 1;
-  color: var(--sd-text-muted);
+  color: var(--panel-text-muted);
   transition: background-color 150ms ease, color 150ms ease;
 }
-[data-shader-dev] .sd-export-res-btn:hover {
-  color: var(--sd-action-text-hover);
+[data-panel] .panel-export-res-btn:hover {
+  color: var(--panel-action-text-hover);
 }
-[data-shader-dev] .sd-export-res-active,
-[data-shader-dev] .sd-export-res-active:hover {
-  background: var(--sd-surface-active);
-  color: var(--sd-label-active);
+[data-panel] .panel-export-res-active,
+[data-panel] .panel-export-res-active:hover {
+  background: var(--panel-surface-active);
+  color: var(--panel-label-active);
 }
-[data-shader-dev] .sd-export-rec,
-[data-shader-dev] .sd-export-rec:hover {
+[data-panel] .panel-export-rec,
+[data-panel] .panel-export-rec:hover {
   background: #e5484d;
   color: #ffffff;
   display: inline-flex;
@@ -603,34 +640,34 @@ export const SHADER_DEV_CSS = `
   justify-content: center;
   gap: 8px;
 }
-.sd-export-dot {
+.panel-export-dot {
   width: 8px;
   height: 8px;
   border-radius: 999px;
   background: #ffffff;
-  animation: sd-export-pulse 1s ease-in-out infinite;
+  animation: panel-export-pulse 1s ease-in-out infinite;
 }
-@keyframes sd-export-pulse {
+@keyframes panel-export-pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.25; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .sd-export-dot { animation: none; }
+  .panel-export-dot { animation: none; }
 }
 
 /* Auto-height animation via CSS Grid: parent transitions
    grid-template-rows between 0fr and 1fr, child clips overflow. */
-.sd-collapse {
+.panel-collapse {
   display: grid;
   grid-template-rows: 0fr;
   overflow: hidden;
   transition: grid-template-rows 280ms cubic-bezier(0.32, 0.72, 0, 1);
 }
-.sd-collapse[data-sd-open="true"] {
+.panel-collapse[data-panel-open="true"] {
   grid-template-rows: 1fr;
   overflow: visible;
 }
-.sd-collapse-inner {
+.panel-collapse-inner {
   /* Vertical clipping only — height animation still collapses, but horizontal
      overshoot (slider overscroll spring, toggle row full-bleed hover) is not
      cropped. inset(-16px 0) regressed toggle hovers (white side gutters). */
@@ -640,12 +677,12 @@ export const SHADER_DEV_CSS = `
   opacity: 0;
   transition: opacity 200ms ease;
 }
-.sd-collapse[data-sd-open="true"] > .sd-collapse-inner {
+.panel-collapse[data-panel-open="true"] > .panel-collapse-inner {
   opacity: 1;
   transition: opacity 200ms ease 80ms;
 }
 
-.sd-saved-indicator {
+.panel-saved-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -653,9 +690,9 @@ export const SHADER_DEV_CSS = `
   padding: 4px 4px 2px;
   font-size: 11px;
   font-weight: 500;
-  color: var(--sd-text-muted);
+  color: var(--panel-text-muted);
 }
-.sd-saved-dot {
+.panel-saved-dot {
   width: 6px;
   height: 6px;
   border-radius: 999px;
@@ -664,42 +701,42 @@ export const SHADER_DEV_CSS = `
   flex-shrink: 0;
 }
 
-.sd-paste {
+.panel-paste {
   display: flex;
   flex-direction: column;
   gap: 6px;
   padding: 4px 0;
 }
-/* Scoped under [data-shader-dev] to beat the global textarea reset on
+/* Scoped under [data-panel] to beat the global textarea reset on
    specificity — otherwise the explicit small font-size loses. */
-[data-shader-dev] .sd-paste-textarea {
+[data-panel] .panel-paste-textarea {
   width: 100%;
   min-height: 96px;
   resize: vertical;
   padding: 8px 10px;
   border-radius: 8px;
-  background: var(--sd-bg);
-  color: var(--sd-text);
-  border: 1px solid var(--sd-border);
+  background: var(--panel-bg);
+  color: var(--panel-text);
+  border: 1px solid var(--panel-border);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 10px;
   line-height: 1.5;
   outline: none;
   transition: border-color 150ms ease;
 }
-[data-shader-dev] .sd-paste-textarea:focus {
-  border-color: var(--sd-handle);
+[data-panel] .panel-paste-textarea:focus {
+  border-color: var(--panel-handle);
 }
-[data-shader-dev] .sd-paste-textarea::placeholder {
-  color: var(--sd-muted-icon);
+[data-panel] .panel-paste-textarea::placeholder {
+  color: var(--panel-muted-icon);
 }
-.sd-paste-error {
+.panel-paste-error {
   padding: 0 4px;
   font-size: 11px;
   color: #ef4444;
 }
 
-.sd-empty {
+.panel-empty {
   pointer-events: auto;
   position: fixed;
   top: 16px;
@@ -707,39 +744,39 @@ export const SHADER_DEV_CSS = `
   z-index: 9998;
   max-width: 280px;
   border-radius: 8px;
-  border: 1px solid var(--sd-border);
-  background: var(--sd-bg);
-  color: var(--sd-text-muted);
+  border: 1px solid var(--panel-border);
+  background: var(--panel-bg);
+  color: var(--panel-text-muted);
   padding: 12px;
   font-size: 13px;
-  box-shadow: var(--sd-shadow);
+  box-shadow: var(--panel-shadow);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
-.sd-empty-close {
+.panel-empty-close {
   margin-top: 8px;
   display: block;
   width: 100%;
   border-radius: 8px;
   padding: 8px 12px;
-  background: var(--sd-action-bg);
-  color: var(--sd-text);
+  background: var(--panel-action-bg);
+  color: var(--panel-text);
   font-size: 13px;
 }
-.sd-empty-close:hover { background: var(--sd-action-bg-hover); }
+.panel-empty-close:hover { background: var(--panel-action-bg-hover); }
 
-.sd-section {
-  border-top: 1px solid var(--sd-divider);
+.panel-section {
+  border-top: 1px solid var(--panel-divider);
 }
-.sd-section:first-child { border-top: 0; }
-.sd-section-header {
+.panel-section:first-child { border-top: 0; }
+.panel-section-header {
   display: flex;
   width: 100%;
   align-items: center;
   gap: 4px;
   padding: 12px 0 8px;
 }
-.sd-section:first-child .sd-section-header { padding-top: 2px; }
-.sd-section-button {
+.panel-section:first-child .panel-section-header { padding-top: 2px; }
+.panel-section-button {
   display: flex;
   flex: 1;
   min-width: 0;
@@ -749,53 +786,53 @@ export const SHADER_DEV_CSS = `
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--sd-text-muted);
+  color: var(--panel-text-muted);
   text-align: left;
 }
-.sd-section-button:hover { color: var(--sd-label-active); }
-.sd-section-title {
+.panel-section-button:hover { color: var(--panel-label-active); }
+.panel-section-title {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.sd-section-caret-btn {
+.panel-section-caret-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 20px;
   height: 20px;
   border-radius: 4px;
-  color: var(--sd-muted-icon);
+  color: var(--panel-muted-icon);
   flex-shrink: 0;
   transition: color 150ms ease, background-color 150ms ease;
 }
-.sd-section-caret-btn:hover { color: var(--sd-label-active); background: var(--sd-surface); }
-.sd-section-caret {
+.panel-section-caret-btn:hover { color: var(--panel-label-active); background: var(--panel-surface); }
+.panel-section-caret {
   width: 12px;
   height: 12px;
   transition: transform 200ms ease;
 }
-.sd-section[data-sd-open="true"] .sd-section-caret { transform: rotate(180deg); }
-.sd-section-reset {
+.panel-section[data-panel-open="true"] .panel-section-caret { transform: rotate(180deg); }
+.panel-section-reset {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 20px;
   height: 20px;
   border-radius: 4px;
-  color: var(--sd-muted-icon);
+  color: var(--panel-muted-icon);
   opacity: 0;
   transition: opacity 150ms ease, color 150ms ease, background-color 150ms ease;
   flex-shrink: 0;
 }
-.sd-section-reset svg { width: 12px; height: 12px; }
-.sd-section-header:hover .sd-section-reset,
-.sd-section-reset:focus-visible { opacity: 1; }
-.sd-section-reset:hover {
-  color: var(--sd-label-active);
-  background: var(--sd-surface);
+.panel-section-reset svg { width: 12px; height: 12px; }
+.panel-section-header:hover .panel-section-reset,
+.panel-section-reset:focus-visible { opacity: 1; }
+.panel-section-reset:hover {
+  color: var(--panel-label-active);
+  background: var(--panel-surface);
 }
-.sd-section-children {
+.panel-section-children {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -803,20 +840,20 @@ export const SHADER_DEV_CSS = `
   overflow: visible;
 }
 
-.sd-field {
+.panel-field {
   min-width: 0;
   overflow: visible;
 }
 
-.sd-field-description {
+.panel-field-description {
   font-size: 10.5px;
   line-height: 1.35;
-  color: var(--sd-label-muted);
+  color: var(--panel-label-muted);
   padding: 4px 4px 2px;
   letter-spacing: 0.01em;
 }
 
-[data-shader-dev] .sd-slider {
+[data-panel] .panel-slider {
   position: relative;
   height: 36px;
   width: 100%;
@@ -824,20 +861,20 @@ export const SHADER_DEV_CSS = `
   overflow: visible;
   transition: transform 220ms cubic-bezier(0.34, 1.16, 0.64, 1);
 }
-[data-shader-dev] .sd-slider[data-sd-state="hover"] { transform: scale(1.01); }
-[data-shader-dev] .sd-slider[data-sd-state="drag"] { transform: scale(1.018); }
+[data-panel] .panel-slider[data-panel-state="hover"] { transform: scale(1.01); }
+[data-panel] .panel-slider[data-panel-state="drag"] { transform: scale(1.018); }
 
-.sd-slider-overscroll {
+.panel-slider-overscroll {
   position: absolute;
   inset: 0;
-  transform: scaleX(var(--sd-os-scale, 1));
-  transform-origin: var(--sd-os-origin, 50% 50%);
+  transform: scaleX(var(--panel-os-scale, 1));
+  transform-origin: var(--panel-os-origin, 50% 50%);
 }
-.sd-slider-overscroll[data-sd-release="true"] {
+.panel-slider-overscroll[data-panel-release="true"] {
   transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.sd-slider-track {
+.panel-slider-track {
   position: absolute;
   inset: 0;
   cursor: pointer;
@@ -845,15 +882,15 @@ export const SHADER_DEV_CSS = `
   overflow: hidden;
   touch-action: none;
   border-radius: 8px;
-  background: var(--sd-surface);
+  background: var(--panel-surface);
 }
 
-.sd-slider-hash-row {
+.panel-slider-hash-row {
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
-.sd-slider-hash {
+.panel-slider-hash {
   position: absolute;
   top: 50%;
   height: 8px;
@@ -863,34 +900,34 @@ export const SHADER_DEV_CSS = `
   background: transparent;
   transition: background-color 200ms ease;
 }
-.sd-slider[data-sd-state="hover"] .sd-slider-hash,
-.sd-slider[data-sd-state="drag"] .sd-slider-hash { background: var(--sd-hash); }
+.panel-slider[data-panel-state="hover"] .panel-slider-hash,
+.panel-slider[data-panel-state="drag"] .panel-slider-hash { background: var(--panel-hash); }
 
-.sd-slider-fill {
+.panel-slider-fill {
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
-  width: var(--sd-fill-pct, 0%);
+  width: var(--panel-fill-pct, 0%);
   pointer-events: none;
-  background: var(--sd-surface-idle-fill);
+  background: var(--panel-surface-idle-fill);
   transition: background-color 150ms ease, width 220ms cubic-bezier(0.2, 0, 0, 1);
 }
-.sd-slider[data-sd-state="drag"] .sd-slider-fill {
+.panel-slider[data-panel-state="drag"] .panel-slider-fill {
   transition: background-color 150ms ease, width 0ms;
-  background: var(--sd-surface-active);
+  background: var(--panel-surface-active);
 }
-.sd-slider[data-sd-state="hover"] .sd-slider-fill { background: var(--sd-surface-active); }
+.panel-slider[data-panel-state="hover"] .panel-slider-fill { background: var(--panel-surface-active); }
 
-.sd-slider-handle {
+.panel-slider-handle {
   position: absolute;
   top: 50%;
   height: 20px;
   width: 3px;
-  left: var(--sd-handle-left, 0%);
+  left: var(--panel-handle-left, 0%);
   border-radius: 999px;
   pointer-events: none;
-  background: var(--sd-handle);
+  background: var(--panel-handle);
   opacity: 0;
   transform: translate(-1.5px, -50%) scaleY(1);
   transform-origin: center center;
@@ -899,8 +936,8 @@ export const SHADER_DEV_CSS = `
     transform 200ms cubic-bezier(0.32, 0.72, 0, 1),
     left 220ms cubic-bezier(0.2, 0, 0, 1);
 }
-.sd-slider[data-sd-state="hover"] .sd-slider-handle { opacity: 0.5; }
-.sd-slider[data-sd-state="drag"] .sd-slider-handle {
+.panel-slider[data-panel-state="hover"] .panel-slider-handle { opacity: 0.5; }
+.panel-slider[data-panel-state="drag"] .panel-slider-handle {
   opacity: 0.9;
   transform: translate(-1.5px, -50%) scaleY(1.3);
   transition:
@@ -909,7 +946,7 @@ export const SHADER_DEV_CSS = `
     left 0ms;
 }
 
-.sd-slider-label {
+.panel-slider-label {
   position: absolute;
   left: 10px;
   top: 50%;
@@ -917,9 +954,9 @@ export const SHADER_DEV_CSS = `
   pointer-events: none;
   font-size: 13px;
   font-weight: 500;
-  color: var(--sd-label);
+  color: var(--panel-label);
 }
-.sd-slider-value {
+.panel-slider-value {
   position: absolute;
   right: 10px;
   top: 50%;
@@ -928,13 +965,13 @@ export const SHADER_DEV_CSS = `
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 13px;
   font-weight: 500;
-  color: var(--sd-label);
+  color: var(--panel-label);
   transition: color 150ms ease;
 }
-.sd-slider[data-sd-state="hover"] .sd-slider-value,
-.sd-slider[data-sd-state="drag"] .sd-slider-value { color: var(--sd-label-active); }
+.panel-slider[data-panel-state="hover"] .panel-slider-value,
+.panel-slider[data-panel-state="drag"] .panel-slider-value { color: var(--panel-label-active); }
 
-.sd-color {
+.panel-color {
   display: flex;
   height: 36px;
   align-items: center;
@@ -942,20 +979,20 @@ export const SHADER_DEV_CSS = `
   gap: 12px;
   border-radius: 8px;
   padding: 0 12px;
-  background: var(--sd-surface);
+  background: var(--panel-surface);
 }
-.sd-color-label {
+.panel-color-label {
   font-size: 13px;
   font-weight: 500;
-  color: var(--sd-label);
+  color: var(--panel-label);
 }
-.sd-color-right {
+.panel-color-right {
   position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.sd-color-text {
+.panel-color-text {
   width: 7ch;
   background: transparent;
   border: 0;
@@ -964,21 +1001,21 @@ export const SHADER_DEV_CSS = `
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 13px;
   font-weight: 500;
-  color: var(--sd-label);
+  color: var(--panel-label);
   text-transform: uppercase;
 }
-.sd-color-swatch {
+.panel-color-swatch {
   height: 20px;
   width: 20px;
   flex-shrink: 0;
   border-radius: 4px;
-  border: 1px solid var(--sd-swatch-border);
+  border: 1px solid var(--panel-swatch-border);
   transition: transform 150ms ease;
 }
-.sd-color-swatch:hover { transform: scale(1.1); }
+.panel-color-swatch:hover { transform: scale(1.1); }
 /* Sized + positioned over the swatch (not 0x0) so showPicker()/click() has a
    real anchor rect — pickers anchor to the input's position. */
-.sd-color-native {
+.panel-color-native {
   position: absolute;
   right: 0;
   top: 50%;
@@ -989,198 +1026,198 @@ export const SHADER_DEV_CSS = `
   pointer-events: none;
 }
 
-.sd-path {
+.panel-path {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
-.sd-path-head {
+.panel-path-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
-.sd-path-label {
+.panel-path-label {
   font-size: 13px;
   font-weight: 500;
-  color: var(--sd-label);
+  color: var(--panel-label);
 }
-.sd-path-head-actions {
+.panel-path-head-actions {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.sd-path-count {
+.panel-path-count {
   font-size: 11px;
-  color: var(--sd-muted-icon);
+  color: var(--panel-muted-icon);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
-[data-shader-dev] .sd-path-clear {
+[data-panel] .panel-path-clear {
   font-size: 11px;
   font-weight: 500;
   padding: 3px 8px;
   border-radius: 6px;
-  border: 1px solid var(--sd-border);
-  background: var(--sd-action-bg);
-  color: var(--sd-action-text);
+  border: 1px solid var(--panel-border);
+  background: var(--panel-action-bg);
+  color: var(--panel-action-text);
   cursor: pointer;
   transition: background-color 150ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-[data-shader-dev] .sd-path-clear:hover {
-  background: var(--sd-action-bg-hover);
-  color: var(--sd-action-text-hover);
+[data-panel] .panel-path-clear:hover {
+  background: var(--panel-action-bg-hover);
+  color: var(--panel-action-text-hover);
 }
-.sd-path-pad {
+.panel-path-pad {
   display: block;
   width: 100%;
   aspect-ratio: 1;
   border-radius: 8px;
-  border: 1px solid var(--sd-border);
-  background: var(--sd-surface);
+  border: 1px solid var(--panel-border);
+  background: var(--panel-surface);
   touch-action: none;
   cursor: crosshair;
   overflow: visible;
 }
-.sd-path-bg {
+.panel-path-bg {
   fill: transparent;
   cursor: crosshair;
 }
-.sd-path-grid {
-  stroke: var(--sd-divider);
+.panel-path-grid {
+  stroke: var(--panel-divider);
   stroke-width: 0.5;
 }
-.sd-path-frame {
+.panel-path-frame {
   fill: none;
-  stroke: var(--sd-border);
+  stroke: var(--panel-border);
   stroke-width: 0.5;
 }
-.sd-path-line {
+.panel-path-line {
   fill: none;
-  stroke: var(--sd-handle);
+  stroke: var(--panel-handle);
   stroke-width: 1;
   stroke-linejoin: round;
   stroke-linecap: round;
   opacity: 0.55;
 }
-.sd-path-line-close {
-  stroke: var(--sd-handle);
+.panel-path-line-close {
+  stroke: var(--panel-handle);
   stroke-width: 0.8;
   stroke-dasharray: 2 2;
   opacity: 0.3;
 }
-.sd-path-anchor circle {
+.panel-path-anchor circle {
   fill: none;
-  stroke: var(--sd-handle);
+  stroke: var(--panel-handle);
   stroke-width: 1;
   opacity: 0.7;
 }
-.sd-path-anchor.is-draggable {
+.panel-path-anchor.is-draggable {
   cursor: grab;
 }
-.sd-path-anchor.is-draggable .sd-path-point-hit {
+.panel-path-anchor.is-draggable .panel-path-point-hit {
   cursor: grab;
 }
-.sd-path-anchor.is-draggable:active {
+.panel-path-anchor.is-draggable:active {
   cursor: grabbing;
 }
-.sd-path-anchor.is-selected circle:not(.sd-path-point-hit) {
+.panel-path-anchor.is-selected circle:not(.panel-path-point-hit) {
   stroke-width: 1.4;
   opacity: 1;
 }
-.sd-path-anchor .sd-path-anchor-dot {
-  fill: var(--sd-handle);
+.panel-path-anchor .panel-path-anchor-dot {
+  fill: var(--panel-handle);
   stroke: none;
   opacity: 0.9;
 }
-.sd-path-point {
+.panel-path-point {
   cursor: grab;
 }
-.sd-path-point:active {
+.panel-path-point:active {
   cursor: grabbing;
 }
-.sd-path-point-hit {
+.panel-path-point-hit {
   fill: transparent;
 }
-.sd-path-point-ring {
-  fill: var(--sd-bg);
-  stroke: var(--sd-handle);
+.panel-path-point-ring {
+  fill: var(--panel-bg);
+  stroke: var(--panel-handle);
   stroke-width: 1.2;
   transition: r 120ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-.sd-path-point.is-selected .sd-path-point-ring {
-  fill: var(--sd-handle);
+.panel-path-point.is-selected .panel-path-point-ring {
+  fill: var(--panel-handle);
 }
-.sd-path-point-num {
-  fill: var(--sd-label);
+.panel-path-point-num {
+  fill: var(--panel-label);
   font-size: 3.4px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   text-anchor: middle;
   pointer-events: none;
   user-select: none;
 }
-.sd-path-point.is-selected .sd-path-point-num {
-  fill: var(--sd-bg);
+.panel-path-point.is-selected .panel-path-point-num {
+  fill: var(--panel-bg);
 }
-.sd-path-selected {
+.panel-path-selected {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
   font-size: 11px;
-  color: var(--sd-text-muted);
+  color: var(--panel-text-muted);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
-[data-shader-dev] .sd-path-remove {
+[data-panel] .panel-path-remove {
   font-size: 11px;
   font-weight: 500;
   padding: 3px 8px;
   border-radius: 6px;
-  border: 1px solid var(--sd-border);
-  background: var(--sd-action-bg);
-  color: var(--sd-action-text);
+  border: 1px solid var(--panel-border);
+  background: var(--panel-action-bg);
+  color: var(--panel-action-text);
   cursor: pointer;
   transition: background-color 150ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-[data-shader-dev] .sd-path-remove:hover {
-  background: var(--sd-action-bg-hover);
-  color: var(--sd-action-text-hover);
+[data-panel] .panel-path-remove:hover {
+  background: var(--panel-action-bg-hover);
+  color: var(--panel-action-text-hover);
 }
-.sd-path-hint {
+.panel-path-hint {
   font-size: 10.5px;
-  color: var(--sd-muted-icon);
+  color: var(--panel-muted-icon);
   text-align: center;
 }
 
-.sd-image {
+.panel-image {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
-.sd-image-head {
+.panel-image-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
-.sd-image-label {
+.panel-image-label {
   font-size: 13px;
   font-weight: 500;
-  color: var(--sd-label);
+  color: var(--panel-label);
 }
-.sd-image-upload {
+.panel-image-upload {
   font-size: 11px;
   font-weight: 500;
   padding: 3px 10px;
   border-radius: 6px;
-  border: 1px solid var(--sd-border);
-  background: var(--sd-action-bg);
-  color: var(--sd-action-text);
+  border: 1px solid var(--panel-border);
+  background: var(--panel-action-bg);
+  color: var(--panel-action-text);
   cursor: pointer;
   transition: background-color 150ms ease, color 150ms ease;
 }
-.sd-image-upload:hover {
-  background: var(--sd-action-bg-hover);
-  color: var(--sd-action-text-hover);
+.panel-image-upload:hover {
+  background: var(--panel-action-bg-hover);
+  color: var(--panel-action-text-hover);
 }
-.sd-image-frame {
+.panel-image-frame {
   position: relative;
   display: flex;
   align-items: center;
@@ -1188,29 +1225,29 @@ export const SHADER_DEV_CSS = `
   width: 100%;
   min-height: 48px;
   border-radius: 8px;
-  border: 1px solid var(--sd-border);
-  background: var(--sd-surface);
+  border: 1px solid var(--panel-border);
+  background: var(--panel-surface);
   overflow: hidden;
   transition: border-color 150ms ease, background-color 150ms ease;
 }
-.sd-image-frame[data-sd-interactive="true"] { cursor: pointer; }
-.sd-image-frame[data-sd-interactive="true"]:hover,
-.sd-image-frame[data-sd-drag="true"] {
-  border-color: var(--sd-handle);
-  background: var(--sd-surface-active);
+.panel-image-frame[data-panel-interactive="true"] { cursor: pointer; }
+.panel-image-frame[data-panel-interactive="true"]:hover,
+.panel-image-frame[data-panel-drag="true"] {
+  border-color: var(--panel-handle);
+  background: var(--panel-surface-active);
 }
-.sd-image-preview {
+.panel-image-preview {
   display: block;
   width: 75%;
   height: auto;
   border-radius: 4px;
 }
-.sd-image-empty {
+.panel-image-empty {
   font-size: 11px;
-  color: var(--sd-muted-icon);
+  color: var(--panel-muted-icon);
   padding: 14px 0;
 }
-.sd-image-native {
+.panel-image-native {
   position: absolute;
   height: 0;
   width: 0;
@@ -1218,12 +1255,12 @@ export const SHADER_DEV_CSS = `
   pointer-events: none;
 }
 
-/* Scoped under [data-shader-dev] so it beats the global button reset
+/* Scoped under [data-panel] so it beats the global button reset
    (which zeroes padding/background). The negative margin + matching padding
    full-bleeds the hover highlight ~8px past the label on each side, so the
    label stays aligned with the other rows but the highlight never touches its
    left edge. */
-[data-shader-dev] .sd-toggle {
+[data-panel] .panel-toggle {
   display: flex;
   height: 36px;
   width: calc(100% + 16px);
@@ -1235,42 +1272,42 @@ export const SHADER_DEV_CSS = `
   background: transparent;
   transition: background-color 150ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-[data-shader-dev] .sd-toggle:hover { background: var(--sd-toggle-hover); }
-.sd-toggle-label {
+[data-panel] .panel-toggle:hover { background: var(--panel-toggle-hover); }
+.panel-toggle-label {
   font-size: 13px;
   font-weight: 500;
-  color: var(--sd-label);
+  color: var(--panel-label);
 }
-.sd-toggle-track {
+.panel-toggle-track {
   position: relative;
   width: 28px;
   height: 16px;
   border-radius: 999px;
-  background: var(--sd-surface-idle-fill);
+  background: var(--panel-surface-idle-fill);
   transition: background-color 200ms cubic-bezier(0.32, 0.72, 0, 1);
   flex-shrink: 0;
 }
-.sd-toggle[data-sd-on="true"] .sd-toggle-track {
-  background: var(--sd-handle);
+.panel-toggle[data-panel-on="true"] .panel-toggle-track {
+  background: var(--panel-handle);
 }
-.sd-toggle-thumb {
+.panel-toggle-thumb {
   position: absolute;
   top: 2px;
   left: 2px;
   width: 12px;
   height: 12px;
   border-radius: 999px;
-  background: var(--sd-bg);
+  background: var(--panel-bg);
   transition: transform 220ms cubic-bezier(0.34, 1.16, 0.64, 1);
 }
-.sd-toggle[data-sd-on="false"] .sd-toggle-thumb {
-  background: var(--sd-handle);
+.panel-toggle[data-panel-on="false"] .panel-toggle-thumb {
+  background: var(--panel-handle);
 }
-.sd-toggle[data-sd-on="true"] .sd-toggle-thumb {
+.panel-toggle[data-panel-on="true"] .panel-toggle-thumb {
   transform: translateX(12px);
 }
 
-.sd-select {
+.panel-select {
   display: flex;
   min-height: 36px;
   align-items: center;
@@ -1278,30 +1315,30 @@ export const SHADER_DEV_CSS = `
   gap: 12px;
   border-radius: 8px;
   padding: 0 4px 0 12px;
-  background: var(--sd-surface);
+  background: var(--panel-surface);
 }
-.sd-select[data-sd-layout="stacked"] {
+.panel-select[data-panel-layout="stacked"] {
   flex-direction: column;
   align-items: stretch;
   gap: 6px;
   padding: 8px 12px;
 }
-.sd-select-label {
+.panel-select-label {
   font-size: 13px;
   font-weight: 500;
-  color: var(--sd-label);
+  color: var(--panel-label);
   min-width: 0;
 }
-.sd-select[data-sd-layout="stacked"] .sd-select-label {
+.panel-select[data-panel-layout="stacked"] .panel-select-label {
   white-space: normal;
   line-height: 1.35;
 }
-.sd-select[data-sd-layout="inline"] .sd-select-label {
+.panel-select[data-panel-layout="inline"] .panel-select-label {
   flex: 1 1 auto;
   white-space: normal;
   line-height: 1.35;
 }
-[data-shader-dev] .sd-select-btn {
+[data-panel] .panel-select-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -1310,8 +1347,8 @@ export const SHADER_DEV_CSS = `
   flex-shrink: 0;
   border: 0;
   outline: 0;
-  background: var(--sd-bg);
-  color: var(--sd-label);
+  background: var(--panel-bg);
+  color: var(--panel-label);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 11.5px;
   font-weight: 500;
@@ -1322,59 +1359,59 @@ export const SHADER_DEV_CSS = `
   transition: color 150ms cubic-bezier(0.22, 1, 0.36, 1),
     background-color 150ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-.sd-select[data-sd-layout="stacked"] .sd-select-btn {
+.panel-select[data-panel-layout="stacked"] .panel-select-btn {
   align-self: stretch;
   max-width: none;
   justify-content: space-between;
 }
-.sd-select[data-sd-layout="inline"] .sd-select-btn {
+.panel-select[data-panel-layout="inline"] .panel-select-btn {
   align-self: center;
 }
 /* Selected value stays on a single line — truncate rather than wrap. */
-.sd-select-value {
+.panel-select-value {
   min-width: 0;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-[data-shader-dev] .sd-select-btn:hover {
-  color: var(--sd-label-active);
-  background: var(--sd-surface-active);
+[data-panel] .panel-select-btn:hover {
+  color: var(--panel-label-active);
+  background: var(--panel-surface-active);
 }
-[data-shader-dev] .sd-select-btn:focus-visible {
-  color: var(--sd-label-active);
-  outline: 2px solid var(--sd-handle);
+[data-panel] .panel-select-btn:focus-visible {
+  color: var(--panel-label-active);
+  outline: 2px solid var(--panel-handle);
   outline-offset: 1px;
 }
-[data-shader-dev] .sd-select-btn:active { transform: scale(0.98); }
-.sd-select-chevron {
+[data-panel] .panel-select-btn:active { transform: scale(0.98); }
+.panel-select-chevron {
   width: 12px;
   height: 12px;
   opacity: 0.6;
   flex-shrink: 0;
 }
-.sd-select-layer {
+.panel-select-layer {
   position: fixed;
   inset: 0;
   z-index: 10000;
   pointer-events: none;
 }
-.sd-select-menu {
+.panel-select-menu {
   pointer-events: auto;
   overflow-y: auto;
   padding: 4px;
   border-radius: 10px;
-  border: 1px solid var(--sd-border);
-  background: var(--sd-bg);
+  border: 1px solid var(--panel-border);
+  background: var(--panel-bg);
   box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.2);
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
-  animation: sd-menu-in 160ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation: panel-menu-in 160ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-.sd-select-menu[data-sd-up="true"] {
-  animation-name: sd-menu-in-up;
+.panel-select-menu[data-panel-up="true"] {
+  animation-name: panel-menu-in-up;
 }
-@keyframes sd-menu-in {
+@keyframes panel-menu-in {
   from {
     opacity: 0;
     transform: translate(-100%, 0) translateY(-4px);
@@ -1386,7 +1423,7 @@ export const SHADER_DEV_CSS = `
     filter: blur(0);
   }
 }
-@keyframes sd-menu-in-up {
+@keyframes panel-menu-in-up {
   from {
     opacity: 0;
     transform: translate(-100%, -100%) translateY(4px);
@@ -1399,9 +1436,9 @@ export const SHADER_DEV_CSS = `
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .sd-select-menu { animation: none; }
+  .panel-select-menu { animation: none; }
 }
-[data-shader-dev] .sd-select-option {
+[data-panel] .panel-select-option {
   display: flex;
   width: 100%;
   align-items: center;
@@ -1409,7 +1446,7 @@ export const SHADER_DEV_CSS = `
   gap: 16px;
   border: 0;
   background: transparent;
-  color: var(--sd-label);
+  color: var(--panel-label);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 11.5px;
   font-weight: 500;
@@ -1421,27 +1458,27 @@ export const SHADER_DEV_CSS = `
   transition: background-color 120ms cubic-bezier(0.22, 1, 0.36, 1),
     color 120ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-[data-shader-dev] .sd-select-option[data-sd-active="true"] {
-  background: var(--sd-surface-active);
-  color: var(--sd-label-active);
+[data-panel] .panel-select-option[data-panel-active="true"] {
+  background: var(--panel-surface-active);
+  color: var(--panel-label-active);
 }
-[data-shader-dev] .sd-select-option[aria-selected="true"] {
-  color: var(--sd-text);
+[data-panel] .panel-select-option[aria-selected="true"] {
+  color: var(--panel-text);
 }
-.sd-select-check {
+.panel-select-check {
   width: 13px;
   height: 13px;
   flex-shrink: 0;
   opacity: 0.9;
 }
 
-.sd-prompt {
+.panel-prompt {
   display: flex;
   flex-direction: column;
 }
-/* Bumped under [data-shader-dev] so it ties the button reset on specificity
+/* Bumped under [data-panel] so it ties the button reset on specificity
    and wins on source order — the reset sets padding: 0 globally. */
-[data-shader-dev] .sd-prompt-toggle {
+[data-panel] .panel-prompt-toggle {
   display: flex;
   height: 36px;
   align-items: center;
@@ -1449,53 +1486,53 @@ export const SHADER_DEV_CSS = `
   gap: 8px;
   padding: 0 12px;
   border-radius: 8px;
-  background: var(--sd-surface);
-  color: var(--sd-label);
+  background: var(--panel-surface);
+  color: var(--panel-label);
   font-size: 13px;
   font-weight: 500;
   text-align: left;
   transition: color 150ms ease;
 }
-[data-shader-dev] .sd-prompt-toggle:hover,
-.sd-prompt[data-sd-open="true"] .sd-prompt-toggle {
-  color: var(--sd-label-active);
+[data-panel] .panel-prompt-toggle:hover,
+.panel-prompt[data-panel-open="true"] .panel-prompt-toggle {
+  color: var(--panel-label-active);
 }
-.sd-prompt-label {
+.panel-prompt-label {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
 }
-.sd-prompt-caret {
+.panel-prompt-caret {
   width: 12px;
   height: 12px;
   flex-shrink: 0;
-  color: var(--sd-muted-icon);
+  color: var(--panel-muted-icon);
   transition: transform 200ms ease;
 }
-.sd-prompt[data-sd-open="true"] .sd-prompt-caret { transform: rotate(180deg); }
+.panel-prompt[data-panel-open="true"] .panel-prompt-caret { transform: rotate(180deg); }
 
-.sd-prompt-preview {
+.panel-prompt-preview {
   display: flex;
   flex-direction: column;
   gap: 6px;
   padding: 6px 0 2px;
 }
-.sd-prompt-desc {
+.panel-prompt-desc {
   font-size: 11px;
-  color: var(--sd-text-muted);
+  color: var(--panel-text-muted);
   line-height: 1.4;
   padding: 0 4px;
 }
-.sd-prompt-code-wrap {
+.panel-prompt-code-wrap {
   position: relative;
 }
-.sd-prompt-pre {
+.panel-prompt-pre {
   margin: 0;
   padding: 10px 12px 22px;
-  background: var(--sd-bg);
-  color: var(--sd-text);
-  border: 1px solid var(--sd-border);
+  background: var(--panel-bg);
+  color: var(--panel-text);
+  border: 1px solid var(--panel-border);
   border-radius: 8px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 11px;
@@ -1508,13 +1545,13 @@ export const SHADER_DEV_CSS = `
   -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 22px), transparent);
   mask-image: linear-gradient(to bottom, black calc(100% - 22px), transparent);
 }
-.sd-prompt-pre::-webkit-scrollbar { width: 6px; }
-.sd-prompt-pre::-webkit-scrollbar-thumb { background: var(--sd-surface-active); border-radius: 999px; }
-/* Scoped under [data-shader-dev] to beat the global button reset
+.panel-prompt-pre::-webkit-scrollbar { width: 6px; }
+.panel-prompt-pre::-webkit-scrollbar-thumb { background: var(--panel-surface-active); border-radius: 999px; }
+/* Scoped under [data-panel] to beat the global button reset
    (background: transparent) on specificity — otherwise the button is
    transparent and the prompt text shows through behind the icon. The text
-   field (--sd-bg) is ~95% opaque, so stack two copies → ~99.8% opaque, same hue. */
-[data-shader-dev] .sd-prompt-copy {
+   field (--panel-bg) is ~95% opaque, so stack two copies → ~99.8% opaque, same hue. */
+[data-panel] .panel-prompt-copy {
   position: absolute;
   bottom: 6px;
   right: 6px;
@@ -1525,106 +1562,106 @@ export const SHADER_DEV_CSS = `
   align-items: center;
   justify-content: center;
   background:
-    linear-gradient(var(--sd-bg), var(--sd-bg)),
-    linear-gradient(var(--sd-bg), var(--sd-bg));
-  color: var(--sd-label);
-  border: 1px solid var(--sd-border);
+    linear-gradient(var(--panel-bg), var(--panel-bg)),
+    linear-gradient(var(--panel-bg), var(--panel-bg));
+  color: var(--panel-label);
+  border: 1px solid var(--panel-border);
   transition: color 150ms ease, transform 200ms cubic-bezier(0.34, 1.16, 0.64, 1);
 }
-.sd-prompt-copy svg { width: 14px; height: 14px; }
-[data-shader-dev] .sd-prompt-copy:hover {
+.panel-prompt-copy svg { width: 14px; height: 14px; }
+[data-panel] .panel-prompt-copy:hover {
   /* Subtle surface tint over the opaque base. */
   background:
-    linear-gradient(var(--sd-surface), var(--sd-surface)),
-    linear-gradient(var(--sd-bg), var(--sd-bg)),
-    linear-gradient(var(--sd-bg), var(--sd-bg));
-  color: var(--sd-label-active);
+    linear-gradient(var(--panel-surface), var(--panel-surface)),
+    linear-gradient(var(--panel-bg), var(--panel-bg)),
+    linear-gradient(var(--panel-bg), var(--panel-bg));
+  color: var(--panel-label-active);
   transform: scale(1.05);
 }
 
-.sd-vec2 {
+.panel-vec2 {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
-.sd-vec2-label {
+.panel-vec2-label {
   font-size: 13px;
   font-weight: 500;
-  color: var(--sd-label);
+  color: var(--panel-label);
   padding: 0 12px;
 }
-.sd-vec2-row {
+.panel-vec2-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px;
 }
 
 /* ── Preset selector ──────────────────────────────────────────────────────── */
-.sd-presets {
+.panel-presets {
   display: flex;
   flex-direction: column;
   gap: 6px;
   padding: 0 12px 2px;
 }
-.sd-presets-label {
+.panel-presets-label {
   font-size: 13px;
   font-weight: 500;
-  color: var(--sd-label);
+  color: var(--panel-label);
 }
-[data-shader-dev] .sd-preset-select {
+[data-panel] .panel-preset-select {
   appearance: none;
   -webkit-appearance: none;
   width: 100%;
   height: 36px;
-  border: 1px solid var(--sd-border);
+  border: 1px solid var(--panel-border);
   border-radius: 8px;
   padding: 0 28px 0 12px;
   font-size: 13px;
   font-weight: 500;
   line-height: 1;
-  color: var(--sd-label);
+  color: var(--panel-label);
   background:
-    linear-gradient(45deg, transparent 50%, var(--sd-muted-icon) 50%),
-    linear-gradient(135deg, var(--sd-muted-icon) 50%, transparent 50%),
-    var(--sd-surface);
+    linear-gradient(45deg, transparent 50%, var(--panel-muted-icon) 50%),
+    linear-gradient(135deg, var(--panel-muted-icon) 50%, transparent 50%),
+    var(--panel-surface);
   background-position: calc(100% - 14px) 50%, calc(100% - 10px) 50%, 0 0;
   background-size: 4px 4px, 4px 4px, auto;
   background-repeat: no-repeat;
   cursor: pointer;
   transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
 }
-[data-shader-dev] .sd-preset-select:hover {
-  color: var(--sd-label-active);
-  background-color: var(--sd-surface-active);
+[data-panel] .panel-preset-select:hover {
+  color: var(--panel-label-active);
+  background-color: var(--panel-surface-active);
 }
-[data-shader-dev] .sd-preset-select:focus-visible {
-  outline: 2px solid var(--sd-handle);
+[data-panel] .panel-preset-select:focus-visible {
+  outline: 2px solid var(--panel-handle);
   outline-offset: 1px;
 }
 
 /* ── ToolShell layout ───────────────────────────────────────────────────── */
-.sd-tool-shell {
+.panel-tool-shell {
   position: relative;
   width: 100%;
   height: 100%;
   overflow: hidden;
 }
-.sd-tool-viewport {
+.panel-tool-viewport {
   position: absolute;
   inset: 0;
   z-index: 0;
 }
-.sd-tool-overlay {
+.panel-tool-overlay {
   pointer-events: none;
   position: absolute;
   inset: 0;
   z-index: 20;
   transition: opacity 500ms ease;
 }
-.sd-tool-overlay[data-sd-ui-visible="false"] {
+.panel-tool-overlay[data-panel-ui-visible="false"] {
   opacity: 0;
 }
-.sd-tool-topbar {
+.panel-tool-topbar {
   pointer-events: none;
   display: flex;
   align-items: center;
@@ -1633,16 +1670,16 @@ export const SHADER_DEV_CSS = `
   padding-bottom: 16px;
   transition: padding 300ms ease;
 }
-.sd-tool-topbar > * {
+.panel-tool-topbar > * {
   pointer-events: auto;
 }
-.sd-tool-panels {
+.panel-tool-panels {
   pointer-events: none;
   position: absolute;
   inset: 0;
 }
 
-.sd-panel-toggle {
+.panel-panel-toggle {
   pointer-events: auto;
   position: absolute;
   bottom: 20px;
@@ -1653,25 +1690,25 @@ export const SHADER_DEV_CSS = `
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  border: 1px solid var(--sd-border);
-  background: var(--sd-bg);
-  color: var(--sd-text-muted);
-  box-shadow: var(--sd-shadow);
+  border: 1px solid var(--panel-border);
+  background: var(--panel-bg);
+  color: var(--panel-text-muted);
+  box-shadow: var(--panel-shadow);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   transition: left 300ms ease, right 300ms ease, background 150ms ease, color 150ms ease;
 }
-.sd-panel-toggle:hover {
-  background: var(--sd-surface);
-  color: var(--sd-text);
+.panel-panel-toggle:hover {
+  background: var(--panel-surface);
+  color: var(--panel-text);
 }
-.sd-panel-toggle-icon {
+.panel-panel-toggle-icon {
   width: 16px;
   height: 16px;
   transition: transform 300ms ease;
 }
 
-.sd-eye-toggle {
+.panel-eye-toggle {
   pointer-events: auto;
   position: absolute;
   bottom: 20px;
@@ -1683,44 +1720,44 @@ export const SHADER_DEV_CSS = `
   width: 36px;
   height: 36px;
   border-radius: 999px;
-  border: 1px solid var(--sd-border);
-  background: var(--sd-bg);
-  color: var(--sd-text-muted);
-  box-shadow: var(--sd-shadow);
+  border: 1px solid var(--panel-border);
+  background: var(--panel-bg);
+  color: var(--panel-text-muted);
+  box-shadow: var(--panel-shadow);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   transform: translateX(-50%);
   transition: background 150ms ease, color 500ms ease, opacity 500ms ease;
 }
-.sd-eye-toggle[data-sd-visible="false"] {
-  color: color-mix(in srgb, var(--sd-text-muted) 30%, transparent);
+.panel-eye-toggle[data-panel-visible="false"] {
+  color: color-mix(in srgb, var(--panel-text-muted) 30%, transparent);
 }
-.sd-eye-toggle:hover {
-  background: var(--sd-surface);
-  color: var(--sd-text);
+.panel-eye-toggle:hover {
+  background: var(--panel-surface);
+  color: var(--panel-text);
 }
-.sd-eye-toggle svg {
+.panel-eye-toggle svg {
   width: 16px;
   height: 16px;
 }
 
 /* ── Disclosure rows (POI / caption editors) ─────────────────────────────── */
-.sd-disclosure {
+.panel-disclosure {
   display: flex;
   flex-direction: column;
 }
-.sd-disclosure[data-sd-open="true"] {
+.panel-disclosure[data-panel-open="true"] {
   margin-bottom: 10px;
 }
-.sd-disclosure[data-sd-dimmed="true"] {
+.panel-disclosure[data-panel-dimmed="true"] {
   opacity: 0.38;
   pointer-events: none;
 }
-.sd-disclosure[data-sd-highlight="true"] .sd-disclosure-toggle {
-  box-shadow: inset 0 0 0 1px var(--sd-handle);
-  color: var(--sd-label-active);
+.panel-disclosure[data-panel-highlight="true"] .panel-disclosure-toggle {
+  box-shadow: inset 0 0 0 1px var(--panel-handle);
+  color: var(--panel-label-active);
 }
-[data-shader-dev] .sd-disclosure-toggle {
+[data-panel] .panel-disclosure-toggle {
   display: flex;
   height: 36px;
   align-items: center;
@@ -1728,66 +1765,66 @@ export const SHADER_DEV_CSS = `
   gap: 8px;
   padding: 0 12px;
   border-radius: 8px;
-  background: var(--sd-surface);
-  color: var(--sd-label);
+  background: var(--panel-surface);
+  color: var(--panel-label);
   font-size: 13px;
   font-weight: 500;
   text-align: left;
   transition: color 150ms ease, background-color 150ms ease;
 }
-[data-shader-dev] .sd-disclosure-toggle:hover,
-.sd-disclosure[data-sd-open="true"] .sd-disclosure-toggle {
-  color: var(--sd-label-active);
-  background: var(--sd-surface-active);
+[data-panel] .panel-disclosure-toggle:hover,
+.panel-disclosure[data-panel-open="true"] .panel-disclosure-toggle {
+  color: var(--panel-label-active);
+  background: var(--panel-surface-active);
 }
-.sd-disclosure-label {
+.panel-disclosure-label {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
 }
-.sd-disclosure-caret {
+.panel-disclosure-caret {
   width: 12px;
   height: 12px;
   flex-shrink: 0;
-  color: var(--sd-muted-icon);
+  color: var(--panel-muted-icon);
   transition: transform 200ms ease;
 }
-.sd-disclosure[data-sd-open="true"] .sd-disclosure-caret {
+.panel-disclosure[data-panel-open="true"] .panel-disclosure-caret {
   transform: rotate(180deg);
 }
-.sd-disclosure-body {
+.panel-disclosure-body {
   display: flex;
   flex-direction: column;
   gap: 6px;
   padding: 6px 0 14px;
 }
 /* Nested editors — damp hover scale so sliders don't spill past inset padding. */
-[data-shader-dev] .sd-disclosure-body .sd-slider,
-[data-shader-dev] .sd-vec2-row .sd-slider {
+[data-panel] .panel-disclosure-body .panel-slider,
+[data-panel] .panel-vec2-row .panel-slider {
   width: 100%;
   margin: 0;
 }
-[data-shader-dev] .sd-disclosure-body .sd-slider[data-sd-state="hover"],
-[data-shader-dev] .sd-vec2-row .sd-slider[data-sd-state="hover"] {
+[data-panel] .panel-disclosure-body .panel-slider[data-panel-state="hover"],
+[data-panel] .panel-vec2-row .panel-slider[data-panel-state="hover"] {
   transform: none;
 }
-[data-shader-dev] .sd-disclosure-body .sd-slider[data-sd-state="drag"],
-[data-shader-dev] .sd-vec2-row .sd-slider[data-sd-state="drag"] {
+[data-panel] .panel-disclosure-body .panel-slider[data-panel-state="drag"],
+[data-panel] .panel-vec2-row .panel-slider[data-panel-state="drag"] {
   transform: scale(1.008);
 }
-[data-shader-dev] .sd-disclosure-body .sd-toggle {
+[data-panel] .panel-disclosure-body .panel-toggle {
   width: 100%;
   margin: 0;
 }
 
 /* ── Text input ──────────────────────────────────────────────────────────── */
-.sd-text {
+.panel-text {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
-.sd-text[data-sd-layout="inline"] {
+.panel-text[data-panel-layout="inline"] {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
@@ -1795,66 +1832,66 @@ export const SHADER_DEV_CSS = `
   min-height: 36px;
   padding: 0 12px;
   border-radius: 8px;
-  background: var(--sd-surface);
+  background: var(--panel-surface);
 }
-.sd-text-label,
-.sd-search-label,
-.sd-textarea-label {
+.panel-text-label,
+.panel-search-label,
+.panel-textarea-label {
   font-size: 13px;
   font-weight: 500;
-  color: var(--sd-label);
+  color: var(--panel-label);
   padding: 0;
   line-height: 1.35;
 }
-.sd-text[data-sd-layout="inline"] .sd-text-label {
+.panel-text[data-panel-layout="inline"] .panel-text-label {
   padding: 0;
   flex-shrink: 0;
 }
-[data-shader-dev] .sd-text-input {
+[data-panel] .panel-text-input {
   width: 100%;
   height: 36px;
   padding: 0 12px;
   border-radius: 8px;
-  background: var(--sd-surface);
-  color: var(--sd-label);
+  background: var(--panel-surface);
+  color: var(--panel-label);
   font-size: 13px;
   font-weight: 500;
   line-height: 1.2;
   transition: background-color 150ms ease, color 150ms ease;
 }
-.sd-text[data-sd-layout="inline"] .sd-text-input {
+.panel-text[data-panel-layout="inline"] .panel-text-input {
   flex: 1;
   min-width: 0;
   background: transparent;
   text-align: right;
 }
-[data-shader-dev] .sd-text-input[data-sd-mono="true"] {
+[data-panel] .panel-text-input[data-panel-mono="true"] {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 12px;
 }
-[data-shader-dev] .sd-text-input:focus {
-  color: var(--sd-label-active);
-  background: var(--sd-surface-active);
+[data-panel] .panel-text-input:focus {
+  color: var(--panel-label-active);
+  background: var(--panel-surface-active);
 }
-[data-shader-dev] .sd-text-input::placeholder {
-  color: var(--sd-muted-icon);
+[data-panel] .panel-text-input::placeholder {
+  color: var(--panel-muted-icon);
   text-transform: none;
 }
 
 /* ── Textarea ────────────────────────────────────────────────────────────── */
-.sd-textarea {
+.panel-textarea {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
-[data-shader-dev] .sd-textarea-input {
+[data-panel] .panel-textarea-input {
   width: 100%;
   min-height: 72px;
   resize: vertical;
   padding: 8px 12px;
   border-radius: 8px;
-  background: var(--sd-surface);
-  color: var(--sd-label);
+  background: var(--panel-surface);
+  color: var(--panel-label);
   font-family: inherit;
   font-size: 13px;
   font-weight: 500;
@@ -1862,68 +1899,68 @@ export const SHADER_DEV_CSS = `
   outline: none;
   transition: background-color 150ms ease, color 150ms ease;
 }
-[data-shader-dev] .sd-textarea-input:focus {
-  color: var(--sd-label-active);
-  background: var(--sd-surface-active);
+[data-panel] .panel-textarea-input:focus {
+  color: var(--panel-label-active);
+  background: var(--panel-surface-active);
 }
-[data-shader-dev] .sd-textarea-input::placeholder {
-  color: var(--sd-muted-icon);
+[data-panel] .panel-textarea-input::placeholder {
+  color: var(--panel-muted-icon);
 }
 
-.sd-search {
+.panel-search {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
-.sd-search-row {
+.panel-search-row {
   display: flex;
   align-items: stretch;
   gap: 6px;
 }
-[data-shader-dev] .sd-search-input {
+[data-panel] .panel-search-input {
   flex: 1;
   min-width: 0;
   height: 36px;
   padding: 0 12px;
   border-radius: 8px;
-  background: var(--sd-surface);
-  color: var(--sd-label);
+  background: var(--panel-surface);
+  color: var(--panel-label);
   font-size: 13px;
   font-weight: 500;
   line-height: 1.2;
   transition: background-color 150ms ease, color 150ms ease;
 }
-[data-shader-dev] .sd-search-input:focus {
-  color: var(--sd-label-active);
-  background: var(--sd-surface-active);
+[data-panel] .panel-search-input:focus {
+  color: var(--panel-label-active);
+  background: var(--panel-surface-active);
 }
-[data-shader-dev] .sd-search-input::placeholder {
-  color: var(--sd-muted-icon);
+[data-panel] .panel-search-input::placeholder {
+  color: var(--panel-muted-icon);
 }
-[data-shader-dev] .sd-search-btn {
+[data-panel] .panel-search-btn {
   flex-shrink: 0;
   height: 36px;
   padding: 0 12px;
   border-radius: 8px;
-  background: var(--sd-action-bg);
-  color: var(--sd-action-text);
+  background: var(--panel-action-bg);
+  color: var(--panel-action-text);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.01em;
   transition: background-color 150ms ease, color 150ms ease, transform 120ms ease;
 }
-[data-shader-dev] .sd-search-btn:hover:not(:disabled) {
-  background: var(--sd-action-bg-hover);
-  color: var(--sd-action-text-hover);
+[data-panel] .panel-search-btn:hover:not(:disabled) {
+  background: var(--panel-action-bg-hover);
+  color: var(--panel-action-text-hover);
 }
-[data-shader-dev] .sd-search-btn:active:not(:disabled) {
+[data-panel] .panel-search-btn:active:not(:disabled) {
   transform: scale(0.98);
 }
-[data-shader-dev] .sd-search-btn:disabled {
+[data-panel] .panel-search-btn:disabled {
   opacity: 0.55;
   cursor: not-allowed;
 }
-.sd-search-error {
+.panel-search-error {
   padding: 0 12px;
   font-size: 11px;
   line-height: 1.35;
@@ -1931,7 +1968,7 @@ export const SHADER_DEV_CSS = `
 }
 
 /* ── Readout row ─────────────────────────────────────────────────────────── */
-.sd-readout {
+.panel-readout {
   display: flex;
   min-height: 36px;
   align-items: center;
@@ -1939,19 +1976,19 @@ export const SHADER_DEV_CSS = `
   gap: 12px;
   padding: 8px 12px;
   border-radius: 8px;
-  background: var(--sd-surface);
+  background: var(--panel-surface);
 }
-.sd-readout-label {
+.panel-readout-label {
   flex-shrink: 0;
   font-size: 13px;
   font-weight: 500;
-  color: var(--sd-label);
+  color: var(--panel-label);
 }
-.sd-readout-value {
+.panel-readout-value {
   min-width: 0;
   font-size: 12px;
   font-weight: 500;
-  color: var(--sd-text-muted);
+  color: var(--panel-text-muted);
   text-align: right;
   white-space: nowrap;
   overflow: hidden;
@@ -1959,20 +1996,20 @@ export const SHADER_DEV_CSS = `
 }
 
 /* ── Option list (search results, pickers) ───────────────────────────────── */
-.sd-option-list-wrap {
+.panel-option-list-wrap {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
-.sd-option-list-title {
+.panel-option-list-title {
   padding: 0 12px;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: var(--sd-text-muted);
+  color: var(--panel-text-muted);
 }
-.sd-option-list {
+.panel-option-list {
   display: flex;
   max-height: 168px;
   flex-direction: column;
@@ -1980,18 +2017,18 @@ export const SHADER_DEV_CSS = `
   overflow-y: auto;
   padding: 4px;
   border-radius: 8px;
-  border: 1px solid var(--sd-border);
-  background: var(--sd-bg);
+  border: 1px solid var(--panel-border);
+  background: var(--panel-bg);
   scrollbar-width: thin;
 }
-.sd-option-list::-webkit-scrollbar {
+.panel-option-list::-webkit-scrollbar {
   width: 6px;
 }
-.sd-option-list::-webkit-scrollbar-thumb {
-  background: var(--sd-surface-active);
+.panel-option-list::-webkit-scrollbar-thumb {
+  background: var(--panel-surface-active);
   border-radius: 999px;
 }
-[data-shader-dev] .sd-option-item {
+[data-panel] .panel-option-item {
   display: flex;
   width: 100%;
   flex-direction: column;
@@ -2000,50 +2037,55 @@ export const SHADER_DEV_CSS = `
   padding: 8px 10px;
   border-radius: 6px;
   background: transparent;
-  color: var(--sd-label);
+  color: var(--panel-label);
   text-align: left;
   transition: background-color 120ms ease, color 120ms ease;
 }
-[data-shader-dev] .sd-option-item:hover:not(:disabled) {
-  background: var(--sd-surface);
-  color: var(--sd-label-active);
+[data-panel] .panel-option-item:hover:not(:disabled) {
+  background: var(--panel-surface);
+  color: var(--panel-label-active);
 }
-[data-shader-dev] .sd-option-item:disabled {
+[data-panel] .panel-option-item:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
-.sd-option-item-label {
+.panel-option-item-label {
   width: 100%;
   font-size: 12px;
   font-weight: 600;
   line-height: 1.3;
   color: inherit;
 }
-.sd-option-item-desc {
+.panel-option-item-desc {
   width: 100%;
   font-size: 10.5px;
   line-height: 1.35;
-  color: var(--sd-text-muted);
+  color: var(--panel-text-muted);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.sd-option-empty {
+.panel-option-empty {
   padding: 8px 12px;
   border-radius: 8px;
-  background: var(--sd-surface);
+  background: var(--panel-surface);
   font-size: 11px;
   line-height: 1.35;
-  color: var(--sd-text-muted);
+  color: var(--panel-text-muted);
 }
 
 /* ── Hint copy ───────────────────────────────────────────────────────────── */
-.sd-hint {
+.panel-hint {
   margin: 0;
   padding: 0 12px 2px;
   font-size: 11px;
   line-height: 1.4;
-  color: var(--sd-text-muted);
+  color: var(--panel-text-muted);
 }
 `
+
+/** @deprecated use PANEL_CSS */
+export const SHADER_DEV_CSS = PANEL_CSS
+/** @deprecated use PANEL_STYLE_ID */
+export const SHADER_DEV_STYLE_ID = PANEL_STYLE_ID

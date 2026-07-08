@@ -8,5 +8,5 @@ export interface ControlHintProps {
 }
 
 export function ControlHint({ children, className }: ControlHintProps) {
-  return <p className={cn("sd-hint", className)}>{children}</p>
+  return <p className={cn("panel-hint", className)}>{children}</p>
 }

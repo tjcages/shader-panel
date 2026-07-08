@@ -67,8 +67,12 @@ export function fillShaderDevPrompt(
 
 // Constants
 export const DEFAULT_SHADER_DEV_PROMPTS: ReadonlyArray<unknown> = []
-export const SHADER_DEV_CSS = ""
-export const SHADER_DEV_STYLE_ID = "shader-dev-styles"
+export const PANEL_CSS = ""
+export const PANEL_STYLE_ID = "shader-dev-styles"
+/** @deprecated use PANEL_CSS */
+export const SHADER_DEV_CSS = PANEL_CSS
+/** @deprecated use PANEL_STYLE_ID */
+export const SHADER_DEV_STYLE_ID = PANEL_STYLE_ID
 export const SHADER_DEV_TOGGLE_EVENT = "cf-shader-dev-toggle"
 
 // Registry
@@ -107,7 +111,7 @@ export function subscribeShaderDevRegistration(): () => void {
 }
 
 // Capture registry — no-op in prod (no export panel to drive it).
-export type { ShaderCaptureFn } from "./hooks/capture-registry"
+export type { ShaderCaptureFn, ShaderGifExportFn, ShaderGifExportOptions } from "./hooks/capture-registry"
 export function registerShaderCapture(): () => void {
   return NOOP
 }
@@ -115,6 +119,27 @@ export function getShaderCapture(): null {
   return null
 }
 export function subscribeShaderCapture(): () => void {
+  return NOOP
+}
+export function registerShaderRecordCanvas(): () => void {
+  return NOOP
+}
+export function getShaderRecordCanvas(): null {
+  return null
+}
+export function registerShaderRecordPrepare(): () => void {
+  return NOOP
+}
+export function getShaderRecordPrepare(): null {
+  return null
+}
+export function registerShaderGifExport(): () => void {
+  return NOOP
+}
+export function getShaderGifExport(): null {
+  return null
+}
+export function subscribeShaderRecording(): () => void {
   return NOOP
 }
 

@@ -25,18 +25,18 @@ export function ControlTextInput({
 }: ControlTextInputProps) {
   return (
     <div
-      className={cn("sd-text", className)}
-      data-sd-layout={layout}
+      className={cn("panel-text", className)}
+      data-panel-layout={layout}
     >
-      <span className="sd-text-label">{label}</span>
+      <span className="panel-text-label">{label}</span>
       <input
         type="text"
         value={value}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
         onKeyDown={onKeyDown}
-        className="sd-text-input"
-        data-sd-mono={monospace ? "true" : "false"}
+        className="panel-text-input"
+        data-panel-mono={monospace ? "true" : "false"}
         aria-label={label}
       />
     </div>

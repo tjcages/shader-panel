@@ -26,9 +26,9 @@ export function ControlSearchField({
   className,
 }: ControlSearchFieldProps) {
   return (
-    <div className={cn("sd-search", className)}>
-      <span className="sd-search-label">{label}</span>
-      <div className="sd-search-row">
+    <div className={cn("panel-search", className)}>
+      <span className="panel-search-label">{label}</span>
+      <div className="panel-search-row">
         <input
           type="text"
           value={value}
@@ -40,19 +40,19 @@ export function ControlSearchField({
               onSearch()
             }
           }}
-          className="sd-search-input"
+          className="panel-search-input"
           aria-label={label}
         />
         <button
           type="button"
-          className="sd-search-btn"
+          className="panel-search-btn"
           onClick={onSearch}
           disabled={searching}
         >
           {searching ? "…" : searchLabel}
         </button>
       </div>
-      {error ? <div className="sd-search-error">{error}</div> : null}
+      {error ? <div className="panel-search-error">{error}</div> : null}
     </div>
   )
 }

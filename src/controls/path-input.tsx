@@ -170,11 +170,11 @@ export function ControlPath({
   const closeTo = chainPad[0]
 
   return (
-    <div className={cn("sd-path", className)}>
-      <div className="sd-path-head">
-        <span className="sd-path-label">{label}</span>
-        <div className="sd-path-head-actions">
-          <span className="sd-path-count">
+    <div className={cn("panel-path", className)}>
+      <div className="panel-path-head">
+        <span className="panel-path-label">{label}</span>
+        <div className="panel-path-head-actions">
+          <span className="panel-path-count">
             {value.length === 0
               ? (emptyLabel ?? "click to add")
               : `${value.length} pt${value.length === 1 ? "" : "s"}`}
@@ -182,7 +182,7 @@ export function ControlPath({
           {value.length > 0 ? (
             <button
               type="button"
-              className="sd-path-clear"
+              className="panel-path-clear"
               onClick={() => {
                 onChange([])
                 setSelected(null)
@@ -195,7 +195,7 @@ export function ControlPath({
       </div>
       <svg
         ref={svgRef}
-        className="sd-path-pad"
+        className="panel-path-pad"
         viewBox={`0 0 ${VB} ${VB}`}
         preserveAspectRatio="none"
         onPointerMove={onPointerMove}
@@ -208,7 +208,7 @@ export function ControlPath({
           y="0"
           width={VB}
           height={VB}
-          className="sd-path-bg"
+          className="panel-path-bg"
           onPointerDown={onPointerDownBackground}
         />
 
@@ -217,7 +217,7 @@ export function ControlPath({
           y1="0"
           x2="50"
           y2={VB}
-          className="sd-path-grid"
+          className="panel-path-grid"
           pointerEvents="none"
         />
         <line
@@ -225,7 +225,7 @@ export function ControlPath({
           y1="50"
           x2={VB}
           y2="50"
-          className="sd-path-grid"
+          className="panel-path-grid"
           pointerEvents="none"
         />
         <rect
@@ -233,14 +233,14 @@ export function ControlPath({
           y="0.5"
           width={VB - 1}
           height={VB - 1}
-          className="sd-path-frame"
+          className="panel-path-frame"
           pointerEvents="none"
         />
 
         {chain.length > 1 ? (
           <polyline
             points={polyline}
-            className="sd-path-line"
+            className="panel-path-line"
             pointerEvents="none"
           />
         ) : null}
@@ -250,7 +250,7 @@ export function ControlPath({
             y1={closeFrom[1]}
             x2={closeTo[0]}
             y2={closeTo[1]}
-            className="sd-path-line-close"
+            className="panel-path-line-close"
             pointerEvents="none"
           />
         ) : null}
@@ -261,7 +261,7 @@ export function ControlPath({
             <g
               key={i}
               className={cn(
-                "sd-path-point",
+                "panel-path-point",
                 selected === i && "is-selected",
               )}
               onPointerDown={(e) => onPointerDownPoint(e, i)}
@@ -274,19 +274,19 @@ export function ControlPath({
                 cx={x}
                 cy={y}
                 r={HIT_RADIUS_PAD}
-                className="sd-path-point-hit"
+                className="panel-path-point-hit"
               />
               <circle
                 cx={x}
                 cy={y}
                 r="3"
-                className="sd-path-point-ring"
+                className="panel-path-point-ring"
                 pointerEvents="none"
               />
               <text
                 x={x}
                 y={y}
-                className="sd-path-point-num"
+                className="panel-path-point-num"
                 dy="0.35em"
                 pointerEvents="none"
               >
@@ -303,7 +303,7 @@ export function ControlPath({
               return (
                 <g
                   className={cn(
-                    "sd-path-anchor",
+                    "panel-path-anchor",
                     anchorDraggable && "is-draggable",
                     selected === "anchor" && "is-selected",
                   )}
@@ -317,7 +317,7 @@ export function ControlPath({
                       cx={ax}
                       cy={ay}
                       r={HIT_RADIUS_PAD}
-                      className="sd-path-point-hit"
+                      className="panel-path-point-hit"
                     />
                   ) : null}
                   <circle
@@ -330,7 +330,7 @@ export function ControlPath({
                     cx={ax}
                     cy={ay}
                     r="1.1"
-                    className="sd-path-anchor-dot"
+                    className="panel-path-anchor-dot"
                     pointerEvents="none"
                   />
                 </g>
@@ -339,27 +339,27 @@ export function ControlPath({
           : null}
       </svg>
       {selected === "anchor" && anchor ? (
-        <div className="sd-path-selected">
+        <div className="panel-path-selected">
           <span>
             Home: {anchor[0].toFixed(2)}, {anchor[1].toFixed(2)}
           </span>
         </div>
       ) : selected !== null && typeof selected === "number" && value[selected] ? (
-        <div className="sd-path-selected">
+        <div className="panel-path-selected">
           <span>
             Point {selected + 1}: {value[selected][0].toFixed(2)},{" "}
             {value[selected][1].toFixed(2)}
           </span>
           <button
             type="button"
-            className="sd-path-remove"
+            className="panel-path-remove"
             onClick={() => removePoint(selected)}
           >
             Remove
           </button>
         </div>
       ) : (
-        <div className="sd-path-hint">
+        <div className="panel-path-hint">
           Click empty space to add · drag home or waypoints to move ·
           double-click to remove
         </div>

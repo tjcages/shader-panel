@@ -34,22 +34,22 @@ export function ControlSection({
   const toggle = () => setOpen(!open)
   return (
     <div
-      data-sd-open={open ? "true" : "false"}
-      className={cn("sd-section", className)}
+      data-panel-open={open ? "true" : "false"}
+      className={cn("panel-section", className)}
     >
-      <div className="sd-section-header">
+      <div className="panel-section-header">
         <button
           type="button"
-          className="sd-section-button"
+          className="panel-section-button"
           onClick={toggle}
           aria-expanded={open}
         >
-          <span className="sd-section-title">{title}</span>
+          <span className="panel-section-title">{title}</span>
         </button>
         {onReset ? (
           <button
             type="button"
-            className="sd-section-reset"
+            className="panel-section-reset"
             onClick={onReset}
             aria-label={`Reset ${title} to defaults`}
             title={`Reset ${title}`}
@@ -59,7 +59,7 @@ export function ControlSection({
         ) : null}
         <button
           type="button"
-          className="sd-section-caret-btn"
+          className="panel-section-caret-btn"
           onClick={toggle}
           aria-label={open ? "Collapse section" : "Expand section"}
           tabIndex={-1}
@@ -67,9 +67,9 @@ export function ControlSection({
           <CaretIcon />
         </button>
       </div>
-      <div className="sd-collapse" data-sd-open={open ? "true" : "false"}>
-        <div className="sd-collapse-inner">
-          <div className="sd-section-children">{children}</div>
+      <div className="panel-collapse" data-panel-open={open ? "true" : "false"}>
+        <div className="panel-collapse-inner">
+          <div className="panel-section-children">{children}</div>
         </div>
       </div>
     </div>
@@ -79,7 +79,7 @@ export function ControlSection({
 function CaretIcon() {
   return (
     <svg
-      className="sd-section-caret"
+      className="panel-section-caret"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"

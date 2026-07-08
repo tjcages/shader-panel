@@ -52,12 +52,12 @@ export function ControlAnimation({
   }, [snapshot.playing])
 
   return (
-    <div className={cn("sd-animation", className)}>
-      <div className="sd-animation-label">Animation</div>
-      <div className="sd-animation-row">
+    <div className={cn("panel-animation", className)}>
+      <div className="panel-animation-label">Animation</div>
+      <div className="panel-animation-row">
         <button
           type="button"
-          className="sd-animation-btn"
+          className="panel-animation-btn"
           onClick={() => stepShaderDevAnimationBackward(step)}
           aria-label="Step backward one frame"
           title="Step back"
@@ -66,7 +66,7 @@ export function ControlAnimation({
         </button>
         <button
           type="button"
-          className="sd-animation-btn sd-animation-btn-primary"
+          className="panel-animation-btn panel-animation-btn-primary"
           onClick={togglePlay}
           aria-label={snapshot.playing ? "Pause animation" : "Play animation"}
           title={snapshot.playing ? "Pause" : "Play"}
@@ -75,19 +75,19 @@ export function ControlAnimation({
         </button>
         <button
           type="button"
-          className="sd-animation-btn"
+          className="panel-animation-btn"
           onClick={() => stepShaderDevAnimationForward(step)}
           aria-label="Step forward one frame"
           title="Step forward"
         >
           <StepForwardIcon />
         </button>
-        <span className="sd-animation-time" aria-live="polite">
+        <span className="panel-animation-time" aria-live="polite">
           {formatTime(snapshot.time)}
         </span>
         <button
           type="button"
-          className="sd-animation-btn sd-animation-btn-reset"
+          className="panel-animation-btn panel-animation-btn-reset"
           onClick={resetShaderDevAnimation}
           aria-label="Reset animation time"
           title="Reset to 0"

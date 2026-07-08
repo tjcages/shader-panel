@@ -50,7 +50,7 @@ export function ControlQuickActions({
     <ControlSection
       title={title}
       defaultOpen={defaultOpen}
-      className={cn("sd-quick-section", className)}
+      className={cn("panel-quick-section", className)}
     >
       {resolved.map((p) => {
         const isOpen = expanded === p.id
@@ -84,31 +84,31 @@ function PromptRow({
   onCopy: () => void
 }) {
   return (
-    <div className="sd-prompt" data-sd-open={isOpen ? "true" : "false"}>
+    <div className="panel-prompt" data-panel-open={isOpen ? "true" : "false"}>
       <button
         type="button"
-        className="sd-prompt-toggle"
+        className="panel-prompt-toggle"
         onClick={onToggle}
         aria-expanded={isOpen}
       >
-        <span className="sd-prompt-label">{prompt.title}</span>
+        <span className="panel-prompt-label">{prompt.title}</span>
         <CaretIcon />
       </button>
       <div
-        className="sd-collapse"
-        data-sd-open={isOpen ? "true" : "false"}
+        className="panel-collapse"
+        data-panel-open={isOpen ? "true" : "false"}
         aria-hidden={!isOpen}
       >
-        <div className="sd-collapse-inner">
-          <div className="sd-prompt-preview">
+        <div className="panel-collapse-inner">
+          <div className="panel-prompt-preview">
             {prompt.description ? (
-              <div className="sd-prompt-desc">{prompt.description}</div>
+              <div className="panel-prompt-desc">{prompt.description}</div>
             ) : null}
-            <div className="sd-prompt-code-wrap">
-              <pre className="sd-prompt-pre">{prompt.prompt}</pre>
+            <div className="panel-prompt-code-wrap">
+              <pre className="panel-prompt-pre">{prompt.prompt}</pre>
               <button
                 type="button"
-                className="sd-prompt-copy"
+                className="panel-prompt-copy"
                 onClick={onCopy}
                 aria-label={isCopied ? "Copied" : "Copy prompt"}
                 title={isCopied ? "Copied" : "Copy prompt"}
@@ -126,7 +126,7 @@ function PromptRow({
 function CaretIcon() {
   return (
     <svg
-      className="sd-prompt-caret"
+      className="panel-prompt-caret"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"

@@ -82,9 +82,18 @@ export {
 
 export {
   getShaderCapture,
+  getShaderGifExport,
+  getShaderRecordCanvas,
+  getShaderRecordPrepare,
   registerShaderCapture,
+  registerShaderGifExport,
+  registerShaderRecordCanvas,
+  registerShaderRecordPrepare,
   subscribeShaderCapture,
+  subscribeShaderRecording,
   type ShaderCaptureFn,
+  type ShaderGifExportFn,
+  type ShaderGifExportOptions,
 } from "./hooks/capture-registry"
 
 export {
@@ -142,7 +151,14 @@ export {
  * the styles themselves. The components inject these automatically on mount —
  * you only need this when you want to control the timing.
  */
-export { SHADER_DEV_CSS, SHADER_DEV_STYLE_ID } from "./styles"
+export {
+  PANEL_CSS,
+  PANEL_STYLE_ID,
+  /** @deprecated use PANEL_CSS */
+  SHADER_DEV_CSS,
+  /** @deprecated use PANEL_STYLE_ID */
+  SHADER_DEV_STYLE_ID,
+} from "./styles"
 
 export {
   ControlAction,

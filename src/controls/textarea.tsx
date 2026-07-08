@@ -20,14 +20,14 @@ export function ControlTextarea({
   className,
 }: ControlTextareaProps) {
   return (
-    <div className={cn("sd-textarea", className)}>
-      <span className="sd-textarea-label">{label}</span>
+    <div className={cn("panel-textarea", className)}>
+      <span className="panel-textarea-label">{label}</span>
       <textarea
         value={value}
         placeholder={placeholder}
         rows={rows}
         onChange={(event) => onChange(event.target.value)}
-        className="sd-textarea-input"
+        className="panel-textarea-input"
         aria-label={label}
       />
     </div>

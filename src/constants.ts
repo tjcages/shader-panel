@@ -1,4 +1,4 @@
-/** Floating panel width in pixels — matches `.sd-floating { width: 280px }`. */
+/** Floating panel width in pixels — matches `.panel-floating { width: 280px }`. */
 export const TOOL_PANEL_WIDTH = 280
 
 /** Gap between panel edge and viewport edge. */

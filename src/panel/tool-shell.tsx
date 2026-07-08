@@ -63,16 +63,16 @@ export function ToolShell({
   }, [uiVisible, onUiVisibleChange])
 
   return (
-    <div className={cn("sd-tool-shell", className)}>
-      <div className="sd-tool-viewport">{children}</div>
+    <div className={cn("panel-tool-shell", className)}>
+      <div className="panel-tool-viewport">{children}</div>
 
       <div
-        className="sd-tool-overlay"
-        data-sd-ui-visible={uiVisible ? "true" : "false"}
+        className="panel-tool-overlay"
+        data-panel-ui-visible={uiVisible ? "true" : "false"}
       >
         {topBar ? (
           <div
-            className="sd-tool-topbar"
+            className="panel-tool-topbar"
             style={{
               paddingLeft: leftOpen ? TOOL_PANEL_FULL + 8 : 20,
               paddingRight: rightOpen ? TOOL_PANEL_FULL + 8 : 20,
@@ -82,7 +82,7 @@ export function ToolShell({
           </div>
         ) : null}
 
-        <div className="sd-tool-panels">{leftPanel}{rightPanel}</div>
+        <div className="panel-tool-panels">{leftPanel}{rightPanel}</div>
 
         {showPanelToggles && leftPanel && onLeftOpenChange ? (
           <PanelToggleButton
@@ -124,8 +124,8 @@ export function PanelToggleButton({
     <button
       type="button"
       onClick={onToggle}
-      className="sd-panel-toggle"
-      data-sd-side={side}
+      className="panel-panel-toggle"
+      data-panel-side={side}
       style={{
         [side]: open ? TOOL_PANEL_FULL + 4 : TOOL_PANEL_INSET,
       }}
@@ -148,8 +148,8 @@ export function EyeToggle({ visible, onToggle }: EyeToggleProps) {
     <button
       type="button"
       onClick={onToggle}
-      className="sd-eye-toggle"
-      data-sd-visible={visible ? "true" : "false"}
+      className="panel-eye-toggle"
+      data-panel-visible={visible ? "true" : "false"}
       title={visible ? "Hide UI" : "Show UI"}
       aria-label={visible ? "Hide UI" : "Show UI"}
     >
@@ -161,8 +161,8 @@ export function EyeToggle({ visible, onToggle }: EyeToggleProps) {
 function ChevronIcon({ direction }: { direction: "left" | "right" }) {
   return (
     <svg
-      className="sd-panel-toggle-icon"
-      data-sd-direction={direction}
+      className="panel-panel-toggle-icon"
+      data-panel-direction={direction}
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"

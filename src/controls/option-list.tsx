@@ -26,26 +26,26 @@ export function ControlOptionList({
 }: ControlOptionListProps) {
   if (items.length === 0) {
     return emptyLabel ? (
-      <div className={cn("sd-option-empty", className)}>{emptyLabel}</div>
+      <div className={cn("panel-option-empty", className)}>{emptyLabel}</div>
     ) : null
   }
 
   return (
-    <div className={cn("sd-option-list-wrap", className)}>
-      {title ? <div className="sd-option-list-title">{title}</div> : null}
-      <div className="sd-option-list" role="listbox" aria-label={title ?? "Options"}>
+    <div className={cn("panel-option-list-wrap", className)}>
+      {title ? <div className="panel-option-list-title">{title}</div> : null}
+      <div className="panel-option-list" role="listbox" aria-label={title ?? "Options"}>
         {items.map((item) => (
           <button
             key={item.id}
             type="button"
             role="option"
-            className="sd-option-item"
+            className="panel-option-item"
             disabled={item.disabled}
             onClick={() => onSelect(item.id)}
           >
-            <span className="sd-option-item-label">{item.label}</span>
+            <span className="panel-option-item-label">{item.label}</span>
             {item.description ? (
-              <span className="sd-option-item-desc">{item.description}</span>
+              <span className="panel-option-item-desc">{item.description}</span>
             ) : null}
           </button>
         ))}

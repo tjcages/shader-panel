@@ -1,12 +1,14 @@
 /**
  * localStorage persistence for shader dev panel values.
  *
- * Keyed by `shader-dev:<id>` so each registered shader gets its own slot.
+ * Keyed by `panels:<id>` so each registered shader gets its own slot. Reads
+ * fall back to the legacy `shader-dev:<id>` key so upgrades don't lose state.
  * Values are merged with defaults on load so adding a new field doesn't wipe
  * existing edits.
  */
 
-const PERSIST_PREFIX = "shader-dev:"
+const PERSIST_PREFIX = "panels:"
+const LEGACY_PERSIST_PREFIX = "shader-dev:"
 const SECTIONS_SUFFIX = ":sections"
 
 function storage(): Storage | null {
@@ -16,6 +18,17 @@ function storage(): Storage | null {
   } catch {
     return null
   }
+}
+
+/**
+ * Read a value from the new `panels:` key, falling back to the legacy
+ * `shader-dev:` key so existing users' saved state hydrates after upgrade.
+ * Writes always go to the new key; legacy keys are never deleted.
+ */
+function readWithLegacy(s: Storage, key: string, legacyKey: string): string | null {
+  const current = s.getItem(key)
+  if (current !== null) return current
+  return s.getItem(legacyKey)
 }
 
 /**
@@ -37,7 +50,7 @@ export function loadPersistedShaderDevValues<T extends Record<string, unknown>>(
   const s = storage()
   if (!s) return { ...defaults }
   try {
-    const raw = s.getItem(PERSIST_PREFIX + id)
+    const raw = readWithLegacy(s, PERSIST_PREFIX + id, LEGACY_PERSIST_PREFIX + id)
     if (!raw) return { ...defaults }
     const parsed = JSON.parse(raw) as Partial<T>
     if (!parsed || typeof parsed !== "object") return { ...defaults }
@@ -80,15 +93,20 @@ export function hasPersistedShaderDevValues(id: string): boolean {
   const s = storage()
   if (!s) return false
   try {
-    return s.getItem(PERSIST_PREFIX + id) !== null
+    return readWithLegacy(s, PERSIST_PREFIX + id, LEGACY_PERSIST_PREFIX + id) !== null
   } catch {
     return false
   }
 }
 
-/** localStorage key for section expand/collapse UI state (`shader-dev:<id>:sections`). */
+/** localStorage key for section expand/collapse UI state (`panels:<id>:sections`). */
 function sectionsStorageKey(id: string): string {
   return PERSIST_PREFIX + id + SECTIONS_SUFFIX
+}
+
+/** Legacy section-state key (`shader-dev:<id>:sections`) for read fallback. */
+function legacySectionsStorageKey(id: string): string {
+  return LEGACY_PERSIST_PREFIX + id + SECTIONS_SUFFIX
 }
 
 /**
@@ -100,7 +118,11 @@ export function loadPersistedShaderDevSections(
   const s = storage()
   if (!s) return {}
   try {
-    const raw = s.getItem(sectionsStorageKey(id))
+    const raw = readWithLegacy(
+      s,
+      sectionsStorageKey(id),
+      legacySectionsStorageKey(id),
+    )
     if (!raw) return {}
     const parsed = JSON.parse(raw) as Record<string, unknown>
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
@@ -147,7 +169,13 @@ export function hasPersistedShaderDevSections(id: string): boolean {
   const s = storage()
   if (!s) return false
   try {
-    return s.getItem(sectionsStorageKey(id)) !== null
+    return (
+      readWithLegacy(
+        s,
+        sectionsStorageKey(id),
+        legacySectionsStorageKey(id),
+      ) !== null
+    )
   } catch {
     return false
   }

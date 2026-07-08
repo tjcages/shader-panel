@@ -77,9 +77,9 @@ export function ShaderDevFloatingPanel({
     <ShaderDevThemeProvider value={theme}>
       {showPeek && collapsed ? (
         <div
-          className="sd-edge-sensor"
-          data-sd-side={side}
-          data-sd-inline={inline ? "true" : "false"}
+          className="panel-edge-sensor"
+          data-panel-side={side}
+          data-panel-inline={inline ? "true" : "false"}
           onMouseEnter={() => setHoverSensor(true)}
           onMouseLeave={() => setHoverSensor(false)}
           onClick={open}
@@ -88,22 +88,23 @@ export function ShaderDevFloatingPanel({
       ) : null}
       <div
         data-shader-dev=""
-        data-sd-theme={theme}
-        data-sd-side={side}
-        data-sd-collapsed={collapsed ? "true" : "false"}
-        data-sd-peek={peeking ? "true" : "false"}
-        data-sd-inline={inline ? "true" : "false"}
-        className={cn("sd-floating", className)}
+        data-panel=""
+        data-panel-theme={theme}
+        data-panel-side={side}
+        data-panel-collapsed={collapsed ? "true" : "false"}
+        data-panel-peek={peeking ? "true" : "false"}
+        data-panel-inline={inline ? "true" : "false"}
+        className={cn("panel-floating", className)}
         onMouseEnter={() => setHoverPanel(true)}
         onMouseLeave={() => setHoverPanel(false)}
       >
-        <div className="sd-panel">
-          <div className="sd-panel-header">
-            <div className="sd-panel-title-row">
-              <span className="sd-panel-title">{title}</span>
+        <div className="panel-panel">
+          <div className="panel-panel-header">
+            <div className="panel-panel-title-row">
+              <span className="panel-panel-title">{title}</span>
               {titleSlot}
             </div>
-            <div className="sd-panel-header-end">
+            <div className="panel-panel-header-end">
               {showThemeToggle ? (
                 <ControlThemeToggle storageKey={themeStorageKey} />
               ) : null}
@@ -111,18 +112,18 @@ export function ShaderDevFloatingPanel({
                 type="button"
                 onClick={onToggle}
                 aria-label="Close panel"
-                className="sd-close-btn"
+                className="panel-close-btn"
               >
                 <CloseIcon />
               </button>
             </div>
           </div>
-          <div className="sd-panel-body">{children}</div>
+          <div className="panel-panel-body">{children}</div>
         </div>
         {peeking ? (
           <button
             type="button"
-            className="sd-peek-catch"
+            className="panel-peek-catch"
             onClick={open}
             aria-label="Open panel"
           />

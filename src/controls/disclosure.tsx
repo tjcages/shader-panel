@@ -41,29 +41,29 @@ export function ControlDisclosure({
 
   return (
     <div
-      className={cn("sd-disclosure", className)}
-      data-sd-open={open ? "true" : "false"}
-      data-sd-dimmed={dimmed ? "true" : "false"}
-      data-sd-highlight={highlighted ? "true" : "false"}
+      className={cn("panel-disclosure", className)}
+      data-panel-open={open ? "true" : "false"}
+      data-panel-dimmed={dimmed ? "true" : "false"}
+      data-panel-highlight={highlighted ? "true" : "false"}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
       <button
         type="button"
-        className="sd-disclosure-toggle"
+        className="panel-disclosure-toggle"
         onClick={() => setOpen(!open)}
         aria-expanded={open}
       >
-        <span className="sd-disclosure-label">{title}</span>
+        <span className="panel-disclosure-label">{title}</span>
         <CaretIcon />
       </button>
       <div
-        className="sd-collapse"
-        data-sd-open={open ? "true" : "false"}
+        className="panel-collapse"
+        data-panel-open={open ? "true" : "false"}
         aria-hidden={!open}
       >
-        <div className="sd-collapse-inner">
-          <div className="sd-disclosure-body">{children}</div>
+        <div className="panel-collapse-inner">
+          <div className="panel-disclosure-body">{children}</div>
         </div>
       </div>
     </div>
@@ -73,7 +73,7 @@ export function ControlDisclosure({
 function CaretIcon() {
   return (
     <svg
-      className="sd-disclosure-caret"
+      className="panel-disclosure-caret"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"

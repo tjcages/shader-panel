@@ -120,11 +120,11 @@ export function ShaderDevRoot({
 
   if (!hasAnyRegistration) {
     return anyOpen ? (
-      <div data-shader-dev="" data-sd-theme={theme} className="sd-empty">
+      <div data-shader-dev="" data-panel="" data-panel-theme={theme} className="panel-empty">
         {emptyMessage}
         <button
           type="button"
-          className="sd-empty-close"
+          className="panel-empty-close"
           onClick={() => {
             setSideOpen("left", false)
             setSideOpen("right", false)
@@ -238,7 +238,7 @@ function ShaderSwitcher({
 }) {
   return (
     <select
-      className="sd-switcher"
+      className="panel-switcher"
       value={activeId ?? ""}
       onChange={(e) => onSelect(e.target.value)}
       aria-label="Active shader"

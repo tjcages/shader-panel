@@ -35,19 +35,19 @@ export function ControlColorInput({
   }
 
   return (
-    <div className={cn("sd-color", className)}>
-      <span className="sd-color-label">{label}</span>
-      <div className="sd-color-right">
+    <div className={cn("panel-color", className)}>
+      <span className="panel-color-label">{label}</span>
+      <div className="panel-color-right">
         <input
           type="text"
           value={value.toUpperCase()}
           onChange={(e) => onChange(e.target.value)}
-          className="sd-color-text"
+          className="panel-color-text"
         />
         <button
           type="button"
           onClick={openPicker}
-          className="sd-color-swatch"
+          className="panel-color-swatch"
           style={{ background: value }}
           aria-label={`Pick color for ${label}`}
         />
@@ -56,7 +56,7 @@ export function ControlColorInput({
           type="color"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="sd-color-native"
+          className="panel-color-native"
           tabIndex={-1}
           aria-hidden="true"
         />
