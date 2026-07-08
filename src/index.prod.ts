@@ -40,6 +40,22 @@ export type {
 // Tiny utility — kept as a real impl since it has no UI deps.
 export { isPanelSection } from "./types"
 export type { PanelPrompt } from "./prompts"
+
+// Overlay projector (OFF-138) — types re-exported; the projector no-ops in prod
+// (no panel-driven overlays to position). `register` still returns an
+// unregister fn and `destroy` is a no-op so consumer teardown stays valid.
+export type {
+  OverlayAnchor,
+  OverlayProjector,
+  OverlayProjectorOptions,
+  ProjectedPoint,
+  RendererBinding,
+  Vec3,
+} from "./overlay"
+import type { OverlayProjector } from "./overlay"
+export function createOverlayProjector(): OverlayProjector {
+  return { register: () => () => {}, destroy: () => {} }
+}
 export type {
   PanelRegistration,
   PanelState,

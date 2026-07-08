@@ -24,3 +24,8 @@ export {
   useShaderPanel,
   type UseShaderPanelOptions,
 } from "./use-shader-panel"
+export {
+  PanelOverlay,
+  createR3FBinding,
+  type PanelOverlayProps,
+} from "./overlay"

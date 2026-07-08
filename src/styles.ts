@@ -1788,6 +1788,26 @@ export const PANEL_CSS = `
   transition: transform 300ms ease;
 }
 
+/* ── Canvas overlay projector (OFF-138) ──────────────────────────────────── */
+/* A single layer pinned over the canvas. Click-through by default so it never
+   eats canvas pointer events; individual overlay items opt back in if needed.
+   overflow: visible so items projected near the edges are not clipped. */
+.panel-overlay-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+/* Each projected node. Positioned via transform only (translate → the screen
+   point, then -50%/-50% to center). will-change hints the compositor; no
+   layout-thrashing properties are ever written. */
+.panel-overlay-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+}
+
 .panel-eye-toggle {
   pointer-events: auto;
   position: absolute;

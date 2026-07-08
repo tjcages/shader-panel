@@ -7,7 +7,24 @@
  * is dropped so the ~2 KB of prompt text never reaches the prod bundle.
  */
 
-import { useState } from "react"
+import { useState, type ReactNode } from "react"
+
+// Overlay (OFF-138) — types re-exported from core; the R3F binding no-ops and
+// PanelOverlay renders its children inline (no projection in prod, no three
+// import). Keeps consumer markup valid when the panel compiles out.
+export type { RendererBinding, Vec3 } from "../overlay/types"
+import type { RendererBinding } from "../overlay/types"
+export type PanelOverlayProps = {
+  anchor: unknown
+  visible?: boolean
+  children?: ReactNode
+}
+export function PanelOverlay(props: PanelOverlayProps): ReactNode {
+  return props.children ?? null
+}
+export function createR3FBinding(): RendererBinding {
+  return { project: () => null, onFrame: () => () => {} }
+}
 
 // Functional utilities — kept in prod (no UI deps).
 export {

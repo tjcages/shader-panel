@@ -1,4 +1,13 @@
 export { type PanelPrompt } from "./prompts"
+export { createOverlayProjector } from "./overlay"
+export type {
+  OverlayAnchor,
+  OverlayProjector,
+  OverlayProjectorOptions,
+  ProjectedPoint,
+  RendererBinding,
+  Vec3,
+} from "./overlay"
 export {
   clearPersistedPanelSections,
   clearPersistedPanelValues,
