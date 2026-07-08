@@ -86,6 +86,7 @@ export const SHADER_DEV_CSS = `
 [data-shader-dev] .sd-prompt-pre,
 [data-shader-dev] .sd-paste-textarea,
 [data-shader-dev] .sd-text-input,
+[data-shader-dev] .sd-textarea-input,
 [data-shader-dev] .sd-search-input {
   -webkit-user-select: text;
   user-select: text;
@@ -1802,7 +1803,8 @@ export const SHADER_DEV_CSS = `
   font-size: 13px;
   font-weight: 500;
   color: var(--sd-label);
-  padding: 0 12px;
+  padding: 0;
+  line-height: 1.35;
 }
 .sd-text[data-sd-layout="inline"] .sd-text-label {
   padding: 0;
@@ -1844,6 +1846,28 @@ export const SHADER_DEV_CSS = `
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+[data-shader-dev] .sd-textarea-input {
+  width: 100%;
+  min-height: 72px;
+  resize: vertical;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--sd-surface);
+  color: var(--sd-label);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.45;
+  outline: none;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+[data-shader-dev] .sd-textarea-input:focus {
+  color: var(--sd-label-active);
+  background: var(--sd-surface-active);
+}
+[data-shader-dev] .sd-textarea-input::placeholder {
+  color: var(--sd-muted-icon);
 }
 
 .sd-search {

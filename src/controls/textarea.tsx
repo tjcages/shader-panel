@@ -22,16 +22,14 @@ export function ControlTextarea({
   return (
     <div className={cn("sd-textarea", className)}>
       <span className="sd-textarea-label">{label}</span>
-      <div className="sd-paste">
-        <textarea
-          value={value}
-          placeholder={placeholder}
-          rows={rows}
-          onChange={(event) => onChange(event.target.value)}
-          className="sd-paste-textarea"
-          aria-label={label}
-        />
-      </div>
+      <textarea
+        value={value}
+        placeholder={placeholder}
+        rows={rows}
+        onChange={(event) => onChange(event.target.value)}
+        className="sd-textarea-input"
+        aria-label={label}
+      />
     </div>
   )
 }
