@@ -1381,70 +1381,87 @@ export const PANEL_CSS = `
 
 .panel-select {
   display: flex;
-  min-height: 36px;
-  width: calc(100% + 16px);
-  margin: 0 -8px;
+  width: 100%;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  border-radius: 8px;
-  padding: 0 8px;
   background: transparent;
+}
+.panel-select[data-panel-layout="inline"] {
+  min-height: 36px;
+  height: 36px;
+  border-radius: 8px;
+  padding: 0 12px;
+  background: var(--panel-surface);
   transition: background-color 150ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 [data-panel] .panel-select[data-panel-layout="inline"]:hover {
-  background: var(--panel-toggle-hover);
+  background: var(--panel-surface-active);
 }
 .panel-select[data-panel-layout="stacked"] {
   flex-direction: column;
   align-items: stretch;
   gap: 6px;
-  padding: 8px;
+  min-height: 0;
+  height: auto;
+  padding: 0;
+  background: transparent;
 }
 .panel-select-label {
   font-size: 13px;
   font-weight: 500;
   color: var(--panel-label);
   min-width: 0;
+  line-height: 1.35;
 }
 .panel-select[data-panel-layout="stacked"] .panel-select-label {
   white-space: normal;
-  line-height: 1.35;
 }
 .panel-select[data-panel-layout="inline"] .panel-select-label {
   flex: 1 1 auto;
   white-space: normal;
-  line-height: 1.35;
 }
 [data-panel] .panel-select-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   min-width: 0;
-  max-width: 168px;
   flex-shrink: 0;
   border: 0;
   outline: 0;
-  background: var(--panel-bg);
+  background: var(--panel-surface);
   color: var(--panel-label);
   font-family: inherit;
   font-variant-numeric: tabular-nums;
-  font-size: 11.5px;
+  font-size: 13px;
   font-weight: 500;
-  line-height: 1;
+  line-height: 1.2;
   cursor: pointer;
-  padding: 6px 8px;
-  border-radius: 6px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
   transition: color 150ms cubic-bezier(0.22, 1, 0.36, 1),
     background-color 150ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .panel-select[data-panel-layout="stacked"] .panel-select-btn {
   align-self: stretch;
+  width: 100%;
   max-width: none;
   justify-content: space-between;
 }
 .panel-select[data-panel-layout="inline"] .panel-select-btn {
   align-self: center;
+  flex: 1 1 auto;
+  max-width: none;
+  height: 100%;
+  justify-content: flex-end;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+}
+.panel-select[data-panel-layout="inline"] .panel-select-btn:hover,
+.panel-select[data-panel-layout="inline"] .panel-select-btn:focus-visible {
+  background: transparent;
 }
 /* Selected value stays on a single line — truncate rather than wrap. */
 .panel-select-value {
@@ -1459,13 +1476,17 @@ export const PANEL_CSS = `
 }
 [data-panel] .panel-select-btn:focus-visible {
   color: var(--panel-label-active);
+  background: var(--panel-surface-active);
   outline: 2px solid var(--panel-handle);
   outline-offset: 1px;
 }
-[data-panel] .panel-select-btn:active { transform: scale(0.98); }
+[data-panel] .panel-select-btn:active { transform: none; }
+.panel-select[data-panel-layout="stacked"] .panel-select-btn:active {
+  transform: none;
+}
 .panel-select-chevron {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   opacity: 0.6;
   flex-shrink: 0;
 }
@@ -1528,26 +1549,28 @@ export const PANEL_CSS = `
   color: var(--panel-label);
   font-family: inherit;
   font-variant-numeric: tabular-nums;
-  font-size: 11.5px;
+  font-size: 13px;
   font-weight: 500;
+  line-height: 1.2;
   text-align: left;
   white-space: nowrap;
-  padding: 7px 10px;
-  border-radius: 6px;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
   cursor: pointer;
   transition: background-color 120ms cubic-bezier(0.22, 1, 0.36, 1),
     color 120ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 [data-panel] .panel-select-option[data-panel-active="true"] {
-  background: var(--panel-surface);
+  background: var(--panel-surface-active);
   color: var(--panel-label-active);
 }
 [data-panel] .panel-select-option[aria-selected="true"] {
   color: var(--panel-text);
 }
 .panel-select-check {
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
   flex-shrink: 0;
   opacity: 0.9;
 }
