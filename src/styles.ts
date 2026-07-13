@@ -1435,11 +1435,13 @@ export const PANEL_CSS = `
   font-variant-numeric: tabular-nums;
   font-size: 13px;
   font-weight: 500;
-  line-height: 1.2;
+  line-height: normal;
   cursor: pointer;
   height: 36px;
+  min-height: 36px;
   padding: 0 12px;
   border-radius: 8px;
+  overflow: visible;
   transition: color 150ms cubic-bezier(0.22, 1, 0.36, 1),
     background-color 150ms cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -1463,12 +1465,14 @@ export const PANEL_CSS = `
 .panel-select[data-panel-layout="inline"] .panel-select-btn:focus-visible {
   background: transparent;
 }
-/* Selected value stays on a single line — truncate rather than wrap. */
+/* Ellipsis horizontally only — vertical overflow clips descenders in custom fonts. */
 .panel-select-value {
   min-width: 0;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: visible;
   white-space: nowrap;
   text-overflow: ellipsis;
+  line-height: 1.35;
 }
 [data-panel] .panel-select-btn:hover {
   color: var(--panel-label-active);
